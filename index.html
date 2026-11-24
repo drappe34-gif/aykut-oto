@@ -471,6 +471,20 @@
           <div id="adminRecordsList" class="space-y-3 max-h-96 overflow-y-auto"></div>
         </div>
 
+        <!-- Şoför Telefonundan Yüklenen Seferler & Fotoğraflar Vitrini -->
+        <div id="adminDriverUploadsSection" class="rounded-2xl bg-surface-950 border border-cyan-500/30 p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-cyan-400">Canlı Saha Kayıtları</span>
+              <h4 class="text-base font-extrabold text-white">Şoför Telefonundan Yüklenen Seferler & Fotoğraflar</h4>
+            </div>
+            <button id="refreshDriverUploadsBtn" type="button" class="px-3.5 py-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-bold cursor-pointer">
+              Şimdi Yenile / Buluttan Çek
+            </button>
+          </div>
+          <div id="adminDriverUploadsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
         <!-- 2. SEKME: Aylık & Yıllık Gelir - Gider -->
         <div id="adminPanelFinance" class="hidden space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -949,669 +963,129 @@
         const merged = Array.from(map.values()).sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
         saveRecordsLocal(merged);
         renderAdminRecords();
+        renderAdminDriverUploads();
         renderFinanceSummary();
       };
-
-      // ==================== ŞOFÖR & ADMİN HESAPLARI ====================
-      function getDriverAccounts() {
-        try {
-          const parsed = JSON.parse(localStorage.getItem(DRIVERS_KEY) || "[]");
-          return Array.isArray(parsed) ? parsed : [];
-        } catch (e) {
-          return [];
-        }
-      }
-
-      function saveDriverAccounts(list) {
-        localStorage.setItem(DRIVERS_KEY, JSON.stringify(list));
-        updatePendingDriversBadge();
-        if (typeof window.__aykutSyncRtdbNode === "function") {
-          list.forEach(acc => {
-            window.__aykutSyncRtdbNode("driverAccounts", acc.id || acc.gmail, acc).catch(() => {});
-          });
-        }
-      }
-
-      function getAdminAccounts() {
-        try {
-          const parsed = JSON.parse(localStorage.getItem(ADMINS_KEY) || "null");
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        } catch (e) {}
-        localStorage.setItem(ADMINS_KEY, JSON.stringify(DEFAULT_ADMINS));
-        return [...DEFAULT_ADMINS];
-      }
-
-      function saveAdminAccounts(list) {
-        localStorage.setItem(ADMINS_KEY, JSON.stringify(list));
-        if (typeof window.__aykutSyncRtdbNode === "function") {
-          list.forEach(adm => {
-            window.__aykutSyncRtdbNode("adminAccounts", adm.id || adm.username, adm).catch(() => {});
-          });
-        }
-      }
-
-      // Firebase Realtime Database'den gelen şoför kayıtlarını yerel listeyle birleştir
-      window.__aykutMergeRemoteDrivers = function(remoteList) {
-        const localList = getDriverAccounts();
-        const mergedMap = new Map();
-
-        localList.forEach(item => {
-          const key = String(item.gmail || item.id || "").trim().toLowerCase();
-          if (key) mergedMap.set(key, item);
-        });
-
-        remoteList.forEach(remote => {
-          const key = String(remote.gmail || remote.id || "").trim().toLowerCase();
-          if (!key) return;
-          const existing = mergedMap.get(key);
-          const remoteTs = Number(remote.updatedAt || 0);
-          const localTs = Number(existing?.updatedAt || 0);
-
-          // Yerel kayıt onaylıysa ve buluttaki kayıt daha eskiyse veya onaylı değilse yerel onaylı durumu koru
-          if (existing && existing.status === "approved" && remote.status !== "approved" && localTs >= remoteTs) {
-            return;
-          }
-
-          if (!existing || remoteTs >= localTs) {
-            mergedMap.set(key, {
-              ...existing,
-              ...remote,
-              gmail: key,
-              id: existing?.id || remote.id || `drv_${key.replace(/[^a-z0-9]/g, "_")}`,
-              status: (existing && existing.status === "approved" && localTs > remoteTs)
-                ? "approved"
-                : (remote.status || existing?.status || "pending")
-            });
-          }
-        });
-
-        const merged = Array.from(mergedMap.values());
-        localStorage.setItem(DRIVERS_KEY, JSON.stringify(merged));
-        updatePendingDriversBadge();
-        if (typeof renderDriverAccounts === "function") {
-          renderDriverAccounts();
-        }
-      };
-
-      // Firebase Realtime Database'den gelen admin hesaplarını yerel listeyle birleştir
-      window.__aykutMergeRemoteAdmins = function(remoteList) {
-        const localList = getAdminAccounts();
-        const mergedMap = new Map();
-
-        localList.forEach(adm => {
-          const key = (adm.username || adm.id || "").toLowerCase();
-          if (key) mergedMap.set(key, adm);
-        });
-
-        remoteList.forEach(remote => {
-          const key = (remote.username || remote.id || "").toLowerCase();
-          if (!key) return;
-          const existing = mergedMap.get(key);
-          const remoteTs = Number(remote.updatedAt || 0);
-          const localTs = Number(existing?.updatedAt || 0);
-          if (!existing || remoteTs >= localTs) {
-            mergedMap.set(key, {
-              ...existing,
-              ...remote,
-              id: existing?.id || remote.id || `adm_${key.replace(/[^a-z0-9]/g, "_")}`
-            });
-          }
-        });
-
-        const merged = Array.from(mergedMap.values());
-        localStorage.setItem(ADMINS_KEY, JSON.stringify(merged));
-        if (typeof renderAdminAccounts === "function") {
-          renderAdminAccounts();
-        }
-      };
-
-      function updatePendingDriversBadge() {
-        const badge = document.getElementById("pendingDriversBadge");
-        if (!badge) return;
-        const pendingCount = getDriverAccounts().filter(d => d.status === "pending").length;
-        badge.textContent = String(pendingCount);
-      }
-
-      window.setDriverStatus = function(accountId, nextStatus) {
-        const nowTs = Date.now();
-        const list = getDriverAccounts();
-        const updated = list.map(acc => {
-          if (acc.id !== accountId) return acc;
-          const nextAcc = {
-            ...acc,
-            gmail: String(acc.gmail || "").trim().toLowerCase(),
-            status: nextStatus,
-            updatedAt: nowTs
-          };
-          if (typeof window.__aykutSyncRtdbNode === "function") {
-            window.__aykutSyncRtdbNode("driverAccounts", nextAcc.id || nextAcc.gmail, nextAcc).catch(() => {});
-          }
-          return nextAcc;
-        });
-        localStorage.setItem(DRIVERS_KEY, JSON.stringify(updated));
-        updatePendingDriversBadge();
-        renderDriverAccounts();
-        showToast(nextStatus === "approved" ? "Şoför hesabı onaylandı ve girişe açıldı." : "Şoför hesabı beklemeye / askıya alındı.");
-      };
-
-      // Kayıtlı şoför bilgilerini (Ad, Gmail, Şifre, Durum) doğrudan düzenle
-      window.editDriverAccount = function(accountId) {
-        const list = getDriverAccounts();
-        const target = list.find(a => a.id === accountId);
-        if (!target) return;
-
-        const nextName = (window.prompt("Şoför Adı Soyadı:", target.fullName || "") || "").trim();
-        if (!nextName) return;
-
-        const nextGmail = (window.prompt("Şoför Gmail Adresi:", target.gmail || "") || "").trim().toLowerCase();
-        if (!nextGmail.endsWith("@gmail.com")) {
-          showToast("Geçerli bir @gmail.com adresi girin.");
-          return;
-        }
-
-        const nextPassword = (window.prompt("Şoför Şifresi (en az 4 karakter):", target.password || "") || "").trim();
-        if (nextPassword.length < 4) {
-          showToast("Şifre en az 4 karakter olmalıdır.");
-          return;
-        }
-
-        const statusInput = (window.prompt("Durum yazın (approved: Onaylı, pending: Beklemede, rejected: Reddedildi):", target.status || "approved") || "approved").trim().toLowerCase();
-        const validStatus = ["approved", "pending", "rejected"].includes(statusInput) ? statusInput : target.status;
-
-        const updated = list.map(acc => {
-          if (acc.id !== accountId) return acc;
-          const nextAcc = {
-            ...acc,
-            fullName: nextName,
-            gmail: nextGmail,
-            password: nextPassword,
-            status: validStatus,
-            updatedAt: Date.now()
-          };
-          if (typeof window.__aykutSyncRtdbNode === "function") {
-            window.__aykutSyncRtdbNode("driverAccounts", nextAcc.id || nextAcc.gmail, nextAcc).catch(() => {});
-          }
-          return nextAcc;
-        });
-
-        saveDriverAccounts(updated);
-        renderDriverAccounts();
-        showToast("Şoför bilgileri güncellendi.");
-      };
-
-      // Admin hesabını (Ad, Kullanıcı Adı, Şifre) doğrudan düzenle
-      window.editAdminAccount = function(adminId) {
-        const current = getAdminAccounts();
-        const target = current.find(a => a.id === adminId);
-        if (!target) return;
-
-        const nextDisplayName = (window.prompt("Admin Görünen Adı:", target.displayName || target.username || "") || "").trim();
-        if (!nextDisplayName) return;
-
-        const nextUsername = (window.prompt("Admin Kullanıcı Adı:", target.username || "") || "").trim().toLowerCase();
-        if (!nextUsername) {
-          showToast("Kullanıcı adı boş olamaz.");
-          return;
-        }
-
-        const duplicate = current.some(a => a.id !== adminId && a.username.toLowerCase() === nextUsername);
-        if (duplicate) {
-          showToast("Bu kullanıcı adı zaten başka bir adminde kullanılıyor.");
-          return;
-        }
-
-        const nextPassword = (window.prompt("Admin Şifresi (en az 4 karakter):", target.password || "") || "").trim();
-        if (nextPassword.length < 4) {
-          showToast("Admin şifresi en az 4 karakter olmalıdır.");
-          return;
-        }
-
-        const updated = current.map(adm => {
-          if (adm.id !== adminId) return adm;
-          const nextAdm = {
-            ...adm,
-            displayName: nextDisplayName,
-            username: nextUsername,
-            password: nextPassword,
-            updatedAt: Date.now()
-          };
-          if (typeof window.__aykutSyncRtdbNode === "function") {
-            window.__aykutSyncRtdbNode("adminAccounts", nextAdm.id || nextAdm.username, nextAdm).catch(() => {});
-          }
-          return nextAdm;
-        });
-
-        saveAdminAccounts(updated);
-        renderAdminAccounts();
-        showToast("Admin hesabı güncellendi.");
-      };
-
-      window.deleteDriverAccount = function(accountId) {
-        const filtered = getDriverAccounts().filter(a => a.id !== accountId);
-        saveDriverAccounts(filtered);
-        if (typeof window.__aykutSyncRtdbNode === "function") {
-          window.__aykutSyncRtdbNode("driverAccounts", accountId, null).catch(() => {});
-        }
-        renderDriverAccounts();
-        showToast("Kayıtlı şoför hesabı silindi.");
-      };
-
-      window.deleteAdminAccount = function(adminId) {
-        const current = getAdminAccounts();
-        if (current.length <= 1) {
-          showToast("En az bir yönetici hesabı kalmalıdır.");
-          return;
-        }
-        const filtered = current.filter(a => a.id !== adminId);
-        saveAdminAccounts(filtered);
-        if (typeof window.__aykutSyncRtdbNode === "function") {
-          window.__aykutSyncRtdbNode("adminAccounts", adminId, null).catch(() => {});
-        }
-        renderAdminAccounts();
-        showToast("Admin hesabı silindi.");
-      };
-
-      function renderDriverAccounts() {
-        const container = document.getElementById("driverAccountsList");
-        if (!container) return;
-        const list = getDriverAccounts();
+// ... existing code ... -->
+      function renderAdminRecords() {
+        const box = document.getElementById("adminRecordsList");
+        if (!box) return;
+        const list = getRecords();
         if (list.length === 0) {
-          container.innerHTML = `<div class="rounded-2xl bg-surface-950 border border-slate-800 p-4 text-xs text-slate-400">Henüz Gmail ile kayıt olan şoför bulunmuyor.</div>`;
+          box.innerHTML = `<p class="text-xs text-slate-400">Kayıt bulunamadı.</p>`;
           return;
         }
 
-        container.innerHTML = list.map(acc => {
-          const statusBadge = acc.status === "approved"
-            ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Onaylı</span>`
-            : acc.status === "rejected"
-              ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">Reddedildi</span>`
-              : `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Beklemede</span>`;
+        box.innerHTML = list.map(r => {
+          const isTow = r.source === "tow" || Boolean(r.pickupLocation || r.dropoffLocation || r.photoData);
+          const routeLine = (r.pickupLocation || r.dropoffLocation)
+            ? `<p class="text-xs text-cyan-300 font-semibold mt-1">Konum: ${r.pickupLocation || "-"} → ${r.dropoffLocation || "-"}</p>`
+            : "";
+          const driverLine = r.driver
+            ? `<p class="text-[11px] text-slate-400">Şoför: <span class="text-slate-200 font-semibold">${r.driver}</span></p>`
+            : "";
+          const photoBlock = r.photoData
+            ? `
+              <div class="flex items-center gap-3 mt-2">
+                <button type="button" onclick="window.openTowPhotoModal('${r.id}')" class="group relative rounded-xl overflow-hidden border border-slate-700 hover:border-amber-400 transition cursor-pointer shrink-0">
+                  <img src="${r.photoData}" alt="${r.plate} sefer fotoğrafı" class="w-24 h-16 object-cover group-hover:scale-105 transition" />
+                  <span class="block text-[10px] font-bold bg-slate-950/90 text-amber-300 px-2 py-0.5 text-center">Resmi Büyüt</span>
+                </button>
+                <span class="text-[11px] text-emerald-300 font-semibold">Sefer fotoğrafı eklendi</span>
+              </div>
+            `
+            : "";
 
           return `
-            <div class="rounded-2xl bg-surface-950 border border-slate-800 p-4 flex flex-wrap items-center justify-between gap-3">
-              <div class="space-y-0.5">
-                <div class="flex items-center gap-2">
-                  <span class="text-sm font-bold text-white">${acc.fullName || "Şoför"}</span>
-                  ${statusBadge}
+            <div class="rounded-2xl bg-surface-950 border border-slate-800 p-4 flex flex-wrap items-start justify-between gap-3">
+              <div class="space-y-0.5 min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-sm font-extrabold text-amber-300">${r.plate}</span>
+                  <span class="text-xs font-semibold text-white">• ${r.serviceName}</span>
+                  ${isTow ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">Çekici Seferi</span>` : ""}
+                  <span class="text-xs font-bold text-emerald-300">(${formatCurrency(r.fee)})</span>
                 </div>
-                <p class="text-xs text-cyan-300">${acc.gmail}</p>
-                <p class="text-[11px] text-slate-400">Şifre: <span class="text-slate-200 font-semibold">${acc.password || "-"}</span> • Kayıt: ${acc.createdAt || "-"}</p>
+                <p class="text-xs text-slate-400">${[r.brand, r.model, r.year].filter(Boolean).join(" ")} • ${r.date || "-"}</p>
+                ${routeLine}
+                ${driverLine}
+                ${r.notes ? `<p class="text-xs text-slate-300 mt-1">${r.notes}</p>` : ""}
+                ${photoBlock}
               </div>
-              <div class="flex flex-wrap items-center gap-2">
-                <button type="button" onclick="window.setDriverStatus('${acc.id}', 'approved')" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold cursor-pointer">
-                  Onayla
-                </button>
-                <button type="button" onclick="window.editDriverAccount('${acc.id}')" class="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 text-xs font-bold cursor-pointer">
-                  Düzenle
-                </button>
-                <button type="button" onclick="window.setDriverStatus('${acc.id}', 'rejected')" class="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold cursor-pointer">
-                  Beklemeye / Reddet
-                </button>
-                <button type="button" onclick="window.deleteDriverAccount('${acc.id}')" class="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-bold cursor-pointer">
-                  Sil
-                </button>
-              </div>
+              <button type="button" onclick="window.deleteServiceRecord('${r.id}')" class="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-bold cursor-pointer">
+                Sil
+              </button>
             </div>
           `;
         }).join("");
       }
 
-      function renderAdminAccounts() {
-        const container = document.getElementById("adminAccountsList");
-        if (!container) return;
-        const admins = getAdminAccounts();
-
-        container.innerHTML = admins.map(adm => `
-          <div class="rounded-2xl bg-surface-950 border border-slate-800 p-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p class="text-sm font-bold text-white">${adm.displayName || adm.username}</p>
-              <p class="text-xs text-amber-300">Kullanıcı Adı: <span class="font-bold">${adm.username}</span> • Şifre: <span class="text-slate-200 font-semibold">${adm.password}</span></p>
-            </div>
-            <div class="flex items-center gap-2">
-              <button type="button" onclick="window.editAdminAccount('${adm.id}')" class="px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 text-xs font-bold cursor-pointer">
-                Düzenle
-              </button>
-              <button type="button" onclick="window.deleteAdminAccount('${adm.id}')" class="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-bold cursor-pointer">
-                Sil
-              </button>
-            </div>
-          </div>
-        `).join("");
-      }
-
-      // ==================== KADEMELİ MARKA -> MODEL -> YIL KURUCU ====================
-      function setupCascadingVehicleSelect(brandId, modelWrapperId, modelSelectId, customModelInputId, yearWrapperId, yearSelectId) {
-        const brandEl = document.getElementById(brandId);
-        const modelWrap = document.getElementById(modelWrapperId);
-        const modelEl = document.getElementById(modelSelectId);
-        const customModelEl = document.getElementById(customModelInputId);
-        const yearWrap = document.getElementById(yearWrapperId);
-        const yearEl = document.getElementById(yearSelectId);
-
-        if (!brandEl || !modelEl || !yearEl) return;
-
-        brandEl.innerHTML = `<option value="">Marka Seçin...</option>` + Object.keys(VEHICLE_CATALOG)
-          .sort((a, b) => a.localeCompare(b, "tr"))
-          .map(b => `<option value="${b}">${b}</option>`)
-          .join("");
-
-        const currentYear = new Date().getFullYear();
-        const years = [];
-        for (let y = currentYear + 1; y >= 1990; y--) {
-          years.push(String(y));
-        }
-        yearEl.innerHTML = `<option value="">Yıl Seçin...</option>` + years
-          .map(y => `<option value="${y}">${y}</option>`)
-          .join("");
-
-        brandEl.addEventListener("change", () => {
-          const selectedBrand = brandEl.value;
-          modelEl.value = "";
-          yearEl.value = "";
-          if (customModelEl) {
-            customModelEl.value = "";
-            customModelEl.classList.add("hidden");
-          }
-          if (yearWrap) yearWrap.classList.add("hidden");
-
-          if (!selectedBrand) {
-            if (modelWrap) modelWrap.classList.add("hidden");
-            return;
-          }
-
-          const models = VEHICLE_CATALOG[selectedBrand] || [];
-          modelEl.innerHTML = `<option value="">Model Seçin...</option>` +
-            models.map(m => `<option value="${m}">${m}</option>`).join("") +
-            `<option value="__OTHER__">Diğer / Elle Yaz</option>`;
-          if (modelWrap) modelWrap.classList.remove("hidden");
-        });
-
-        modelEl.addEventListener("change", () => {
-          const val = modelEl.value;
-          if (!val) {
-            if (yearWrap) yearWrap.classList.add("hidden");
-            if (customModelEl) customModelEl.classList.add("hidden");
-            return;
-          }
-          if (val === "__OTHER__") {
-            if (customModelEl) {
-              customModelEl.classList.remove("hidden");
-              customModelEl.focus();
-            }
-          } else if (customModelEl) {
-            customModelEl.classList.add("hidden");
-          }
-          if (yearWrap) yearWrap.classList.remove("hidden");
-        });
-      }
-
-      function resolveVehicleSelection(brandId, modelSelectId, customModelInputId, yearSelectId) {
-        const brand = (document.getElementById(brandId)?.value || "").trim();
-        const modelSel = (document.getElementById(modelSelectId)?.value || "").trim();
-        const customModel = (document.getElementById(customModelInputId)?.value || "").trim();
-        const model = modelSel === "__OTHER__" ? customModel : modelSel;
-        const year = (document.getElementById(yearSelectId)?.value || "").trim();
-        return { brand, model, year };
-      }
-
-      // ==================== PLAKA SORGULAMA ====================
-      document.getElementById("plateLookupForm")?.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const raw = document.getElementById("lookupPlateInput")?.value || "";
-        const norm = normalizePlate(raw);
-        const resultBox = document.getElementById("plateLookupResult");
-        if (!norm || !resultBox) return;
-
-        const matches = getRecords().filter(r => normalizePlate(r.plate) === norm);
-        if (matches.length === 0) {
-          resultBox.innerHTML = `<p class="text-xs text-amber-300 font-semibold">${raw.toUpperCase()} plakasına ait kayıt bulunamadı.</p>`;
-          return;
-        }
-
-        resultBox.innerHTML = matches.map(m => `
-          <div class="rounded-xl bg-surface-900 border border-slate-800 p-3 space-y-1">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-xs font-extrabold text-amber-300">${m.plate} • ${m.serviceName}</span>
-              <span class="text-xs font-bold text-emerald-300">${formatCurrency(m.fee)}</span>
-            </div>
-            <p class="text-[11px] text-slate-300">${[m.brand, m.model, m.year].filter(Boolean).join(" ")} • ${m.date || "-"}</p>
-            ${m.notes ? `<p class="text-[11px] text-slate-400">${m.notes}</p>` : ""}
-          </div>
-        `).join("");
-      });
-
-      // ==================== MÜŞTERİ ÖN KAYIT FORMU ====================
-      document.getElementById("customerBookingForm")?.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const owner = (document.getElementById("bookingOwnerName")?.value || "").trim();
-        const phone = (document.getElementById("bookingPhone")?.value || "").trim();
-        const plate = normalizePlate(document.getElementById("bookingPlate")?.value || "");
-        const serviceType = document.getElementById("bookingServiceType")?.value || "Periyodik Bakım";
-        const notes = (document.getElementById("bookingNotes")?.value || "").trim();
-        const veh = resolveVehicleSelection("bookingBrandSelect", "bookingModelSelect", "bookingCustomModelInput", "bookingYearSelect");
-
-        if (!plate) {
-          showToast("Lütfen geçerli bir plaka girin.");
-          return;
-        }
-
-        addRecord({
-          plate,
-          brand: veh.brand,
-          model: veh.model,
-          year: veh.year,
-          serviceName: `Ön Kayıt: ${serviceType}`,
-          fee: 0,
-          notes: `Müşteri: ${owner} (${phone})${notes ? " • Not: " + notes : ""}`,
-          source: "booking"
-        });
-
-        e.target.reset();
-        document.getElementById("bookingModelWrapper")?.classList.add("hidden");
-        document.getElementById("bookingYearWrapper")?.classList.add("hidden");
-        showToast("Ön kaydınız oluşturuldu ve servis listesine eklendi.");
-      });
-
-      // ==================== ŞOFÖR PANELİ (GMAIL KAYIT + GİRİŞ + SEFER) ====================
-      const driverModal = document.getElementById("driverPortalModal");
-      const driverAuthSection = document.getElementById("driverAuthSection");
-      const driverActiveWorkspace = document.getElementById("driverActiveWorkspace");
-
-      function syncDriverPortalView() {
-        const activeDriver = sessionStorage.getItem(ACTIVE_DRIVER_KEY);
-        if (activeDriver) {
-          driverAuthSection?.classList.add("hidden");
-          driverActiveWorkspace?.classList.remove("hidden");
-          const label = document.getElementById("activeDriverLabel");
-          if (label) label.textContent = activeDriver;
-          renderDriverRecentTrips();
-        } else {
-          driverAuthSection?.classList.remove("hidden");
-          driverActiveWorkspace?.classList.add("hidden");
-        }
-      }
-
-      document.getElementById("openDriverPortalBtn")?.addEventListener("click", () => {
-        if (typeof window.__aykutPullRtdbAccounts === "function") {
-          window.__aykutPullRtdbAccounts();
-        }
-        syncDriverPortalView();
-        driverModal?.classList.remove("hidden");
-      });
-
-      document.getElementById("closeDriverPortalBtn")?.addEventListener("click", () => {
-        driverModal?.classList.add("hidden");
-      });
-
-      document.getElementById("driverTabLoginBtn")?.addEventListener("click", () => {
-        document.getElementById("driverTabLoginBtn")?.classList.add("bg-cyan-500", "text-slate-950");
-        document.getElementById("driverTabLoginBtn")?.classList.remove("text-slate-300");
-        document.getElementById("driverTabRegisterBtn")?.classList.remove("bg-emerald-500", "text-slate-950");
-        document.getElementById("driverTabRegisterBtn")?.classList.add("text-slate-300");
-        document.getElementById("driverLoginForm")?.classList.remove("hidden");
-        document.getElementById("driverRegisterForm")?.classList.add("hidden");
-      });
-
-      document.getElementById("driverTabRegisterBtn")?.addEventListener("click", () => {
-        document.getElementById("driverTabRegisterBtn")?.classList.add("bg-emerald-500", "text-slate-950");
-        document.getElementById("driverTabRegisterBtn")?.classList.remove("text-slate-300");
-        document.getElementById("driverTabLoginBtn")?.classList.remove("bg-cyan-500", "text-slate-950");
-        document.getElementById("driverTabLoginBtn")?.classList.add("text-slate-300");
-        document.getElementById("driverRegisterForm")?.classList.remove("hidden");
-        document.getElementById("driverLoginForm")?.classList.add("hidden");
-      });
-
-      document.getElementById("driverRegisterForm")?.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const fullName = (document.getElementById("driverRegName")?.value || "").trim();
-        const gmail = (document.getElementById("driverRegGmail")?.value || "").trim().toLowerCase();
-        const password = (document.getElementById("driverRegPassword")?.value || "").trim();
-
-        if (!gmail.endsWith("@gmail.com")) {
-          showToast("Lütfen geçerli bir @gmail.com hesabı girin.");
-          return;
-        }
-        if (password.length < 4) {
-          showToast("Şifre en az 4 karakter olmalıdır.");
-          return;
-        }
-
-        const existing = getDriverAccounts();
-        if (existing.some(d => d.gmail.toLowerCase() === gmail)) {
-          showToast("Bu Gmail adresi ile zaten kayıt yapılmış.");
-          return;
-        }
-
-        const newAccount = {
-          id: `drv_${Date.now()}`,
-          fullName,
-          gmail,
-          password,
-          status: "pending",
-          createdAt: new Date().toLocaleDateString("tr-TR"),
-          updatedAt: Date.now()
-        };
-
-        saveDriverAccounts([newAccount, ...existing]);
-        renderDriverAccounts();
-        e.target.reset();
-        showToast("Kaydınız alındı. Yönetici onayından sonra giriş yapabilirsiniz.");
-      });
-
-      document.getElementById("driverLoginForm")?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = (document.getElementById("driverLoginEmail")?.value || "").trim().toLowerCase();
-        const password = (document.getElementById("driverLoginPassword")?.value || "").trim();
-
-        let found = getDriverAccounts().find(
-          d => String(d.gmail || "").trim().toLowerCase() === email && String(d.password || "").trim() === password
+      // Şoför telefonundan yüklenen seferleri ve fotoğrafları ayrı kartlarda göster
+      function renderAdminDriverUploads() {
+        const box = document.getElementById("adminDriverUploadsList");
+        if (!box) return;
+        const driverUploads = getRecords().filter(
+          r => r.source === "tow" || Boolean(r.photoData) || Boolean(r.pickupLocation) || Boolean(r.dropoffLocation)
         );
 
-        // Yerelde onaylı bulunamazsa buluttan çekip tekrar kontrol et
-        if ((!found || found.status !== "approved") && typeof window.__aykutPullRtdbAccounts === "function") {
-          await window.__aykutPullRtdbAccounts();
-          found = getDriverAccounts().find(
-            d => String(d.gmail || "").trim().toLowerCase() === email && String(d.password || "").trim() === password
-          );
-        }
-
-        if (!found) {
-          showToast("Gmail veya şifre hatalı.");
-          return;
-        }
-        if (found.status !== "approved") {
-          showToast("Hesabınız henüz yönetici tarafından onaylanmamış (Beklemede).");
-          return;
-        }
-
-        sessionStorage.setItem(ACTIVE_DRIVER_KEY, `${found.fullName} (${found.gmail})`);
-        syncDriverPortalView();
-        showToast("Şoför paneline giriş yapıldı.");
-      });
-
-      document.getElementById("driverLogoutBtn")?.addEventListener("click", () => {
-        sessionStorage.removeItem(ACTIVE_DRIVER_KEY);
-        syncDriverPortalView();
-      });
-
-      let currentTowPhotoData = "";
-      document.getElementById("towPhotoInput")?.addEventListener("change", async (e) => {
-        const file = e.target.files?.[0];
-        const preview = document.getElementById("towPhotoPreview");
-        if (!file) {
-          currentTowPhotoData = "";
-          preview?.classList.add("hidden");
-          return;
-        }
-        currentTowPhotoData = await compressImageFile(file, 900, 0.72);
-        if (preview && currentTowPhotoData) {
-          preview.src = currentTowPhotoData;
-          preview.classList.remove("hidden");
-        }
-      });
-
-      document.getElementById("towTripForm")?.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const plate = normalizePlate(document.getElementById("towPlateInput")?.value || "");
-        const fee = Number(document.getElementById("towFeeInput")?.value || 0);
-        const pickup = (document.getElementById("towPickupLocation")?.value || "").trim();
-        const dropoff = (document.getElementById("towDropoffLocation")?.value || "").trim();
-        const driverLabel = sessionStorage.getItem(ACTIVE_DRIVER_KEY) || "Çekici Şoför";
-
-        if (!plate) {
-          showToast("Lütfen çekilen aracın plakasını girin.");
-          return;
-        }
-
-        addRecord({
-          plate,
-          serviceName: "Çekici Seferi",
-          fee,
-          pickupLocation: pickup,
-          dropoffLocation: dropoff,
-          photoData: currentTowPhotoData || "",
-          driver: driverLabel,
-          notes: `Alındı: ${pickup} → Bırakıldı: ${dropoff} (${driverLabel})`,
-          source: "tow"
-        });
-
-        e.target.reset();
-        currentTowPhotoData = "";
-        document.getElementById("towPhotoPreview")?.classList.add("hidden");
-        renderDriverRecentTrips();
-        showToast("Çekici seferi kaydedildi ve gelire eklendi.");
-      });
-
-      function renderDriverRecentTrips() {
-        const box = document.getElementById("driverRecentTripsList");
-        if (!box) return;
-        const trips = getRecords().filter(r => r.source === "tow").slice(0, 10);
-        if (trips.length === 0) {
-          box.innerHTML = `<p class="text-xs text-slate-400">Henüz kayıtlı çekici seferi yok.</p>`;
-          return;
-        }
-        box.innerHTML = trips.map(t => `
-          <div class="rounded-xl bg-surface-950 border border-slate-800 p-3 flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p class="text-xs font-extrabold text-cyan-300">${t.plate} • ${t.date}</p>
-              <p class="text-xs text-slate-200">${t.pickupLocation || "-"} → ${t.dropoffLocation || "-"}</p>
+        if (driverUploads.length === 0) {
+          box.innerHTML = `
+            <div class="md:col-span-2 rounded-2xl bg-surface-900/80 border border-slate-800 p-4 text-xs text-slate-400">
+              Henüz şoför telefonundan yüklenen çekici seferi veya fotoğraf yok. Şoför Paneli üzerinden sefer kaydedildiğinde burada görünür.
             </div>
-            <span class="text-xs font-extrabold text-emerald-300">${formatCurrency(t.fee)}</span>
+          `;
+          return;
+        }
+
+        box.innerHTML = driverUploads.map(item => `
+          <div class="rounded-2xl bg-surface-900 border border-slate-800 p-4 flex flex-col sm:flex-row gap-4 justify-between">
+            <div class="space-y-1.5 min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-sm font-extrabold text-amber-300">${item.plate || "-"}</span>
+                <span class="text-xs font-bold text-emerald-300">${formatCurrency(item.fee)}</span>
+                <span class="text-[11px] text-slate-400">• ${item.date || "-"}</span>
+              </div>
+              <p class="text-xs text-cyan-300 font-semibold">
+                ${item.pickupLocation || "-"} → ${item.dropoffLocation || "-"}
+              </p>
+              <p class="text-[11px] text-slate-300">
+                Şoför: <span class="font-semibold text-white">${item.driver || "Çekici Şoför"}</span>
+              </p>
+              <div class="pt-1 flex items-center gap-2">
+                ${item.photoData
+                  ? `<button type="button" onclick="window.openTowPhotoModal('${item.id}')" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-[11px] font-extrabold cursor-pointer">Fotoğrafı Aç</button>`
+                  : `<span class="text-[11px] text-slate-500">Fotoğraf eklenmemiş</span>`
+                }
+                <button type="button" onclick="window.deleteServiceRecord('${item.id}')" class="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-[11px] font-bold cursor-pointer">
+                  Sil
+                </button>
+              </div>
+            </div>
+            ${item.photoData
+              ? `
+                <button type="button" onclick="window.openTowPhotoModal('${item.id}')" class="shrink-0 rounded-xl overflow-hidden border border-slate-700 hover:border-amber-400 transition cursor-pointer self-start">
+                  <img src="${item.photoData}" alt="${item.plate || "Sefer"} fotoğrafı" class="w-28 h-24 object-cover" />
+                </button>
+              `
+              : ""
+            }
           </div>
         `).join("");
       }
 
-      // ==================== YÖNETİCİ / ADMİN PANELİ ====================
-      const adminModal = document.getElementById("adminPortalModal");
-      const adminLoginSection = document.getElementById("adminLoginSection");
-      const adminWorkspaceSection = document.getElementById("adminWorkspaceSection");
-
-      function syncAdminPortalView() {
-        const isAuthed = sessionStorage.getItem(ACTIVE_ADMIN_KEY) === "1";
+      document.getElementById("refreshDriverUploadsBtn")?.addEventListener("click", async () => {
+        if (typeof window.__aykutPullRemoteTowTrips === "function") {
+          await window.__aykutPullRemoteTowTrips();
+        }
+        renderAdminRecords();
+        renderAdminDriverUploads();
+        showToast("Şoför yüklemeleri güncellendi.");
+      });
+// ... existing code ... -->
         if (isAuthed) {
           adminLoginSection?.classList.add("hidden");
           adminWorkspaceSection?.classList.remove("hidden");
           renderAdminRecords();
+          renderAdminDriverUploads();
           renderFinanceSummary();
           renderDriverAccounts();
           renderAdminAccounts();
