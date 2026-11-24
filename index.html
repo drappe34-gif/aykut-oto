@@ -703,11 +703,19 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, setDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     try {
       const appId = typeof __app_id !== "undefined" ? __app_id : "aykut-oto-servis";
-      const rawConfig = typeof __firebase_config !== "undefined" ? __firebase_config : null;
+      const embeddedConfig = {
+        apiKey: "AIzaSyCbzU1qqRkGcyKeWEoyb9DzxWeCnqB934M",
+        authDomain: "aykut-oto-servis.firebaseapp.com",
+        projectId: "aykut-oto-servis",
+        storageBucket: "aykut-oto-servis.firebasestorage.app",
+        messagingSenderId: "871636523769",
+        appId: "1:871636523769:web:6cdf0bb117827e5d45e028"
+      };
+      const rawConfig = typeof __firebase_config !== "undefined" && __firebase_config ? __firebase_config : embeddedConfig;
       if (rawConfig) {
         const firebaseConfig = typeof rawConfig === "string" ? JSON.parse(rawConfig) : rawConfig;
         const app = initializeApp(firebaseConfig);
@@ -723,7 +731,29 @@
         const publicCol = collection(db, "artifacts", appId, "public", "data", "aykut_records");
         window.__aykutCloudReady = true;
         window.__aykutAddCloudRecord = async (payload) => {
-          await addDoc(publicCol, { ...payload, cloudSyncedAt: new Date().toISOString() });
+          const docId = payload.id ? String(payload.id) : ("rec-" + Date.now());
+          await setDoc(doc(publicCol, docId), { ...payload, id: docId, cloudSyncedAt: new Date().toISOString() }, { merge: true });
+        };
+        window.__aykutUpdateDriverCloudStatus = async (accountId, gmail, nextStatus) => {
+          const targetId = String(accountId || gmail || "").replace(/[^a-zA-Z0-9_-]/g, "_");
+          await setDoc(
+            doc(publicCol, targetId),
+            {
+              recordKind: "driver_account",
+              id: accountId,
+              gmail: (gmail || "").toLowerCase(),
+              status: nextStatus,
+              updatedAt: new Date().toISOString()
+            },
+            { merge: true }
+          );
+          await addDoc(publicCol, {
+            recordKind: "driver_status_event",
+            accountId,
+            gmail: (gmail || "").toLowerCase(),
+            status: nextStatus,
+            cloudSyncedAt: new Date().toISOString()
+          });
         };
 
         const badge = document.getElementById("cloudStatusBadge");
@@ -1135,7 +1165,7 @@
           if (errEl) {
             errEl.textContent = matched.status === "rejected"
               ? "Bu şoför hesabı yönetici tarafından reddedildi veya askıya alındı."
-              : "Hesabınız henüz yönetici tarafından onaylanmadı. Lütfen onay bekleyin.";
+              : "Hesabınız henüz yönetici tarafından onaylanmadı (Durum: Beklemede). Yönetici panelinden onaylayın.";
             errEl.classList.remove("hidden");
           }
           return;
@@ -1635,10 +1665,19 @@
       }
 
       // ================= YÖNETİCİ ŞOFÖR ONAY LİSTESİ =================
-      window.updateDriverAccountStatus = function(accountId, nextStatus) {
-        const list = getDriverAccounts().map(a => a.id === accountId ? { ...a, status: nextStatus } : a);
+      window.updateDriverAccountStatus = async function(accountId, nextStatus) {
+        const currentList = getDriverAccounts();
+        const targetAcc = currentList.find(a => a.id === accountId);
+        const list = currentList.map(a => a.id === accountId ? { ...a, status: nextStatus } : a);
         saveDriverAccounts(list);
         renderDriverAccounts();
+
+        if (targetAcc && window.__aykutCloudReady && typeof window.__aykutUpdateDriverCloudStatus === "function") {
+          try {
+            await window.__aykutUpdateDriverCloudStatus(targetAcc.id, targetAcc.gmail, nextStatus);
+          } catch (err) {}
+        }
+
         const label = nextStatus === "approved" ? "onaylandı" : "reddedildi/askıya alındı";
         showToast(`Şoför hesabı ${label}.`);
       };
@@ -1663,7 +1702,7 @@
                 ${statusBadgeMap[acc.status] || statusBadgeMap.pending}
               </div>
               <div class="text-xs text-sky-300 font-semibold">${acc.gmail}</div>
-              <div class="text-[11px] text-slate-500">Kayıt Tarihi: ${acc.createdAt}</div>
+              <div class="text-[11px] text-slate-400">Şifre: <span class="font-mono text-amber-300">${acc.password}</span> • Kayıt Tarihi: ${acc.createdAt}</div>
             </div>
             <div class="flex items-center gap-2 shrink-0">
               <button type="button" onclick="window.updateDriverAccountStatus('${acc.id}', 'approved')" class="px-3.5 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-extrabold hover:bg-emerald-400">
@@ -1699,13 +1738,39 @@
       // Bulut Anlık Güncelleme Kancası
       window.__onAykutCloudSnapshot = (docs) => {
         if (!Array.isArray(docs) || !docs.length) return;
-        const cloudDrivers = docs.filter(d => d.recordKind === "driver_account");
-        if (cloudDrivers.length) {
+        const cloudDrivers = docs.filter(d => d.recordKind === "driver_account" && d.gmail);
+        const statusEvents = docs.filter(d => d.recordKind === "driver_status_event" && (d.gmail || d.accountId));
+
+        if (cloudDrivers.length || statusEvents.length) {
           const localDrivers = getDriverAccounts();
           const map = new Map();
-          [...localDrivers, ...cloudDrivers].forEach(d => {
-            if (d.gmail) map.set(d.gmail.toLowerCase(), d);
+
+          localDrivers.forEach(d => {
+            if (d.gmail) map.set(d.gmail.toLowerCase(), { ...d });
           });
+
+          cloudDrivers.forEach(cd => {
+            const key = cd.gmail.toLowerCase();
+            const existing = map.get(key);
+            if (!existing) {
+              map.set(key, { ...cd });
+            } else {
+              const finalStatus = cd.updatedAt && (!existing.updatedAt || cd.updatedAt >= existing.updatedAt)
+                ? cd.status
+                : (existing.status === "approved" && cd.status === "pending" ? "approved" : cd.status || existing.status);
+              map.set(key, { ...existing, ...cd, status: finalStatus });
+            }
+          });
+
+          statusEvents.forEach(ev => {
+            const target = Array.from(map.values()).find(
+              item => (ev.gmail && item.gmail.toLowerCase() === ev.gmail.toLowerCase()) || (ev.accountId && item.id === ev.accountId)
+            );
+            if (target && ev.status) {
+              map.set(target.gmail.toLowerCase(), { ...target, status: ev.status });
+            }
+          });
+
           localStorage.setItem(DRIVERS_KEY, JSON.stringify(Array.from(map.values())));
           updatePendingDriversBadge();
           if (adminUnlocked) renderDriverAccounts();
