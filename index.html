@@ -82,10 +82,38 @@
 
         <form id="driverQuickLoginForm" class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
           <div>
-            <label for="driverSelectOrName" class="block text-xs font-semibold text-slate-300 mb-1">Şoför Ad Soyad</label>
-            <input id="driverSelectOrName" list="knownDriversDatalist" type="text" required placeholder="Örn: Mehmet Kaya" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
+            <label for="driverGmailInput" class="block text-xs font-semibold text-slate-300 mb-1">Şoför @gmail Adresi</label>
+            <input id="driverGmailInput" list="knownDriversDatalist" type="email" required placeholder="ornek@gmail.com" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
             <datalist id="knownDriversDatalist"></datalist>
           </div>
+          <div>
+            <label for="driverPinInput" class="block text-xs font-semibold text-slate-300 mb-1">Şifre</label>
+            <input id="driverPinInput" type="password" required placeholder="Şifrenizi girin" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
+          </div>
+          <div>
+            <label for="driverSelectOrName" class="block text-xs font-semibold text-slate-300 mb-1">Ad Soyad & Çekici Plaka</label>
+            <div class="grid grid-cols-2 gap-2">
+              <input id="driverSelectOrName" type="text" placeholder="Ad Soyad" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-2.5 py-2.5 text-xs text-white" />
+              <input id="driverTruckPlate" type="text" placeholder="34 AYK 01" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-2.5 py-2.5 text-xs uppercase font-semibold text-white" />
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button type="submit" class="w-full py-2.5 px-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-xs sm:text-sm cursor-pointer transition">
+              Giriş Yap
+            </button>
+            <button id="driverLogoutBtn" type="button" class="hidden py-2.5 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 font-bold text-xs cursor-pointer transition shrink-0">
+              Çıkış
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Şoför Sefer Gönderim Formu -->
+      <div id="driverTripCard" class="glass rounded-3xl p-5 sm:p-6 space-y-5 opacity-60 pointer-events-none">
+        <div>
+          <h3 class="text-lg font-extrabold text-white">Çekilen Araç Bilgilerini Yöneticiye Aktar</h3>
+          <p id="driverLockHint" class="text-xs text-amber-300">Önce @gmail ve şifrenizle giriş yapın; giriş yaptıktan sonra sefer aktarabilirsiniz.</p>
+        </div>
           <div>
             <label for="driverTruckPlate" class="block text-xs font-semibold text-slate-300 mb-1">Çekici Plakası</label>
             <input id="driverTruckPlate" type="text" required placeholder="Örn: 34 AYK 01" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm uppercase font-semibold text-white" />
@@ -285,6 +313,7 @@
         {
           id: "stf_1",
           name: "Mehmet Kaya",
+          gmail: "mehmet.kaya@gmail.com",
           plate: "34 AYK 01",
           startDate: "2025-03-10",
           salary: 42000,
@@ -294,6 +323,7 @@
         {
           id: "stf_2",
           name: "Ali Demir",
+          gmail: "ali.demir@gmail.com",
           plate: "34 AYK 02",
           startDate: "2025-08-01",
           salary: 39000,
@@ -423,48 +453,97 @@
       function applyActiveDriverBadge() {
         const act = getActiveDriver();
         const badge = document.getElementById("activeDriverBadge");
-        if (act && act.name) {
-          badge.textContent = `${act.name} • ${act.plate || ""}`;
-          document.getElementById("driverSelectOrName").value = act.name;
+        const tripCard = document.getElementById("driverTripCard");
+        const lockHint = document.getElementById("driverLockHint");
+        const logoutBtn = document.getElementById("driverLogoutBtn");
+
+        if (act && act.gmail) {
+          badge.textContent = `${act.name || act.gmail} • ${act.plate || ""}`;
+          document.getElementById("driverGmailInput").value = act.gmail;
+          if (act.name) document.getElementById("driverSelectOrName").value = act.name;
           if (act.plate) document.getElementById("driverTruckPlate").value = act.plate;
+          tripCard.classList.remove("opacity-60", "pointer-events-none");
+          lockHint.textContent = `Giriş aktif (${act.gmail}). Çekilen araç bilgisini, konumları, ücreti ve varsa fotoğrafı girip gönderin.`;
+          lockHint.className = "text-xs text-slate-400";
+          logoutBtn.classList.remove("hidden");
         } else {
-          badge.textContent = "Şoför Seçilmedi";
+          badge.textContent = "Giriş Yapılmadı";
+          tripCard.classList.add("opacity-60", "pointer-events-none");
+          lockHint.textContent = "Önce @gmail ve şifrenizle giriş yapın; giriş yaptıktan sonra sefer aktarabilirsiniz.";
+          lockHint.className = "text-xs text-amber-300";
+          logoutBtn.classList.add("hidden");
         }
       }
 
       function renderDriverDatalist() {
         const dl = document.getElementById("knownDriversDatalist");
         const staff = readList(STORAGE.STAFF, DEFAULT_STAFF);
-        dl.innerHTML = staff.map(s => `<option value="${s.name}">${s.plate}</option>`).join("");
+        dl.innerHTML = staff.filter(s => s.gmail).map(s => `<option value="${s.gmail}">${s.name} (${s.plate})</option>`).join("");
       }
+
+      document.getElementById("driverLogoutBtn").addEventListener("click", () => {
+        sessionStorage.removeItem(STORAGE.ACTIVE_DRIVER);
+        document.getElementById("driverPinInput").value = "";
+        applyActiveDriverBadge();
+        toast("Şoför oturumu kapatıldı.");
+      });
 
       document.getElementById("driverQuickLoginForm").addEventListener("submit", (e) => {
         e.preventDefault();
-        const name = document.getElementById("driverSelectOrName").value.trim();
-        const plate = document.getElementById("driverTruckPlate").value.trim().toUpperCase();
+        const gmail = document.getElementById("driverGmailInput").value.trim().toLowerCase();
         const pin = document.getElementById("driverPinInput").value.trim();
+        const typedName = document.getElementById("driverSelectOrName").value.trim();
+        const typedPlate = document.getElementById("driverTruckPlate").value.trim().toUpperCase();
 
-        const staffList = readList(STORAGE.STAFF, DEFAULT_STAFF);
-        const matched = staffList.find(s => s.name.toLowerCase() === name.toLowerCase());
-        if (matched && matched.pin && matched.pin !== pin) {
-          toast("Şoför şifresi hatalı.");
+        if (!gmail.endsWith("@gmail.com")) {
+          toast("Lütfen geçerli bir @gmail.com adresi girin.");
+          return;
+        }
+        if (pin.length < 3) {
+          toast("Lütfen şifrenizi girin.");
           return;
         }
 
-        const sessionDriver = { name, plate: plate || matched?.plate || "ÇEKİCİ" };
-        sessionStorage.setItem(STORAGE.ACTIVE_DRIVER, JSON.stringify(sessionDriver));
+        const staffList = readList(STORAGE.STAFF, DEFAULT_STAFF);
+        const matched = staffList.find(s => String(s.gmail || "").toLowerCase() === gmail);
 
-        // Eğer kadroda yoksa otomatik kaydet
-        if (!matched) {
-          staffList.push({
-            id: `stf_${Date.now()}`,
-            name,
-            plate: sessionDriver.plate,
-            startDate: new Date().toISOString().slice(0, 10),
-            salary: 0,
-            insurance: 0,
-            pin
-          });
+        if (matched) {
+          if (matched.pin && matched.pin !== pin) {
+            toast("Bu @gmail hesabı için şifre hatalı.");
+            return;
+          }
+          const sessionDriver = {
+            name: typedName || matched.name || gmail.split("@")[0],
+            gmail,
+            plate: typedPlate || matched.plate || "ÇEKİCİ"
+          };
+          sessionStorage.setItem(STORAGE.ACTIVE_DRIVER, JSON.stringify(sessionDriver));
+          applyActiveDriverBadge();
+          toast(`${sessionDriver.name} giriş yaptı.`);
+          return;
+        }
+
+        // Yeni @gmail hesabı oluşturma
+        const newName = typedName || gmail.split("@")[0];
+        const newPlate = typedPlate || "ÇEKİCİ";
+        staffList.push({
+          id: `stf_${Date.now()}`,
+          name: newName,
+          gmail,
+          plate: newPlate,
+          startDate: new Date().toISOString().slice(0, 10),
+          salary: 0,
+          insurance: 0,
+          pin
+        });
+        writeList(STORAGE.STAFF, staffList);
+
+        const sessionDriver = { name: newName, gmail, plate: newPlate };
+        sessionStorage.setItem(STORAGE.ACTIVE_DRIVER, JSON.stringify(sessionDriver));
+        applyActiveDriverBadge();
+        renderDriverDatalist();
+        toast(`${gmail} ile şoför hesabı oluşturuldu ve giriş yapıldı.`);
+      });
           writeList(STORAGE.STAFF, staffList);
         }
 
@@ -491,12 +570,12 @@
       document.getElementById("driverTripSubmitForm").addEventListener("submit", (e) => {
         e.preventDefault();
         const active = getActiveDriver();
-        const fallbackName = document.getElementById("driverSelectOrName").value.trim() || "Çekici Şoförü";
-        const fallbackPlate = (document.getElementById("driverTruckPlate").value.trim() || "ÇEKİCİ").toUpperCase();
-
-        const trip = {
-          id: `trp_${Date.now()}`,
-          driverName: active?.name || fallbackName,
+        if (!active || !active.gmail) {
+          toast("Önce @gmail ve şifrenizle giriş yapın.");
+          return;
+        }
+        const fallbackName = active.name || active.gmail;
+        const fallbackPlate = (active.plate || "ÇEKİCİ").toUpperCase();
           truckPlate: active?.plate || fallbackPlate,
           vehicleInfo: document.getElementById("tripVehicleInfo").value.trim(),
           pickupPlace: document.getElementById("tripPickupPlace").value.trim(),
