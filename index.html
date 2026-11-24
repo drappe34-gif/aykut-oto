@@ -14,7 +14,7 @@ body{font-family:Inter,Arial,sans-serif;background:#070b14;color:#f8fafc}
 .field{width:100%;background:#080e1b;border:1px solid #334155;border-radius:12px;padding:11px 13px;color:white;font-size:13px;outline:none}
 .field:focus{border-color:#06b6d4}
 label{display:block;font-size:12px;color:#cbd5e1;margin-bottom:6px;font-weight:600}
-.btn{border-radius:11px;padding:10px 14px;font-size:12px;font-weight:800}
+.btn{border-radius:11px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer}
 .btn-cyan{background:#06b6d4;color:#07111c}
 .btn-green{background:#10b981;color:#06150f}
 .btn-amber{background:#f59e0b;color:#171006}
@@ -28,17 +28,17 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <body class="min-h-screen">
 
 <header class="sticky top-0 z-40 glass">
-<div class="max-w-6xl mx-auto p-3 flex flex-wrap items-center justify-between gap-3">
- <div class="flex items-center gap-3">
-  <div class="w-11 h-11 rounded-xl bg-amber-500 text-black font-black flex items-center justify-center">AO</div>
-  <div><h1 class="font-extrabold">AYKUT OTO ÇEKİCİ</h1><p class="text-[10px] text-slate-400">Şoför & Yönetici Yönetim Sistemi</p></div>
+ <div class="max-w-6xl mx-auto p-3 flex flex-wrap items-center justify-between gap-3">
+  <div class="flex items-center gap-3">
+   <div class="w-11 h-11 rounded-xl bg-amber-500 text-black font-black flex items-center justify-center">AO</div>
+   <div><h1 class="font-extrabold">AYKUT OTO ÇEKİCİ</h1><p class="text-[10px] text-slate-400">Şoför & Yönetici Yönetim Sistemi</p></div>
+  </div>
+  <div class="flex flex-wrap items-center gap-2">
+   <span id="cloudStatus" class="text-[10px] px-3 py-2 rounded-full bg-slate-800 text-slate-300">Bulut kontrol ediliyor</span>
+   <button id="driverModeBtn" class="btn btn-cyan">Şoför Paneli</button>
+   <button id="adminModeBtn" class="btn btn-dark">Yönetici Paneli</button>
+  </div>
  </div>
- <div class="flex flex-wrap items-center gap-2">
-  <span id="cloudStatus" class="text-[10px] px-3 py-2 rounded-full bg-slate-800 text-slate-300">Bulut kontrol ediliyor</span>
-  <button id="driverModeBtn" class="btn btn-cyan">Şoför Paneli</button>
-  <button id="adminModeBtn" class="btn btn-dark">Yönetici Paneli</button>
- </div>
-</div>
 </header>
 
 <div id="toast" class="hidden fixed bottom-5 right-5 z-[100] max-w-sm bg-slate-900 border border-amber-500 rounded-xl p-4 text-sm shadow-2xl"></div>
@@ -54,7 +54,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
   </div>
   <form id="driverLoginForm" class="space-y-3">
    <div><label>Gmail adresi</label><input id="loginEmail" class="field" type="email" required placeholder="ornek@gmail.com"></div>
-   <div><label>Şifre</label><input id="loginPassword" class="field" type="password" required autocomplete="current-password" placeholder="Şifreniz"></div>
+   <div><label>Şifre</label><input id="loginPassword" class="field" type="password" required autocomplete="current-password"></div>
    <button class="btn btn-cyan w-full" type="submit">Giriş Yap</button>
   </form>
   <form id="driverRegisterForm" class="hidden space-y-3">
@@ -87,11 +87,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
     <div><label>Nereden Alındı?</label><input id="tripPickup" class="field" required></div>
     <div><label>Nereye Götürüldü?</label><input id="tripDropoff" class="field" required></div>
     <div><label>Alınan Ücret (₺)</label><input id="tripFee" class="field" type="number" min="0" required></div>
-    <div>
-     <label>Sefer Fotoğrafları (Birden fazla seçebilirsin)</label>
-     <input id="tripPhotos" class="field" type="file" accept="image/*" multiple capture="environment">
-     <p class="text-[10px] text-slate-400 mt-1">Birden fazla fotoğraf seçebilirsin.</p>
-    </div>
+    <div><label>Sefer Fotoğrafları (En fazla 8)</label><input id="tripPhotos" class="field" type="file" accept="image/*" multiple><p class="text-[10px] text-slate-400 mt-1">Birden fazla fotoğraf seçebilirsiniz.</p></div>
     <div id="photoPreviews" class="md:col-span-2 grid grid-cols-3 sm:grid-cols-5 gap-2"></div>
     <div class="md:col-span-2"><button class="btn btn-green w-full" type="submit">Seferi Yöneticiye Gönder</button></div>
    </form>
@@ -109,7 +105,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
   <p class="text-xs text-amber-400 font-bold">YÖNETİCİ GİRİŞİ</p>
   <h2 class="text-xl font-extrabold">Yönetici Paneli</h2>
   <form id="adminLoginForm" class="space-y-3">
-   <div><label>Yönetici Şifresi</label><input id="adminLoginPassword" class="field" type="password" required autocomplete="current-password" placeholder="Şifrenizi girin"></div>
+   <div><label>Yönetici Şifresi</label><input id="adminLoginPassword" class="field" type="password" required autocomplete="current-password"></div>
    <button class="btn btn-amber w-full">Giriş Yap</button>
   </form>
   <p class="text-[11px] text-slate-500">İlk kurulum varsayılan şifresi: 3454</p>
@@ -118,46 +114,35 @@ button:disabled{opacity:.5;cursor:not-allowed}
  <div id="adminDashboard" class="hidden space-y-5">
   <div class="glass rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
    <div><p class="text-xs text-amber-400 font-bold">YÖNETİCİ PANELİ</p><h2 class="text-xl font-extrabold">Genel Yönetim</h2></div>
-   <div class="flex gap-2">
-    <button id="syncBtn" class="btn btn-cyan">Buluttan Yenile</button>
-    <button id="adminLogout" class="btn btn-red">Kilitle</button>
-   </div>
+   <div class="flex gap-2"><button id="syncBtn" class="btn btn-cyan">Buluttan Yenile</button><button id="adminLogout" class="btn btn-red">Kilitle</button></div>
   </div>
 
   <div class="glass rounded-3xl p-5 space-y-4">
-   <div><p class="text-xs text-amber-400 font-bold">HESAP GÜVENLİĞİ</p><h3 class="text-lg font-extrabold">Yönetici Şifresini Değiştir</h3></div>
+   <h3 class="text-lg font-extrabold">Yönetici Şifresini Değiştir</h3>
    <form id="changeAdminPasswordForm" class="grid grid-cols-1 md:grid-cols-3 gap-3">
-    <div><label>Mevcut Şifre</label><input id="oldAdminPassword" class="field" type="password" required autocomplete="current-password"></div>
-    <div><label>Yeni Şifre</label><input id="newAdminPassword" class="field" type="password" minlength="4" required autocomplete="new-password"></div>
-    <div><label>Yeni Şifre Tekrar</label><input id="repeatAdminPassword" class="field" type="password" minlength="4" required autocomplete="new-password"></div>
-    <div class="md:col-span-3"><button class="btn btn-amber w-full" type="submit">Yönetici Şifresini Güncelle</button></div>
+    <div><label>Mevcut Şifre</label><input id="oldAdminPassword" class="field" type="password" required></div>
+    <div><label>Yeni Şifre</label><input id="newAdminPassword" class="field" type="password" minlength="4" required></div>
+    <div><label>Yeni Şifre Tekrar</label><input id="repeatAdminPassword" class="field" type="password" minlength="4" required></div>
+    <div class="md:col-span-3"><button class="btn btn-amber w-full">Şifreyi Güncelle</button></div>
    </form>
-   <p class="text-[11px] text-slate-400">Şifre değişikliği Firebase'e kaydedilir. Yönetici hesapları listesinde şifre bilgisi gösterilmez.</p>
   </div>
 
   <div class="glass rounded-3xl p-5 space-y-4">
    <div><p class="text-xs text-emerald-400 font-bold">YENİ GÖREVLENDİRME</p><h3 class="text-lg font-extrabold">Şoföre İş Gönder</h3></div>
    <form id="assignJobForm" class="grid grid-cols-1 md:grid-cols-2 gap-3">
     <div class="md:col-span-2"><label>İş Gönderilecek Şoför</label><select id="assignDriver" class="field" required><option value="">Şoför seçin</option></select></div>
-    <div><label>Alınacak Yer</label><input id="jobPickup" class="field" required placeholder="Örn. Avcılar"></div>
-    <div><label>Bırakılacak Yer</label><input id="jobDropoff" class="field" required placeholder="Örn. İkitelli"></div>
-    <div><label>Araç Bilgisi</label><input id="jobVehicle" class="field" placeholder="Marka, model, plaka"></div>
+    <div><label>Alınacak Yer</label><input id="jobPickup" class="field" required></div>
+    <div><label>Bırakılacak Yer</label><input id="jobDropoff" class="field" required></div>
+    <div><label>Araç Bilgisi</label><input id="jobVehicle" class="field"></div>
     <div><label>İş Tarihi</label><input id="jobDate" class="field" type="datetime-local" required></div>
-    <div class="md:col-span-2"><label>İş Açıklaması</label><textarea id="jobNote" class="field" rows="3" placeholder="Müşteri bilgisi, telefon, özel notlar..."></textarea></div>
-    <div class="md:col-span-2"><button class="btn btn-green w-full" type="submit">Seçilen Şoföre İşi Gönder</button></div>
+    <div class="md:col-span-2"><label>İş Açıklaması</label><textarea id="jobNote" class="field" rows="3"></textarea></div>
+    <div class="md:col-span-2"><button class="btn btn-green w-full">Seçilen Şoföre İşi Gönder</button></div>
    </form>
    <div><h4 class="font-bold text-sm mb-3">Gönderilen İşler</h4><div id="adminJobs" class="space-y-3"></div></div>
   </div>
 
-  <div class="glass rounded-3xl p-5 space-y-3">
-   <h3 class="text-lg font-extrabold">Şoför Üyelikleri ve Onaylar</h3>
-   <div id="adminDrivers" class="space-y-3"></div>
-  </div>
-
-  <div class="glass rounded-3xl p-5 space-y-3">
-   <h3 class="text-lg font-extrabold">Şoförlerden Gelen Seferler</h3>
-   <div id="adminTrips" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-  </div>
+  <div class="glass rounded-3xl p-5 space-y-3"><h3 class="text-lg font-extrabold">Şoför Üyelikleri ve Onaylar</h3><div id="adminDrivers" class="space-y-3"></div></div>
+  <div class="glass rounded-3xl p-5 space-y-3"><h3 class="text-lg font-extrabold">Şoförlerden Gelen Seferler</h3><div id="adminTrips" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div></div>
 
   <div class="glass rounded-3xl p-5 space-y-4">
    <h3 class="text-lg font-extrabold">Personel / Çekici Listesi</h3>
@@ -193,7 +178,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
    <h3 class="text-lg font-extrabold">Yönetici Hesapları</h3>
    <form id="addAdminForm" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
     <div><label>Yönetici Adı</label><input id="newAdminName" class="field" required></div>
-    <div><label>Yeni Şifre</label><input id="newAdminPass" class="field" type="password" minlength="4" required autocomplete="new-password"></div>
+    <div><label>Yeni Şifre</label><input id="newAdminPass" class="field" type="password" minlength="4" required></div>
     <div class="flex items-end"><button class="btn btn-amber w-full">Yönetici Ekle</button></div>
    </form>
    <div id="adminAccountsList" class="space-y-2"></div>
@@ -205,8 +190,8 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <script>
 "use strict";
 
-const DB = "https://aykut-oto-servis-default-rtdb.firebaseio.com";
-const K = {
+const DB="https://aykut-oto-servis-default-rtdb.firebaseio.com";
+const K={
  drivers:"aykut_cekici_driver_accounts_v3",
  trips:"aykut_cekici_trips_v3",
  staff:"aykut_cekici_staff_v3",
@@ -215,13 +200,13 @@ const K = {
  jobs:"aykut_cekici_jobs_v1"
 };
 
-const DEFAULT_ADMINS = [{id:"adm_1",name:"Aykut Yönetici",password:"3454"}];
-const DEFAULT_DRIVERS = [{
+const DEFAULT_ADMINS=[{id:"adm_1",name:"Aykut Yönetici",password:"3454"}];
+const DEFAULT_DRIVERS=[{
  id:"drv_demo_1",name:"Mehmet Kaya",gmail:"mehmet.kaya@gmail.com",
  password:"1234",plate:"34 AYK 01",status:"approved"
 }];
 
-const CARS = {
+const CARS={
  "Fiat":["Egea","Egea Cross","Linea","Doblo","Fiorino","Tipo"],
  "Renault":["Clio","Megane","Taliant","Captur","Kangoo"],
  "Volkswagen":["Passat","Golf","Polo","Tiguan","Jetta","Caddy","Transporter"],
@@ -243,11 +228,11 @@ const CARS = {
  "Diğer":["Binek Araç","SUV","Ticari Araç","Motosiklet"]
 };
 
-let data = {drivers:[],trips:[],staff:[],entries:[],admins:[],jobs:[]};
-let activeDriver = null;
-let adminUnlocked = false;
-let selectedPhotos = [];
-let loadInProgress = false;
+let data={drivers:[],trips:[],staff:[],entries:[],admins:[],jobs:[]};
+let activeDriver=null;
+let adminUnlocked=false;
+let selectedPhotos=[];
+let loadInProgress=false;
 
 function $(id){return document.getElementById(id)}
 function money(n){return (Number(n)||0).toLocaleString("tr-TR")+" ₺"}
@@ -279,9 +264,7 @@ function normalize(value){
  if(Array.isArray(value))return value.filter(Boolean);
  return Object.entries(value).filter(([,v])=>v&&typeof v==="object").map(([id,v])=>({...v,id:v.id||id}));
 }
-function keyFor(node){
- return ({drivers:K.drivers,trips:K.trips,staff:K.staff,entries:K.entries,admins:K.admins,jobs:K.jobs})[node];
-}
+function keyFor(node){return K[node]}
 
 async function cloudGet(node){
  const res=await fetch(`${DB}/${keyFor(node)}.json`,{cache:"no-store"});
@@ -305,19 +288,16 @@ async function cloudSave(node,list){
  return true;
 }
 
-/* DÜZELTİLDİ: Artık tanımlanmamış renderAll() çağrılmıyor. */
+/* VERİLERİ YÜKLEME */
 async function loadAll(){
  if(loadInProgress)return false;
  loadInProgress=true;
- badge(true,"Bulut verileri yükleniyor...");
+ badge(true,"Firebase verileri yükleniyor...");
  try{
   const nodes=["drivers","trips","staff","entries","admins","jobs"];
-  const results=await Promise.allSettled(nodes.map(cloudGet));
+  const results=await Promise.allSettled(nodes.map(node=>cloudGet(node)));
   const failed=results.map((r,i)=>r.status==="rejected"?nodes[i]+": "+r.reason.message:null).filter(Boolean);
-
-  if(failed.length){
-   throw new Error("Veri yükleme sorunu: "+failed.join(" | "));
-  }
+  if(failed.length)throw new Error(failed.join(" | "));
 
   if(!data.admins.length){
    data.admins=DEFAULT_ADMINS;
@@ -329,10 +309,10 @@ async function loadAll(){
 
   badge(true,"Bulut Bağlantısı Aktif");
   return true;
- }catch(e){
-  console.error("Firebase / Uygulama Hatası:",e);
-  badge(false,"Bağlantı Hatası");
-  notify(e.message);
+ }catch(error){
+  console.error("Firebase / Uygulama Hatası:",error);
+  badge(false,"Firebase Bağlantı Hatası");
+  notify(error.message);
   return false;
  }finally{
   loadInProgress=false;
@@ -369,25 +349,31 @@ $("registerTab").onclick=()=>{
  $("registerTab").className="btn btn-green";
 };
 
-/* ŞOFÖR ÜYELİK VE GİRİŞ */
+/* ŞOFÖR ÜYELİK */
 $("driverRegisterForm").onsubmit=async e=>{
  e.preventDefault();
  const name=$("regName").value.trim();
  const plate=$("regPlate").value.trim().toUpperCase();
  const gmail=$("regEmail").value.trim().toLowerCase();
  const password=$("regPassword").value;
+
  if(!gmail.endsWith("@gmail.com"))return notify("Lütfen @gmail.com adresi kullanın.");
  if(password.length<4)return notify("Şifre en az 4 karakter olmalıdır.");
+
  try{
   await cloudGet("drivers");
   if(data.drivers.some(x=>String(x.gmail).toLowerCase()===gmail))return notify("Bu Gmail zaten kayıtlı.");
+
   const driver={id:"drv_"+Date.now(),name,plate,gmail,password,status:"pending",createdAt:Date.now()};
   const staff={id:"stf_"+Date.now(),name,plate,gmail,startDate:new Date().toISOString().slice(0,10),salary:0,insurance:0};
+
   await cloudSave("drivers",[driver,...data.drivers]);
+
   try{
    await cloudGet("staff");
    if(!data.staff.some(x=>x.gmail===gmail))await cloudSave("staff",[staff,...data.staff]);
-  }catch(err){console.warn("Personel kaydı ayrıca eklenemedi",err)}
+  }catch(err){console.warn("Personel kaydı eklenemedi:",err)}
+
   e.target.reset();
   $("loginEmail").value=gmail;
   $("loginTab").click();
@@ -395,16 +381,20 @@ $("driverRegisterForm").onsubmit=async e=>{
  }catch(err){notify("Üyelik kaydedilemedi: "+err.message)}
 };
 
+/* ŞOFÖR GİRİŞ */
 $("driverLoginForm").onsubmit=async e=>{
  e.preventDefault();
  const gmail=$("loginEmail").value.trim().toLowerCase();
  const password=$("loginPassword").value;
+
  try{
   await cloudGet("drivers");
   const found=data.drivers.find(x=>String(x.gmail).toLowerCase()===gmail);
+
   if(!found)return notify("Şoför hesabı bulunamadı.");
   if(found.password!==password)return notify("Şifre hatalı.");
   if(found.status!=="approved")return notify("Hesabınız henüz yönetici tarafından onaylanmadı.");
+
   activeDriver={id:found.id,name:found.name,gmail:found.gmail,plate:found.plate};
   sessionStorage.setItem("aykut_active_driver",JSON.stringify(activeDriver));
   adminUnlocked=false;
@@ -431,7 +421,7 @@ $("tripBrand").onchange=()=>{
 };
 for(let y=2026;y>=1985;y--)$("tripYear").add(new Option(y,y));
 
-/* ÇOKLU FOTOĞRAF */
+/* FOTOĞRAF SIKIŞTIRMA */
 $("tripPhotos").onchange=async e=>{
  selectedPhotos=[];
  $("photoPreviews").innerHTML="";
@@ -479,10 +469,11 @@ function compressImage(file){
  });
 }
 
-/* ŞOFÖR SEFER GÖNDERİMİ */
+/* SEFER GÖNDERME */
 $("tripForm").onsubmit=async e=>{
  e.preventDefault();
  if(!activeDriver)return notify("Şoför girişi yapmalısınız.");
+
  const trip={
   id:"trip_"+Date.now(),
   driverId:activeDriver.id,
@@ -502,6 +493,7 @@ $("tripForm").onsubmit=async e=>{
   date:new Date().toISOString().slice(0,10),
   createdAt:Date.now()
  };
+
  try{
   await cloudGet("trips");
   await cloudSave("trips",[trip,...data.trips]);
@@ -513,14 +505,35 @@ $("tripForm").onsubmit=async e=>{
  }catch(err){notify("Sefer gönderilemedi: "+err.message)}
 };
 
-/* ŞOFÖRE GÖNDERİLEN İŞLER */
+/* FOTOĞRAFLARI GÖSTER */
+function renderPhotos(t){
+ const photos=Array.isArray(t.photos)&&t.photos.length?t.photos:(t.photoData?[t.photoData]:[]);
+ if(!photos.length)return "";
+ return `<div class="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-3">${photos.map((p,i)=>`
+ <img src="${p}" onclick="showLargePhoto('${safe(t.id)}',${i})" class="w-full h-24 object-cover rounded-xl border border-slate-700 cursor-pointer" alt="Sefer fotoğrafı ${i+1}">`).join("")}</div>`;
+}
+window.showLargePhoto=function(id,index){
+ const t=data.trips.find(x=>x.id===id);
+ if(!t)return;
+ const photos=t.photos?.length?t.photos:(t.photoData?[t.photoData]:[]);
+ if(!photos[index])return;
+ const w=window.open("","_blank");
+ if(w){
+  const img=w.document.createElement("img");
+  img.src=photos[index];
+  img.style.cssText="max-width:100%;max-height:100vh;object-fit:contain";
+  w.document.body.style.cssText="margin:0;background:#070b14;display:flex;justify-content:center;align-items:center;min-height:100vh";
+  w.document.body.appendChild(img);
+ }
+};
+
+/* ŞOFÖR PANELİ */
 function driverJobStatus(job){
  if(job.status==="accepted")return "Kabul Edildi";
  if(job.status==="completed")return "Tamamlandı";
  if(job.status==="rejected")return "Reddedildi";
  return "Yeni İş";
 }
-
 async function updateJobStatus(id,status){
  try{
   await cloudGet("jobs");
@@ -531,9 +544,12 @@ async function updateJobStatus(id,status){
   notify("İş durumu güncellendi.");
  }catch(err){notify("İşlem yapılamadı: "+err.message)}
 }
-
 function renderDriver(){
- if(!activeDriver)return;
+ if(!activeDriver){
+  $("driverWorkspace").classList.add("hidden");
+  $("driverAuth").classList.remove("hidden");
+  return;
+ }
  $("driverAuth").classList.add("hidden");
  $("driverWorkspace").classList.remove("hidden");
  $("driverWelcome").textContent=activeDriver.name+" • "+activeDriver.plate;
@@ -548,8 +564,8 @@ function renderDriver(){
    <p class="text-sm">🏁 Bırakılacak yer: <b>${safe(j.dropoff)}</b></p>
    <p class="text-xs text-slate-400">Tarih: ${safe(j.date||"-")}</p>
    ${j.note?`<p class="text-sm text-slate-300">${safe(j.note)}</p>`:""}
-   ${j.status==="pending"?`<div class="flex gap-2 pt-2"><button class="btn btn-green" onclick="updateJobStatus('${j.id}','accepted')">İşi Kabul Et</button><button class="btn btn-red" onclick="updateJobStatus('${j.id}','rejected')">Reddet</button></div>`:""}
-   ${j.status==="accepted"?`<button class="btn btn-cyan mt-2" onclick="updateJobStatus('${j.id}','completed')">İşi Tamamlandı Olarak İşaretle</button>`:""}
+   ${j.status==="pending"?`<div class="flex gap-2 pt-2"><button class="btn btn-green" onclick="updateJobStatus('${safe(j.id)}','accepted')">İşi Kabul Et</button><button class="btn btn-red" onclick="updateJobStatus('${safe(j.id)}','rejected')">Reddet</button></div>`:""}
+   ${j.status==="accepted"?`<button class="btn btn-cyan mt-2" onclick="updateJobStatus('${safe(j.id)}','completed')">İşi Tamamlandı Olarak İşaretle</button>`:""}
   </div>`).join(""):'<p class="text-sm text-slate-400">Henüz size gönderilmiş bir iş bulunmuyor.</p>';
 
  const trips=data.trips.filter(t=>t.driverGmail===activeDriver.gmail);
@@ -580,7 +596,6 @@ $("adminLoginForm").onsubmit=async e=>{
   notify("Yönetici paneli açıldı.");
  }catch(err){notify("Yönetici bilgileri alınamadı: "+err.message)}
 };
-
 $("adminLogout").onclick=()=>{
  adminUnlocked=false;
  $("adminDashboard").classList.add("hidden");
@@ -607,11 +622,12 @@ $("changeAdminPasswordForm").onsubmit=async e=>{
  }catch(err){notify("Şifre değiştirilemedi: "+err.message)}
 };
 
-/* YÖNETİCİDEN ŞOFÖRE İŞ GÖNDERME */
+/* ŞOFÖRE İŞ GÖNDERME */
 $("assignJobForm").onsubmit=async e=>{
  e.preventDefault();
  const driver=data.drivers.find(d=>d.id===$("assignDriver").value);
  if(!driver)return notify("Önce bir şoför seçin.");
+
  const job={
   id:"job_"+Date.now(),
   driverId:driver.id,
@@ -625,6 +641,7 @@ $("assignJobForm").onsubmit=async e=>{
   status:"pending",
   createdAt:Date.now()
  };
+
  try{
   await cloudGet("jobs");
   await cloudSave("jobs",[job,...data.jobs]);
@@ -633,7 +650,6 @@ $("assignJobForm").onsubmit=async e=>{
   notify(driver.name+" isimli şoföre iş gönderildi.");
  }catch(err){notify("İş gönderilemedi: "+err.message)}
 };
-
 async function deleteJob(id){
  if(!confirm("Bu iş kaydını silmek istiyor musunuz?"))return;
  try{
@@ -644,7 +660,7 @@ async function deleteJob(id){
  }catch(err){notify(err.message)}
 }
 
-/* ŞOFÖR ÜYELİK ONAYI */
+/* ŞOFÖR ONAYLARI */
 async function changeDriverStatus(id,status){
  try{
   await cloudGet("drivers");
@@ -654,7 +670,6 @@ async function changeDriverStatus(id,status){
   notify("Şoför durumu güncellendi.");
  }catch(err){notify(err.message)}
 }
-
 async function deleteDriver(id){
  if(!confirm("Şoför hesabını silmek istiyor musunuz?"))return;
  try{
@@ -665,26 +680,7 @@ async function deleteDriver(id){
  }catch(err){notify(err.message)}
 }
 
-/* SEFER FOTOĞRAFLARI */
-function renderPhotos(t){
- const photos=Array.isArray(t.photos)&&t.photos.length?t.photos:(t.photoData?[t.photoData]:[]);
- if(!photos.length)return "";
- return `<div class="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-3">${photos.map((p,i)=>`
- <img src="${p}" onclick="showLargePhoto('${t.id}',${i})" class="w-full h-24 object-cover rounded-xl border border-slate-700 cursor-pointer" alt="Sefer fotoğrafı ${i+1}">`).join("")}</div>`;
-}
-
-window.showLargePhoto=function(id,index){
- const t=data.trips.find(x=>x.id===id);
- if(!t)return;
- const photos=t.photos?.length?t.photos:(t.photoData?[t.photoData]:[]);
- if(!photos[index])return;
- const w=window.open("","_blank");
- if(w){
-  w.document.write(`<html><head><title>Sefer Fotoğrafı</title></head><body style="margin:0;background:#070b14;display:flex;justify-content:center;align-items:center;min-height:100vh"><img src="${photos[index]}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`);
-  w.document.close();
- }
-};
-
+/* SEFER SİLME */
 async function deleteTrip(id){
  if(!confirm("Sefer kaydı silinsin mi?"))return;
  try{
@@ -695,7 +691,7 @@ async function deleteTrip(id){
  }catch(err){notify(err.message)}
 }
 
-/* PERSONEL VE FİNANS */
+/* PERSONEL */
 $("staffForm").onsubmit=async e=>{
  e.preventDefault();
  const person={
@@ -714,7 +710,6 @@ $("staffForm").onsubmit=async e=>{
   notify("Personel eklendi.");
  }catch(err){notify(err.message)}
 };
-
 async function deleteStaff(id){
  if(!confirm("Personel silinsin mi?"))return;
  try{
@@ -725,12 +720,12 @@ async function deleteStaff(id){
  }catch(err){notify(err.message)}
 }
 
+/* FİNANS */
 async function addFinance(type,title,amount,date){
  await cloudGet("entries");
  const item={id:"entry_"+Date.now(),type,title,amount:Number(amount),date};
  await cloudSave("entries",[item,...data.entries]);
 }
-
 $("financeForm").onsubmit=async e=>{
  e.preventDefault();
  try{
@@ -741,7 +736,6 @@ $("financeForm").onsubmit=async e=>{
   notify("Finans kaydı eklendi.");
  }catch(err){notify(err.message)}
 };
-
 async function deleteFinance(id){
  if(!confirm("Finans kaydı silinsin mi?"))return;
  try{
@@ -751,7 +745,6 @@ async function deleteFinance(id){
   notify("Kayıt silindi.");
  }catch(err){notify(err.message)}
 }
-
 async function salaryPayment(id,kind){
  const s=data.staff.find(x=>x.id===id);
  if(!s)return;
@@ -760,18 +753,14 @@ async function salaryPayment(id,kind){
  try{
   await addFinance("expense",s.name+" - "+(kind==="salary"?"Maaş Ödemesi":"Sigorta Ödemesi"),amount,new Date().toISOString().slice(0,10));
   renderAdmin();
-  notify("Ödeme gideri finans listesine eklendi.");
+  notify("Ödeme gider listesine eklendi.");
  }catch(err){notify(err.message)}
 }
 
 /* YÖNETİCİ HESAPLARI */
 $("addAdminForm").onsubmit=async e=>{
  e.preventDefault();
- const item={
-  id:"adm_"+Date.now(),
-  name:$("newAdminName").value.trim(),
-  password:$("newAdminPass").value
- };
+ const item={id:"adm_"+Date.now(),name:$("newAdminName").value.trim(),password:$("newAdminPass").value};
  try{
   await cloudGet("admins");
   await cloudSave("admins",[...data.admins,item]);
@@ -780,7 +769,6 @@ $("addAdminForm").onsubmit=async e=>{
   notify("Yönetici hesabı eklendi.");
  }catch(err){notify(err.message)}
 };
-
 async function deleteAdmin(id){
  if(data.admins.length<=1)return notify("En az bir yönetici hesabı kalmalı.");
  if(!confirm("Yönetici hesabı silinsin mi?"))return;
@@ -792,7 +780,7 @@ async function deleteAdmin(id){
  }catch(err){notify(err.message)}
 }
 
-/* YÖNETİCİ EKRANI */
+/* YÖNETİCİ PANELİNİ ÇİZ */
 function renderAdmin(){
  if(!adminUnlocked)return;
  $("adminLoginBox").classList.add("hidden");
@@ -802,42 +790,42 @@ function renderAdmin(){
  $("assignDriver").innerHTML='<option value="">Şoför seçin</option>'+approved.map(d=>`<option value="${safe(d.id)}">${safe(d.name)} - ${safe(d.plate)}</option>`).join("");
 
  $("adminDrivers").innerHTML=data.drivers.length?data.drivers.map(d=>`
- <div class="card flex flex-wrap items-center justify-between gap-3">
-  <div><b>${safe(d.name)}</b><p class="text-xs text-slate-400">${safe(d.gmail)} • ${safe(d.plate)}</p>
-  <span class="text-xs ${d.status==="approved"?"text-emerald-400":"text-amber-300"}">${d.status==="approved"?"Onaylı":"Onay Bekliyor"}</span></div>
-  <div class="flex flex-wrap gap-2">
-   ${d.status!=="approved"?`<button class="btn btn-green" onclick="changeDriverStatus('${d.id}','approved')">Onayla</button>`:`<button class="btn btn-dark" onclick="changeDriverStatus('${d.id}','pending')">Onayı Kaldır</button>`}
-   <button class="btn btn-red" onclick="deleteDriver('${d.id}')">Sil</button>
-  </div>
- </div>`).join(""):'<p class="text-sm text-slate-400">Kayıtlı şoför yok.</p>';
+  <div class="card flex flex-wrap items-center justify-between gap-3">
+   <div><b>${safe(d.name)}</b><p class="text-xs text-slate-400">${safe(d.gmail)} • ${safe(d.plate)}</p>
+   <span class="text-xs ${d.status==="approved"?"text-emerald-400":"text-amber-300"}">${d.status==="approved"?"Onaylı":"Onay Bekliyor"}</span></div>
+   <div class="flex flex-wrap gap-2">
+    ${d.status!=="approved"?`<button class="btn btn-green" onclick="changeDriverStatus('${safe(d.id)}','approved')">Onayla</button>`:`<button class="btn btn-dark" onclick="changeDriverStatus('${safe(d.id)}','pending')">Onayı Kaldır</button>`}
+    <button class="btn btn-red" onclick="deleteDriver('${safe(d.id)}')">Sil</button>
+   </div>
+  </div>`).join(""):'<p class="text-sm text-slate-400">Kayıtlı şoför yok.</p>';
 
  $("adminJobs").innerHTML=data.jobs.length?data.jobs.map(j=>`
- <div class="card">
-  <div class="flex flex-wrap justify-between gap-2"><b>${safe(j.driverName)}</b><span class="text-xs text-amber-300">${safe(j.status==="pending"?"Bekliyor":j.status==="accepted"?"Kabul Edildi":j.status==="completed"?"Tamamlandı":"Reddedildi")}</span></div>
-  <p class="text-xs mt-2">📍 ${safe(j.pickup)} → ${safe(j.dropoff)}</p>
-  <p class="text-xs text-slate-400 mt-1">${safe(j.vehicle)} • ${safe(j.date)}</p>
-  ${j.note?`<p class="text-xs text-slate-300 mt-2">${safe(j.note)}</p>`:""}
-  <button class="btn btn-red mt-3" onclick="deleteJob('${j.id}')">İşi Sil</button>
- </div>`).join(""):'<p class="text-sm text-slate-400">Henüz şoföre iş gönderilmedi.</p>';
+  <div class="card">
+   <div class="flex flex-wrap justify-between gap-2"><b>${safe(j.driverName)}</b><span class="text-xs text-amber-300">${safe(j.status==="pending"?"Bekliyor":j.status==="accepted"?"Kabul Edildi":j.status==="completed"?"Tamamlandı":"Reddedildi")}</span></div>
+   <p class="text-xs mt-2">📍 ${safe(j.pickup)} → ${safe(j.dropoff)}</p>
+   <p class="text-xs text-slate-400 mt-1">${safe(j.vehicle)} • ${safe(j.date)}</p>
+   ${j.note?`<p class="text-xs text-slate-300 mt-2">${safe(j.note)}</p>`:""}
+   <button class="btn btn-red mt-3" onclick="deleteJob('${safe(j.id)}')">İşi Sil</button>
+  </div>`).join(""):'<p class="text-sm text-slate-400">Henüz şoföre iş gönderilmedi.</p>';
 
  $("adminTrips").innerHTML=data.trips.length?data.trips.map(t=>`
- <div class="card">
-  <div class="flex justify-between gap-2"><b class="text-amber-300">${safe(t.vehicleInfo)}</b><b class="text-emerald-400">${money(t.fee)}</b></div>
-  <p class="text-xs mt-2">${safe(t.pickup)} → ${safe(t.dropoff)}</p>
-  <p class="text-xs text-slate-400 mt-1">Şoför: ${safe(t.driverName)} • ${safe(t.date)}</p>
-  ${renderPhotos(t)}
-  <button class="btn btn-red mt-3" onclick="deleteTrip('${t.id}')">Seferi Sil</button>
- </div>`).join(""):'<p class="text-sm text-slate-400">Henüz sefer gönderilmedi.</p>';
+  <div class="card">
+   <div class="flex justify-between gap-2"><b class="text-amber-300">${safe(t.vehicleInfo)}</b><b class="text-emerald-400">${money(t.fee)}</b></div>
+   <p class="text-xs mt-2">${safe(t.pickup)} → ${safe(t.dropoff)}</p>
+   <p class="text-xs text-slate-400 mt-1">Şoför: ${safe(t.driverName)} • ${safe(t.date)}</p>
+   ${renderPhotos(t)}
+   <button class="btn btn-red mt-3" onclick="deleteTrip('${safe(t.id)}')">Seferi Sil</button>
+  </div>`).join(""):'<p class="text-sm text-slate-400">Henüz sefer gönderilmedi.</p>';
 
  $("staffList").innerHTML=data.staff.length?data.staff.map(s=>`
- <div class="card flex flex-wrap justify-between gap-3">
-  <div><b>${safe(s.name)}</b><p class="text-xs text-slate-400">${safe(s.plate)} • Maaş: ${money(s.salary)} • Sigorta: ${money(s.insurance)}</p></div>
-  <div class="flex flex-wrap gap-2">
-   <button class="btn btn-amber" onclick="salaryPayment('${s.id}','salary')">Maaş Öde</button>
-   <button class="btn btn-cyan" onclick="salaryPayment('${s.id}','insurance')">Sigorta İşle</button>
-   <button class="btn btn-red" onclick="deleteStaff('${s.id}')">Sil</button>
-  </div>
- </div>`).join(""):'<p class="text-sm text-slate-400">Personel yok.</p>';
+  <div class="card flex flex-wrap justify-between gap-3">
+   <div><b>${safe(s.name)}</b><p class="text-xs text-slate-400">${safe(s.plate)} • Maaş: ${money(s.salary)} • Sigorta: ${money(s.insurance)}</p></div>
+   <div class="flex flex-wrap gap-2">
+    <button class="btn btn-amber" onclick="salaryPayment('${safe(s.id)}','salary')">Maaş Öde</button>
+    <button class="btn btn-cyan" onclick="salaryPayment('${safe(s.id)}','insurance')">Sigorta İşle</button>
+    <button class="btn btn-red" onclick="deleteStaff('${safe(s.id)}')">Sil</button>
+   </div>
+  </div>`).join(""):'<p class="text-sm text-slate-400">Personel yok.</p>';
 
  let income=data.trips.reduce((a,t)=>a+(Number(t.fee)||0),0);
  let expense=0;
@@ -850,19 +838,19 @@ function renderAdmin(){
  $("totalNet").textContent=money(income-expense);
 
  $("financeList").innerHTML=data.entries.length?data.entries.map(x=>`
- <div class="card flex justify-between items-center gap-3">
-  <div><b class="text-sm">${safe(x.title)}</b><p class="text-xs text-slate-400">${safe(x.date)}</p></div>
-  <div class="flex items-center gap-3"><b class="${x.type==="income"?"text-emerald-400":"text-rose-400"}">${x.type==="income"?"+":"-"}${money(x.amount)}</b><button class="text-xs text-rose-400" onclick="deleteFinance('${x.id}')">Sil</button></div>
- </div>`).join(""):'<p class="text-sm text-slate-400">Finans kaydı yok.</p>';
+  <div class="card flex justify-between items-center gap-3">
+   <div><b class="text-sm">${safe(x.title)}</b><p class="text-xs text-slate-400">${safe(x.date)}</p></div>
+   <div class="flex items-center gap-3"><b class="${x.type==="income"?"text-emerald-400":"text-rose-400"}">${x.type==="income"?"+":"-"}${money(x.amount)}</b><button class="text-xs text-rose-400" onclick="deleteFinance('${safe(x.id)}')">Sil</button></div>
+  </div>`).join(""):'<p class="text-sm text-slate-400">Finans kaydı yok.</p>';
 
  $("adminAccountsList").innerHTML=data.admins.map(a=>`
- <div class="card flex justify-between items-center gap-3">
-  <div><b>${safe(a.name)}</b><p class="text-xs text-slate-400">Şifre: •••••••• (Gizli)</p></div>
-  ${data.admins.length>1?`<button class="btn btn-red" onclick="deleteAdmin('${a.id}')">Sil</button>`:"<span class='text-xs text-slate-500'>Ana yönetici</span>"}
- </div>`).join("");
+  <div class="card flex justify-between items-center gap-3">
+   <div><b>${safe(a.name)}</b><p class="text-xs text-slate-400">Şifre: •••••••• (Gizli)</p></div>
+   ${data.admins.length>1?`<button class="btn btn-red" onclick="deleteAdmin('${safe(a.id)}')">Sil</button>`:"<span class='text-xs text-slate-500'>Ana yönetici</span>"}
+  </div>`).join("");
 }
 
-/* GENEL YENİLEME */
+/* BUTONLAR VE BAŞLANGIÇ */
 $("syncBtn").onclick=async()=>{
  const ok=await loadAll();
  if(ok)notify("Veriler başarıyla yenilendi.");
