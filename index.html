@@ -850,11 +850,150 @@ function renderAdmin(){
   </div>`).join("");
 }
 
-/* BUTONLAR VE BAŞLANGIÇ */
-$("syncBtn").onclick=async()=>{
- const ok=await loadAll();
- if(ok)notify("Veriler başarıyla yenilendi.");
-};
+/* YÖNETİCİ ANLIK SEFER BİLDİRİM SİSTEMİ */
+
+let knownTripIds = new Set();
+let tripNotificationReady = false;
+let notificationAudio = null;
+
+function unlockNotificationSound(){
+ try{
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if(!AudioCtx) return;
+
+  if(!notificationAudio){
+   notificationAudio = new AudioCtx();
+  }
+
+  if(notificationAudio.state === "suspended"){
+   notificationAudio.resume();
+  }
+ }catch(e){
+  console.warn("Bildirim sesi açılamadı:",e);
+ }
+}
+
+function playTripNotificationSound(){
+ try{
+  if(!notificationAudio) return;
+
+  if(notificationAudio.state === "suspended"){
+   notificationAudio.resume();
+  }
+
+  const ctx = notificationAudio;
+  const now = ctx.currentTime;
+
+  [0,0.25,0.5].forEach((delay)=>{
+   const oscillator = ctx.createOscillator();
+   const gain = ctx.createGain();
+
+   oscillator.type = "sine";
+   oscillator.frequency.value = 880;
+
+   gain.gain.setValueAtTime(0.0001,now+delay);
+   gain.gain.exponentialRampToValueAtTime(0.25,now+delay+0.03);
+   gain.gain.exponentialRampToValueAtTime(0.0001,now+delay+0.18);
+
+   oscillator.connect(gain);
+   gain.connect(ctx.destination);
+
+   oscillator.start(now+delay);
+   oscillator.stop(now+delay+0.2);
+  });
+ }catch(e){
+  console.warn("Bildirim sesi çalınamadı:",e);
+ }
+}
+
+async function enableTripNotifications(){
+ if("Notification" in window && Notification.permission==="default"){
+  try{
+   await Notification.requestPermission();
+  }catch(e){
+   console.warn("Bildirim izni alınamadı:",e);
+  }
+ }
+}
+
+function sendTripNotification(trip){
+ const message =
+  (trip.driverName || "Şoför")+
+  " yeni sefer gönderdi.\n"+
+  (trip.vehicleInfo || "Araç bilgisi")+
+  "\n"+(trip.pickup || "-")+" → "+(trip.dropoff || "-")+
+  "\nÜcret: "+money(trip.fee);
+
+ // Panel açıksa ekran bildirimi
+ if(adminUnlocked){
+  notify("🔔 YENİ SEFER!\n"+message);
+ }
+
+ // Tarayıcı bildirimi
+ if("Notification" in window && Notification.permission==="granted"){
+  try{
+   const n = new Notification("🚨 Aykut Oto Çekici - Yeni Sefer!",{
+    body:message,
+    tag:"aykut-trip-"+trip.id,
+    requireInteraction:true
+   });
+
+   n.onclick=()=>{
+    window.focus();
+    showMode("admin");
+    if(adminUnlocked){
+     $("adminTrips").scrollIntoView({behavior:"smooth",block:"start"});
+    }
+    n.close();
+   };
+  }catch(e){
+   console.warn("Tarayıcı bildirimi gösterilemedi:",e);
+  }
+ }
+
+ // Sesli uyarı
+ playTripNotificationSound();
+}
+
+async function checkNewTrips(){
+ try{
+  const response=await fetch(
+   `${DB}/${K.trips}.json`,
+   {cache:"no-store"}
+  );
+
+  if(!response.ok) throw new Error("Sefer kontrolü yapılamadı.");
+
+  const result=normalize(await response.json());
+
+  // İlk kontrolde mevcut seferleri kaydet, eski seferlere bildirim gönderme.
+  if(!tripNotificationReady){
+   result.forEach(t=>knownTripIds.add(t.id));
+   tripNotificationReady=true;
+   return;
+  }
+
+  // Sadece daha önce görülmemiş seferleri bildir.
+  const newTrips=result.filter(t=>t.id && !knownTripIds.has(t.id));
+
+  result.forEach(t=>knownTripIds.add(t.id));
+
+  if(newTrips.length){
+   data.trips=result;
+   localWrite(K.trips,result);
+
+   newTrips.forEach(trip=>{
+    sendTripNotification(trip);
+   });
+
+   if(adminUnlocked){
+    renderAdmin();
+   }
+  }
+ }catch(e){
+  console.warn("Anlık sefer kontrolü:",e.message);
+ }
+}
 
 window.changeDriverStatus=changeDriverStatus;
 window.deleteDriver=deleteDriver;
