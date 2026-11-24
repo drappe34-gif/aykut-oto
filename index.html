@@ -1619,6 +1619,9 @@
         } else {
           adminLoginSection?.classList.remove("hidden");
           adminWorkspaceSection?.classList.add("hidden");
+        }
+      }
+
       document.getElementById("openAdminPortalBtn")?.addEventListener("click", async () => {
         if (typeof window.__aykutPullRtdbAccounts === "function") {
           await window.__aykutPullRtdbAccounts();
