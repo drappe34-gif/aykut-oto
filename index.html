@@ -554,119 +554,78 @@
             <div id="statReturningCount" class="font-display text-2xl font-bold text-emerald-400 mt-1">0</div>
           </div>
           <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between gap-2">
-            <div class="flex items-center justify-between gap-1">
+            <div class="flex items-center justify-between gap-1 flex-wrap">
               <button type="button" id="changePinBtn" class="px-2.5 py-1.5 rounded-lg bg-white/10 text-amber-300 text-[11px] font-bold">PIN Değiştir</button>
+              <button type="button" id="firebaseConfigBtn" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 text-[11px] font-bold">Bulut Ayarı</button>
               <button type="button" id="exportJsonBtn" class="px-2.5 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 text-[11px] font-bold">JSON Yedek</button>
             </div>
             <div id="pinChangeBox" class="hidden flex gap-1.5">
               <input id="newPinField" type="text" placeholder="Yeni PIN" class="w-full rounded-lg bg-slate-900 border border-white/15 px-2 py-1 text-xs text-white" />
               <button type="button" id="saveNewPinBtn" class="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 text-xs font-bold">Kaydet</button>
             </div>
+            <div id="firebaseConfigBox" class="hidden space-y-1.5 pt-1">
+              <textarea id="firebaseConfigInput" rows="2" placeholder='{"apiKey":"...","projectId":"..."}' class="w-full rounded-lg bg-slate-900 border border-white/15 px-2 py-1 text-[11px] text-white font-mono"></textarea>
+              <div class="flex items-center justify-between gap-1">
+                <span id="cloudSyncStatus" class="text-[10px] text-slate-400">Yerel mod</span>
+                <button type="button" id="saveFirebaseConfigBtn" class="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 text-[11px] font-bold">Bağlan</button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="grid lg:grid-cols-12 gap-6">
-          <!-- Camera Scanner & History -->
-          <div class="lg:col-span-5 space-y-4">
-            <div class="glass-panel rounded-3xl p-5 border border-amber-400/25 space-y-3.5">
-              <div class="flex items-center justify-between">
-                <h3 class="font-display text-base font-bold text-white">1. Kamera ile Plaka Tanıma</h3>
-                <span id="ocrStatusBadge" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-[11px] font-bold">Hazır</span>
+        <!-- Camera ANPR & Vehicle History Lookup Row -->
+        <div class="grid lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-6 glass-panel rounded-3xl p-5 sm:p-6 border border-amber-400/25 space-y-4">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">1. Kamera / Fotoğraf ANPR</span>
+                <h3 class="font-display text-lg font-bold text-white">Telefon Kamerasıyla Plaka Okut</h3>
               </div>
-
-              <div class="relative rounded-2xl overflow-hidden bg-slate-950 border border-white/15 aspect-video flex items-center justify-center">
-                <video id="plateCameraVideo" autoplay playsinline muted class="hidden w-full h-full object-cover"></video>
-                <canvas id="plateSnapCanvas" class="hidden"></canvas>
-                <div id="plateReticle" class="hidden absolute inset-x-8 top-1/2 -translate-y-1/2 h-14 border-2 border-dashed border-amber-400 rounded-xl pointer-events-none flex items-end justify-center pb-1">
-                  <span class="text-[10px] font-bold bg-slate-950/80 text-amber-300 px-2 rounded">Plakayı Çerçeveye Hizalayın</span>
-                </div>
-                <div id="cameraPlaceholder" class="text-center p-4 space-y-1">
-                  <div class="text-xs font-bold text-slate-300">Telefon Kamerası Kapalı</div>
-                  <div class="text-[11px] text-slate-500">Arka kamerayı açıp plakayı okutabilir veya fotoğraf seçebilirsiniz.</div>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-3 gap-2">
-                <button type="button" id="startCameraBtn" class="px-3 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs">Kamerayı Aç</button>
-                <button type="button" id="capturePlateBtn" disabled class="px-3 py-2.5 rounded-xl bg-emerald-500 disabled:opacity-40 text-slate-950 font-extrabold text-xs">Plakayı Oku</button>
-                <label class="px-3 py-2.5 rounded-xl bg-white/10 text-white font-bold text-xs text-center cursor-pointer">
-                  Fotoğraf Seç
-                  <input id="plateImageUpload" type="file" accept="image/*" capture="environment" class="hidden" />
-                </label>
-              </div>
-
-              <div class="pt-1 flex flex-wrap items-center gap-1.5 text-[11px]">
-                <span class="text-slate-400">Hızlı Test:</span>
-                <button type="button" data-demo-plate="34 CTL 342" class="demo-plate-btn px-2 py-1 rounded-lg bg-slate-900 border border-white/15 text-amber-300 font-bold">34 CTL 342</button>
-                <button type="button" data-demo-plate="39 AYK 054" class="demo-plate-btn px-2 py-1 rounded-lg bg-slate-900 border border-white/15 text-amber-300 font-bold">39 AYK 054</button>
-              </div>
+              <span id="ocrStatusBadge" class="px-2.5 py-1 rounded-lg bg-white/10 text-amber-300 text-xs font-bold">Hazır</span>
             </div>
 
-            <div class="glass-panel rounded-3xl p-5 border border-white/15 space-y-3">
-              <div class="flex items-center justify-between gap-2">
-                <h3 class="font-display text-base font-bold text-white">2. Araç Geliş & Bakım Geçmişi</h3>
-                <span id="historyVisitBadge" class="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[11px] font-bold">Plaka Bekleniyor</span>
+            <div class="relative rounded-2xl overflow-hidden bg-slate-950 border border-white/15 aspect-video flex items-center justify-center">
+              <div id="cameraPlaceholder" class="text-center p-4 space-y-1">
+                <div class="text-xs font-bold text-slate-300">Arka kamerayı açın veya plaka fotoğrafı seçin</div>
+                <div class="text-[11px] text-slate-500">Türk plakaları (Örn: 34 CTL 342) otomatik ayrıştırılır</div>
               </div>
-              <div id="vehicleHistoryContent" class="text-xs text-slate-300 leading-relaxed">
-                Kamerayla plaka okuttuğunuzda veya sağdaki kutuya plaka yazdığınızda; bu aracın en son ne zaman geldiği, son kilometresi, yapılan işlemler ve bakım durumu otomatik listelenir.
-              </div>
+              <video id="plateCameraVideo" autoplay playsinline muted class="hidden w-full h-full object-cover"></video>
+              <div id="plateReticle" class="hidden pointer-events-none absolute inset-x-10 inset-y-14 border-2 border-amber-400/80 rounded-xl shadow-[0_0_0_999px_rgba(2,6,23,0.45)]"></div>
+              <canvas id="plateSnapCanvas" class="hidden"></canvas>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button type="button" id="startCameraBtn" class="tactile-btn bg-amber-400 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-xl">Kamerayı Aç</button>
+              <button type="button" id="capturePlateBtn" disabled class="tactile-surface disabled:opacity-40 bg-emerald-500 text-slate-950 font-extrabold text-xs px-4 py-2.5 rounded-xl">Plakayı Oku</button>
+              <label class="tactile-surface bg-slate-900 border border-white/15 text-white font-bold text-xs px-4 py-2.5 rounded-xl cursor-pointer">
+                <span>Fotoğraf Seç</span>
+                <input id="plateImageUpload" type="file" accept="image/*" capture="environment" class="hidden" />
+              </label>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-1.5 pt-1">
+              <span class="text-[11px] text-slate-400">Hızlı Test:</span>
+              <button type="button" data-demo-plate="34 CTL 342" class="demo-plate-btn px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-amber-300 text-[11px] font-bold">34 CTL 342</button>
+              <button type="button" data-demo-plate="39 AYK 054" class="demo-plate-btn px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-amber-300 text-[11px] font-bold">39 AYK 054</button>
             </div>
           </div>
 
-          <!-- New Record Form -->
-          <div class="lg:col-span-7 glass-panel rounded-3xl p-5 sm:p-6 border border-white/15">
-            <h3 class="font-display text-lg font-bold text-white mb-4">3. Yeni Servis / Tamir / Çekici Kaydı Oluştur</h3>
-            <form id="adminRecordForm" class="space-y-4">
-              <div class="grid sm:grid-cols-2 gap-3">
-                <div>
-                  <label for="recPlate" class="block text-xs font-bold text-amber-300 mb-1">Araç Plakası *</label>
-                  <input id="recPlate" type="text" required placeholder="34 CTL 342" class="w-full uppercase font-display font-bold rounded-xl bg-slate-900 border border-amber-400/40 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
-                </div>
-                <div>
-                  <label for="recDate" class="block text-xs font-bold text-slate-300 mb-1">İşlem Tarihi *</label>
-                  <input id="recDate" type="date" required class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
-                </div>
+          <div class="lg:col-span-6 glass-panel rounded-3xl p-5 sm:p-6 border border-white/15 space-y-4">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">2. Araç Geçmişi & Geliş Analizi</span>
+                <h3 class="font-display text-lg font-bold text-white">Son Geliş, KM & Yapılan İşlemler</h3>
               </div>
+              <span id="historyVisitBadge" class="px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300 text-[11px] font-bold">Plaka Bekleniyor</span>
+            </div>
+            <div id="vehicleHistoryContent" class="text-xs text-slate-300">
+              <div class="p-3 rounded-xl bg-slate-900/80 border border-white/10">Kameradan plaka okutun, hazır plakalardan seçin veya sağdaki forma plaka yazın; aracın geçmiş gelişleri ve bakım kilometresi burada görünecek.</div>
+            </div>
+          </div>
+        </div>
 
-              <div class="grid sm:grid-cols-3 gap-3">
-                <div>
-                  <label for="recBrand" class="block text-xs font-bold text-slate-300 mb-1">Marka *</label>
-                  <select id="recBrand" required class="w-full rounded-xl bg-slate-900 border border-white/15 px-3 py-2.5 text-sm font-semibold text-white focus:outline-none">
-                    <option value="">Marka Seçin...</option>
-                  </select>
-                </div>
-                <div>
-                  <label for="recModel" class="block text-xs font-bold text-slate-300 mb-1">Model *</label>
-                  <select id="recModel" required disabled class="w-full rounded-xl bg-slate-900 border border-white/15 px-3 py-2.5 text-sm font-semibold text-white disabled:opacity-50 focus:outline-none">
-                    <option value="">Önce marka seçin...</option>
-                  </select>
-                </div>
-                <div id="recYearWrapper" class="hidden">
-                  <label for="recYear" class="block text-xs font-bold text-emerald-300 mb-1">Model Yılı *</label>
-                  <select id="recYear" required class="w-full rounded-xl bg-slate-900 border border-emerald-400/40 px-3 py-2.5 text-sm font-semibold text-white focus:outline-none">
-                    <option value="">Yıl seçin...</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="grid sm:grid-cols-2 gap-3">
-                <div>
-                  <label for="recCustomer" class="block text-xs font-bold text-slate-300 mb-1">Müşteri Adı Soyadı</label>
-                  <input id="recCustomer" type="text" placeholder="Ad Soyad" class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
-                </div>
-                <div>
-                  <label for="recPhone" class="block text-xs font-bold text-slate-300 mb-1">Müşteri Telefonu</label>
-                  <input id="recPhone" type="tel" placeholder="05XX XXX XX XX" class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
-                </div>
-              </div>
-
-              <div class="grid sm:grid-cols-3 gap-3">
-                <div>
-                  <label for="recKm" class="block text-xs font-bold text-slate-300 mb-1">Güncel Kilometre (KM) *</label>
-                  <input id="recKm" type="number" required placeholder="148500" class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
-                </div>
-                <div>
-                  <label for="recNextKm" class="block text-xs font-bold text-emerald-300 mb-1">Sonraki Bakım KM</label>
+        <!-- New Record Form -->
+        <div class="glass-panel rounded-3xl p-5 sm:p-6 border border-white/15">
                   <input id="recNextKm" type="number" placeholder="158500" class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
                 </div>
                 <div>
@@ -1057,7 +1016,28 @@
       // ================= ADMIN / USTA PANEL & CAMERA ANPR =================
       const STORAGE_KEY = 'aykut_oto_service_records_v1';
       const PIN_KEY = 'aykut_oto_admin_pin_v1';
+      const CLOUD_CFG_KEY = 'aykut_oto_cloud_cfg_v1';
+      let cameraStream = null;
 
+      function normalizePlate(raw) {
+        return (raw || '')
+          .toUpperCase()
+          .replace(/[^A-Z0-9ĞÜŞİÖÇ]/g, '')
+          .replace(/Ğ/g, 'G')
+          .replace(/Ü/g, 'U')
+          .replace(/Ş/g, 'S')
+          .replace(/İ/g, 'I')
+          .replace(/Ö/g, 'O')
+          .replace(/Ç/g, 'C')
+          .replace(/^(\d{2})([A-Z]{1,3})(\d{2,4})$/, (_, city, letters, nums) => `${city} ${letters} ${nums}`)
+          .trim();
+      }
+
+      function extractTurkishPlate(ocrText) {
+        const cleaned = (ocrText || '').toUpperCase().replace(/[^A-Z0-9\s]/g, ' ');
+        const match = cleaned.match(/\b(0[1-9]|[1-7][0-9]|8[01])\s*[A-Z]{1,3}\s*\d{2,4}\b/);
+        return match ? normalizePlate(match[0]) : '';
+      }
       const defaultSeedRecords = [
         {
           id: 'rec-1',
@@ -1120,126 +1100,177 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
       }
 
-      function normalizePlate(raw) {
-        return (raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^(\d{2})([A-Z]{1,3})(\d{2,4})$/, '$1 $2 $3');
+      // Firestore Live Sync State (with safe auth & fallback to local storage)
+      let cloudDb = null;
+      let cloudRecordsCol = null;
+      let cloudUnsubscribe = null;
+      let cloudActive = false;
+
+      function setCloudStatus(label, isLive) {
+        const badge = document.getElementById('cloudSyncStatus');
+        if (!badge) return;
+        badge.textContent = label;
+        badge.className = isLive ? 'text-[10px] text-emerald-400 font-bold' : 'text-[10px] text-slate-400';
       }
 
-      function extractTurkishPlate(text) {
-        const cleaned = (text || '').toUpperCase().replace(/[^A-Z0-9\s]/g, ' ');
-        const match = cleaned.match(/\b(0[1-9]|[1-7][0-9]|8[01])\s*([A-Z]{1,3})\s*(\d{2,4})\b/);
-        return match ? `${match[1]} ${match[2]} ${match[3]}` : null;
+      function resolveFirebaseConfig() {
+        try {
+          if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+            return JSON.parse(__firebase_config);
+          }
+        } catch (e) {}
+        try {
+          const saved = localStorage.getItem(CLOUD_CFG_KEY);
+          if (saved) return JSON.parse(saved);
+        } catch (e) {}
+        return {
+          apiKey: "AIzaSyCbzU1qqRkGcyKeWEoyb9DzxWeCnqB934M",
+          authDomain: "aykut-oto-servis.firebaseapp.com",
+          projectId: "aykut-oto-servis",
+          storageBucket: "aykut-oto-servis.firebasestorage.app",
+          messagingSenderId: "871636523769",
+          appId: "1:871636523769:web:6cdf0bb117827a5d45e028",
+          measurementId: "G-97P2G1T653"
+        };
       }
 
-      const adminModal = document.getElementById('adminModal');
-      const adminLoginScreen = document.getElementById('adminLoginScreen');
-      const adminDashboard = document.getElementById('adminDashboard');
-      const adminLogoutBtn = document.getElementById('adminLogoutBtn');
-      const recDateInput = document.getElementById('recDate');
-      if (recDateInput) recDateInput.value = new Date().toISOString().split('T')[0];
-
-      let cameraStream = null;
-
-      function stopCamera() {
-        if (cameraStream) {
-          cameraStream.getTracks().forEach(t => t.stop());
-          cameraStream = null;
+      async function initCloudSync() {
+        const cfg = resolveFirebaseConfig();
+        const cfgInput = document.getElementById('firebaseConfigInput');
+        if (cfg && cfgInput && !cfgInput.value) {
+          cfgInput.value = JSON.stringify(cfg);
         }
-        const vid = document.getElementById('plateCameraVideo');
-        const ph = document.getElementById('cameraPlaceholder');
-        const ret = document.getElementById('plateReticle');
-        const capBtn = document.getElementById('capturePlateBtn');
-        if (vid) vid.classList.add('hidden');
-        if (ret) ret.classList.add('hidden');
-        if (ph) ph.classList.remove('hidden');
-        if (capBtn) capBtn.disabled = true;
-      }
+        if (!cfg || !cfg.projectId || !cfg.apiKey) {
+          setCloudStatus('Yerel kayıt aktif', false);
+          return;
+        }
 
-      function openAdminModal() {
-        adminModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        const userInput = document.getElementById('adminUsernameInput');
-        if (userInput && !adminLoginScreen.classList.contains('hidden')) {
-          userInput.focus();
+        try {
+          const appId = typeof __app_id !== 'undefined' && __app_id ? __app_id : 'aykut-oto-catalca';
+          const [{ initializeApp }, { getAuth, signInAnonymously, signInWithCustomToken }, { getFirestore, collection, onSnapshot, addDoc }] = await Promise.all([
+            import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'),
+            import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js'),
+            import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js')
+          ]);
+
+          const fbApp = initializeApp(cfg);
+          const fbAuth = getAuth(fbApp);
+
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(fbAuth, __initial_auth_token);
+          } else {
+            await signInAnonymously(fbAuth);
+          }
+
+          if (!fbAuth.currentUser) {
+            setCloudStatus('Kimlik doğrulanamadı', false);
+            return;
+          }
+
+          cloudDb = getFirestore(fbApp);
+          cloudRecordsCol = collection(cloudDb, 'artifacts', appId, 'public', 'data', 'service_records');
+          cloudActive = true;
+          window.__aykutAddCloudRecord = async (rec) => {
+            await addDoc(cloudRecordsCol, rec);
+          };
+
+          if (cloudUnsubscribe) cloudUnsubscribe();
+          setCloudStatus('Bulut bağlanıyor...', false);
+
+          cloudUnsubscribe = onSnapshot(
+            cloudRecordsCol,
+            snapshot => {
+              const items = [];
+              snapshot.forEach(docSnap => {
+                items.push({ id: docSnap.id, ...docSnap.data() });
+              });
+              items.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+              if (items.length > 0) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+              }
+              setCloudStatus('Canlı bulut aktif', true);
+              if (!adminDashboard.classList.contains('hidden')) {
+                renderDashboard();
+              }
+            },
+            err => {
+              console.warn('Firestore snapshot error:', err);
+              cloudActive = false;
+              setCloudStatus('Yerel yedek mod', false);
+            }
+          );
+        } catch (err) {
+          console.warn('Firestore init fallback:', err);
+          cloudActive = false;
+          setCloudStatus('Yerel kayıt aktif', false);
         }
       }
 
-      function closeAdminModal() {
-        stopCamera();
-        adminModal.classList.add('hidden');
-        document.body.style.overflow = '';
-      }
+      on(document.getElementById('firebaseConfigBtn'), 'click', () => {
+        document.getElementById('firebaseConfigBox')?.classList.toggle('hidden');
+      });
 
-      on(document.getElementById('openAdminModalBtn'), 'click', openAdminModal);
-      on(document.getElementById('footerAdminTrigger'), 'click', openAdminModal);
-      on(document.getElementById('closeAdminModalBtn'), 'click', closeAdminModal);
+      on(document.getElementById('saveFirebaseConfigBtn'), 'click', () => {
+        const raw = (document.getElementById('firebaseConfigInput')?.value || '').trim();
+        if (!raw) return;
+        try {
+          const normalizedRaw = raw.replace(/^\s*(const|let|var)?\s*firebaseConfig\s*=\s*/i, '').replace(/;\s*$/, '');
+          const parsed = new Function(`return (${normalizedRaw});`)();
+          if (!parsed || typeof parsed !== 'object' || !parsed.projectId || !parsed.apiKey) {
+            showToast('apiKey ve projectId içeren geçerli ayar girin.');
+            return;
+          }
+          localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(parsed));
+          showToast('Bulut yapılandırması kaydedildi, bağlanılıyor...');
+          initCloudSync();
+        } catch (e) {
+          showToast('Geçerli Firebase yapılandırması girin.');
+        }
+      });
 
-      on(document.getElementById('adminLoginForm'), 'submit', e => {
+      initCloudSync();
+      on(document.getElementById('adminRecordForm'), 'submit', async e => {
         e.preventDefault();
-        const username = (document.getElementById('adminUsernameInput')?.value || '').trim().toLowerCase();
-        const password = (document.getElementById('adminPasswordInput')?.value || '').trim();
-        const savedUser = (localStorage.getItem('aykut_oto_admin_user_v1') || 'aykut').toLowerCase();
-        const savedPin = localStorage.getItem(PIN_KEY) || '3454';
-        const errEl = document.getElementById('adminLoginError');
+        const plate = normalizePlate(document.getElementById('recPlate').value);
+        const rBrand = adminVehiclePicker.brandSel.value === '__OTHER__' ? 'Diğer' : adminVehiclePicker.brandSel.value;
+        const rModel = adminVehiclePicker.modelSel.value === '__OTHER_MODEL__' ? 'Özel Model' : adminVehiclePicker.modelSel.value;
+        const rYear = adminVehiclePicker.yearSel.value;
+        const vehicleSummary = `${rBrand} ${rModel}${rYear ? ` (${rYear})` : ''}`.trim();
+        const cats = Array.from(document.querySelectorAll('.admin-cat-btn.bg-amber-400')).map(b => b.textContent);
+        const newRec = {
+          id: 'rec-' + Date.now(),
+          plate,
+          vehicle: vehicleSummary,
+          customer: document.getElementById('recCustomer').value.trim(),
+          phone: document.getElementById('recPhone').value.trim(),
+          date: document.getElementById('recDate').value,
+          km: parseInt(document.getElementById('recKm').value, 10) || 0,
+          nextKm: parseInt(document.getElementById('recNextKm').value, 10) || 0,
+          price: parseFloat(document.getElementById('recPrice').value) || 0,
+          categories: cats.length ? cats : ['Genel Servis'],
+          workDone: document.getElementById('recWorkDone').value.trim(),
+          paid: document.getElementById('recPaid').checked
+        };
 
-        if ((username === savedUser || username === 'admin' || username === 'usta') && (password === savedPin || password === '1453')) {
-          if (errEl) errEl.classList.add('hidden');
-          adminLoginScreen.classList.add('hidden');
-          adminDashboard.classList.remove('hidden');
-          adminLogoutBtn.classList.remove('hidden');
-          renderDashboard();
-          showToast('Usta / Admin paneline giriş yapıldı.');
-        } else if (errEl) {
-          errEl.classList.remove('hidden');
+        const list = getRecords();
+        list.unshift(newRec);
+        saveRecords(list);
+
+        if (cloudActive && typeof window.__aykutAddCloudRecord === 'function') {
+          try {
+            const { id, ...cloudPayload } = newRec;
+            await window.__aykutAddCloudRecord(cloudPayload);
+            showToast(`${plate} kaydı buluta ve deftere işlendi.`);
+          } catch (err) {
+            showToast(`${plate} yerel deftere kaydedildi (bulut beklemede).`);
+          }
+        } else {
+          showToast(`${plate} servis kaydı deftere eklendi.`);
         }
-      });
 
-      on(adminLogoutBtn, 'click', () => {
-        stopCamera();
-        adminDashboard.classList.add('hidden');
-        adminLogoutBtn.classList.add('hidden');
-        adminLoginScreen.classList.remove('hidden');
-        const passInput = document.getElementById('adminPasswordInput');
-        if (passInput) passInput.value = '';
-      });
-
-      on(adminLogoutBtn, 'click', () => {
-        stopCamera();
-        adminDashboard.classList.add('hidden');
-        adminLogoutBtn.classList.add('hidden');
-        adminLoginScreen.classList.remove('hidden');
-        document.getElementById('adminPinInput').value = '';
-      });
-
-      on(document.getElementById('changePinBtn'), 'click', () => {
-        document.getElementById('pinChangeBox').classList.toggle('hidden');
-      });
-
-      on(document.getElementById('saveNewPinBtn'), 'click', () => {
-        const val = document.getElementById('newPinField').value.trim();
-        if (val.length >= 4) {
-          localStorage.setItem(PIN_KEY, val);
-          document.getElementById('pinChangeBox').classList.add('hidden');
-          showToast('Yeni PIN kaydedildi.');
-        }
-      });
-
-      on(document.getElementById('exportJsonBtn'), 'click', () => {
-        const blob = new Blob([JSON.stringify(getRecords(), null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `aykut-oto-servis-yedek-${new Date().toISOString().slice(0, 10)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-      });
-
-      // Category selection
-      document.querySelectorAll('.admin-cat-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          btn.classList.toggle('bg-amber-400');
-          btn.classList.toggle('text-slate-950');
-          btn.classList.toggle('border-amber-400');
-        });
+        renderDashboard();
+        window.applyDetectedPlate(plate);
+        document.getElementById('recWorkDone').value = '';
       });
 
       // Vehicle History Lookup
@@ -1421,6 +1452,103 @@
         window.applyDetectedPlate(plate);
         document.getElementById('recWorkDone').value = '';
         showToast(`${plate} servis kaydı deftere eklendi.`);
+      });
+
+      const adminModal = document.getElementById('adminModal');
+      const adminLoginScreen = document.getElementById('adminLoginScreen');
+      const adminDashboard = document.getElementById('adminDashboard');
+
+      function openAdminModal() {
+        if (!adminModal) return;
+        adminModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function stopAdminCamera() {
+        if (cameraStream) {
+          cameraStream.getTracks().forEach(t => t.stop());
+          cameraStream = null;
+        }
+      }
+
+      function closeAdminModal() {
+        stopAdminCamera();
+        if (!adminModal) return;
+        adminModal.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+
+      on(document.getElementById('openAdminModalBtn'), 'click', openAdminModal);
+      on(document.getElementById('footerAdminTrigger'), 'click', openAdminModal);
+      on(document.getElementById('closeAdminModalBtn'), 'click', closeAdminModal);
+
+      on(document.getElementById('adminLoginForm'), 'submit', e => {
+        e.preventDefault();
+        const userVal = (document.getElementById('adminUsernameInput')?.value || '').trim().toLowerCase();
+        const passVal = (document.getElementById('adminPasswordInput')?.value || '').trim();
+        const savedPin = localStorage.getItem(PIN_KEY) || '3454';
+        const validUsers = ['aykut', 'admin', 'usta'];
+        const errEl = document.getElementById('adminLoginError');
+
+        if (validUsers.includes(userVal) && passVal === savedPin) {
+          errEl?.classList.add('hidden');
+          adminLoginScreen?.classList.add('hidden');
+          adminDashboard?.classList.remove('hidden');
+          document.getElementById('adminLogoutBtn')?.classList.remove('hidden');
+          const dateEl = document.getElementById('recDate');
+          if (dateEl && !dateEl.value) {
+            dateEl.value = new Date().toISOString().slice(0, 10);
+          }
+          renderDashboard();
+          showToast('Usta paneline giriş yapıldı.');
+        } else {
+          errEl?.classList.remove('hidden');
+        }
+      });
+
+      on(document.getElementById('adminLogoutBtn'), 'click', () => {
+        stopAdminCamera();
+        adminDashboard?.classList.add('hidden');
+        adminLoginScreen?.classList.remove('hidden');
+        document.getElementById('adminLogoutBtn')?.classList.add('hidden');
+        const pwInput = document.getElementById('adminPasswordInput');
+        if (pwInput) pwInput.value = '';
+      });
+
+      on(document.getElementById('changePinBtn'), 'click', () => {
+        document.getElementById('pinChangeBox')?.classList.toggle('hidden');
+      });
+
+      on(document.getElementById('saveNewPinBtn'), 'click', () => {
+        const nextPin = (document.getElementById('newPinField')?.value || '').trim();
+        if (nextPin.length < 4) {
+          showToast('En az 4 haneli yeni şifre/PIN girin.');
+          return;
+        }
+        localStorage.setItem(PIN_KEY, nextPin);
+        document.getElementById('newPinField').value = '';
+        document.getElementById('pinChangeBox')?.classList.add('hidden');
+        showToast('Giriş şifresi güncellendi.');
+      });
+
+      on(document.getElementById('exportJsonBtn'), 'click', () => {
+        const blob = new Blob([JSON.stringify(getRecords(), null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `aykut-oto-servis-kayitlari-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('JSON yedeği indirildi.');
+      });
+
+      document.querySelectorAll('.admin-cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          btn.classList.toggle('bg-amber-400');
+          btn.classList.toggle('text-slate-950');
+          btn.classList.toggle('bg-slate-900');
+          btn.classList.toggle('text-slate-300');
+        });
       });
 
       function renderDashboard() {
