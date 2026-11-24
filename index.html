@@ -955,6 +955,7 @@ function sendTripNotification(trip){
  playTripNotificationSound();
 }
 
+
 async function checkNewTrips(){
  try{
   const response=await fetch(
@@ -966,34 +967,45 @@ async function checkNewTrips(){
 
   const result=normalize(await response.json());
 
-  // İlk kontrolde mevcut seferleri kaydet, eski seferlere bildirim gönderme.
+  // İlk kontrolde mevcut kayıtları tanı
   if(!tripNotificationReady){
    result.forEach(t=>knownTripIds.add(t.id));
    tripNotificationReady=true;
+   data.trips=result;
    return;
   }
 
-  // Sadece daha önce görülmemiş seferleri bildir.
+  // Yeni gelen seferleri bul
   const newTrips=result.filter(t=>t.id && !knownTripIds.has(t.id));
 
   result.forEach(t=>knownTripIds.add(t.id));
 
-  if(newTrips.length){
-   data.trips=result;
-   localWrite(K.trips,result);
+  // Veriyi güncelle
+  data.trips=result;
+  localWrite(K.trips,result);
 
+  // Yeni sefer varsa bildir
+  if(newTrips.length){
    newTrips.forEach(trip=>{
     sendTripNotification(trip);
    });
-
-   if(adminUnlocked){
-    renderAdmin();
-   }
   }
+
+  // Yönetici panelini her kontrolde güncel tut
+  if(adminUnlocked){
+   renderAdmin();
+  }
+
+  // Şoför panelini de güncel tut
+  if(activeDriver){
+   renderDriver();
+  }
+
  }catch(e){
   console.warn("Anlık sefer kontrolü:",e.message);
  }
 }
+
 
 window.changeDriverStatus=changeDriverStatus;
 window.deleteDriver=deleteDriver;
