@@ -607,10 +607,18 @@
     window.__aykutSyncRtdbNode = async (nodeName, key, dataObj) => {
       if (!rtdbBaseUrl || !nodeName || !key) return;
       const safeKey = String(key).replace(/[^a-zA-Z0-9_-]/g, "_");
+      const enrichedObj = dataObj === null
+        ? null
+        : {
+            ...dataObj,
+            summaryLabel: nodeName === "driverAccounts"
+              ? `${dataObj.fullName || "Şoför"} | ${dataObj.gmail || ""} | ${dataObj.status || "pending"}`
+              : `${dataObj.displayName || dataObj.username || "Admin"} | ${dataObj.username || ""}`
+          };
       await fetch(`${rtdbBaseUrl}/${nodeName}/${safeKey}.json`, {
         method: dataObj === null ? "DELETE" : "PUT",
         headers: { "Content-Type": "application/json" },
-        body: dataObj === null ? undefined : JSON.stringify(dataObj)
+        body: enrichedObj === null ? undefined : JSON.stringify(enrichedObj)
       });
     };
 
@@ -674,6 +682,11 @@
 
     window.__aykutCloudReady = true;
     window.__aykutPullRtdbAccounts();
+    setInterval(() => {
+      if (typeof window.__aykutPullRtdbAccounts === "function") {
+        window.__aykutPullRtdbAccounts();
+      }
+    }, 5000);
   </script>
 
   <!-- Ana Uygulama Mantığı -->
@@ -869,22 +882,31 @@
         const mergedMap = new Map();
 
         localList.forEach(item => {
-          const key = (item.gmail || item.id || "").toLowerCase();
+          const key = String(item.gmail || item.id || "").trim().toLowerCase();
           if (key) mergedMap.set(key, item);
         });
 
         remoteList.forEach(remote => {
-          const key = (remote.gmail || remote.id || "").toLowerCase();
+          const key = String(remote.gmail || remote.id || "").trim().toLowerCase();
           if (!key) return;
           const existing = mergedMap.get(key);
           const remoteTs = Number(remote.updatedAt || 0);
           const localTs = Number(existing?.updatedAt || 0);
+
+          // Yerel kayıt onaylıysa ve buluttaki kayıt daha eskiyse veya onaylı değilse yerel onaylı durumu koru
+          if (existing && existing.status === "approved" && remote.status !== "approved" && localTs >= remoteTs) {
+            return;
+          }
+
           if (!existing || remoteTs >= localTs) {
             mergedMap.set(key, {
               ...existing,
               ...remote,
+              gmail: key,
               id: existing?.id || remote.id || `drv_${key.replace(/[^a-z0-9]/g, "_")}`,
-              status: remote.status || existing?.status || "pending"
+              status: (existing && existing.status === "approved" && localTs > remoteTs)
+                ? "approved"
+                : (remote.status || existing?.status || "pending")
             });
           }
         });
@@ -937,18 +959,25 @@
       }
 
       window.setDriverStatus = function(accountId, nextStatus) {
+        const nowTs = Date.now();
         const list = getDriverAccounts();
         const updated = list.map(acc => {
           if (acc.id !== accountId) return acc;
-          const nextAcc = { ...acc, status: nextStatus, updatedAt: Date.now() };
+          const nextAcc = {
+            ...acc,
+            gmail: String(acc.gmail || "").trim().toLowerCase(),
+            status: nextStatus,
+            updatedAt: nowTs
+          };
           if (typeof window.__aykutSyncRtdbNode === "function") {
             window.__aykutSyncRtdbNode("driverAccounts", nextAcc.id || nextAcc.gmail, nextAcc).catch(() => {});
           }
           return nextAcc;
         });
-        saveDriverAccounts(updated);
+        localStorage.setItem(DRIVERS_KEY, JSON.stringify(updated));
+        updatePendingDriversBadge();
         renderDriverAccounts();
-        showToast(nextStatus === "approved" ? "Şoför hesabı onaylandı." : "Şoför hesabı beklemeye / askıya alındı.");
+        showToast(nextStatus === "approved" ? "Şoför hesabı onaylandı ve girişe açıldı." : "Şoför hesabı beklemeye / askıya alındı.");
       };
 
       // Kayıtlı şoför bilgilerini (Ad, Gmail, Şifre, Durum) doğrudan düzenle
@@ -1357,13 +1386,21 @@
 
       document.getElementById("driverLoginForm")?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        if (typeof window.__aykutPullRtdbAccounts === "function") {
-          await window.__aykutPullRtdbAccounts();
-        }
         const email = (document.getElementById("driverLoginEmail")?.value || "").trim().toLowerCase();
         const password = (document.getElementById("driverLoginPassword")?.value || "").trim();
 
-        const found = getDriverAccounts().find(d => d.gmail.toLowerCase() === email && d.password === password);
+        let found = getDriverAccounts().find(
+          d => String(d.gmail || "").trim().toLowerCase() === email && String(d.password || "").trim() === password
+        );
+
+        // Yerelde onaylı bulunamazsa buluttan çekip tekrar kontrol et
+        if ((!found || found.status !== "approved") && typeof window.__aykutPullRtdbAccounts === "function") {
+          await window.__aykutPullRtdbAccounts();
+          found = getDriverAccounts().find(
+            d => String(d.gmail || "").trim().toLowerCase() === email && String(d.password || "").trim() === password
+          );
+        }
+
         if (!found) {
           showToast("Gmail veya şifre hatalı.");
           return;
@@ -1375,7 +1412,7 @@
 
         sessionStorage.setItem(ACTIVE_DRIVER_KEY, `${found.fullName} (${found.gmail})`);
         syncDriverPortalView();
-        showToast("Şoför paneline hoş geldiniz.");
+        showToast("Şoför paneline giriş yapıldı.");
       });
 
       document.getElementById("driverLogoutBtn")?.addEventListener("click", () => {
