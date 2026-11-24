@@ -36,11 +36,15 @@
         </div>
         <div>
           <h1 class="text-base sm:text-lg font-extrabold text-white leading-tight">Aykut Oto Çekici Paneli</h1>
-          <p class="text-xs text-slate-400">Şoför Üyelik & Sefer Aktarımı • Aylık/Yıllık Gelir-Gider • Maaş & Sigorta</p>
+          <p class="text-xs text-slate-400">Canlı Bulut Senkronizasyon • Şoför Üyelik & Sefer Aktarımı • Maaş & Sigorta</p>
         </div>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
+        <span id="cloudSyncStatus" class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+          Bulut Bağlı
+        </span>
+
         <!-- Üst Bar Hızlı Yönetici Girişi -->
         <form id="topAdminQuickForm" class="flex items-center gap-1.5 bg-surface-950 px-2.5 py-1.5 rounded-2xl border border-amber-500/30">
           <span class="text-[11px] font-bold text-amber-300 hidden sm:inline px-1">Yönetici Girişi:</span>
@@ -54,6 +58,7 @@
           <button id="modeDriverBtn" type="button" class="px-3.5 py-1.5 rounded-xl bg-cyan-500 text-slate-950 text-xs font-extrabold cursor-pointer transition">
             Şoför Ekranı
           </button>
+          <!-- Şoför girişliyken yönetici butonu tamamen gizlenir; şoför yönetici paneline giremez -->
           <button id="modeAdminBtn" type="button" class="px-3.5 py-1.5 rounded-xl text-slate-300 hover:text-white text-xs font-bold cursor-pointer transition">
             Yönetici Paneli
           </button>
@@ -85,7 +90,7 @@
           <div>
             <span class="text-[11px] font-bold uppercase tracking-wider text-cyan-400">Çekici Şoför Portalı</span>
             <h2 class="text-xl font-extrabold text-white">Şoför Giriş & Üyelik Ekranı</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Kayıt olduktan sonra yönetici onayının ardından @gmail ve şifrenizle giriş yapabilirsiniz.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Kendi telefonunuzdan kayıt olup yönetici onayının ardından @gmail ve şifrenizle giriş yapabilirsiniz.</p>
           </div>
           <div class="flex bg-surface-950 p-1 rounded-xl border border-slate-800">
             <button id="tabDriverLogin" type="button" class="px-3.5 py-1.5 rounded-lg bg-cyan-500 text-slate-950 text-xs font-extrabold cursor-pointer">
@@ -233,7 +238,7 @@
         <div>
           <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Yönetici Erişimi</span>
           <h2 class="text-xl font-extrabold text-white">Yönetici Paneli Girişi</h2>
-          <p class="text-xs text-slate-400 mt-1">Varsayılan şifre: <span class="text-amber-300 font-bold">3454</span></p>
+          <p class="text-xs text-slate-400 mt-1">Varsayılan yönetici şifresi: <span class="text-amber-300 font-bold">3454</span></p>
         </div>
         <form id="adminAuthForm" class="space-y-3">
           <div>
@@ -259,6 +264,9 @@
               <label for="filterYear" class="block text-[11px] font-semibold text-slate-400 mb-1">Yıl</label>
               <input id="filterYear" type="number" min="2020" max="2035" class="rounded-xl bg-surface-950 border border-slate-700 px-3 py-2 text-xs font-bold text-white w-24" />
             </div>
+            <button id="manualSyncNowBtn" type="button" class="mt-4 px-3.5 py-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-bold cursor-pointer">
+              Şimdi Buluttan Çek
+            </button>
           </div>
 
           <button id="adminLogoutBtn" type="button" class="px-4 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-bold cursor-pointer">
@@ -358,19 +366,47 @@
 
           <div id="financeEntriesList" class="space-y-2 max-h-72 overflow-y-auto"></div>
         </div>
+
+        <!-- Yönetici Hesapları & Şifre Yönetimi -->
+        <div class="glass rounded-3xl p-5 sm:p-6 space-y-4">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Yönetici Yetkisi</span>
+            <h3 class="text-lg font-extrabold text-white">Yönetici Hesapları & Şifre Ekleme</h3>
+            <p class="text-xs text-slate-400">Kod içindeki <code class="text-amber-300">DEFAULT_ADMINS</code> dizisinden veya buradan yönetici adı ve şifresi ekleyebilirsiniz.</p>
+          </div>
+
+          <form id="addAdminAccountForm" class="grid grid-cols-1 sm:grid-cols-3 gap-3 rounded-2xl bg-surface-950 border border-slate-800 p-4">
+            <input id="newAdminNameInput" type="text" required placeholder="Yönetici Adı (Örn: Aykut Bey)" class="rounded-xl bg-surface-900 border border-slate-700 px-3 py-2 text-xs text-white" />
+            <input id="newAdminPassInput" type="text" required placeholder="Yeni Yönetici Şifresi" class="rounded-xl bg-surface-900 border border-slate-700 px-3 py-2 text-xs text-white" />
+            <button type="submit" class="rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs py-2 px-3 cursor-pointer">
+              Yönetici Hesabı Ekle
+            </button>
+          </form>
+
+          <div id="adminAccountsList" class="space-y-2"></div>
+        </div>
       </div>
     </section>
   </main>
 
   <script>
     (function () {
+      // ==================== BURADAN YÖNETİCİ HESAPLARINI VE ŞİFRELERİNİ EKLEYEBİLİRSİN ====================
+      const DEFAULT_ADMINS = [
+        { id: "adm_1", name: "Aykut Yönetici", password: String(3454) }
+      ];
+
+      // ==================== CANLI BULUT VERİTABANI (TÜM CİHAZLAR ARASI ORTAK) ====================
+      const RTDB_URL = "https://aykut-oto-servis-default-rtdb.firebaseio.com";
+
       const STORAGE = {
-        TRIPS: "aykut_cekici_trips_v2",
-        STAFF: "aykut_cekici_staff_v2",
-        ENTRIES: "aykut_cekici_entries_v2",
-        DRIVER_ACCOUNTS: "aykut_cekici_driver_accounts_v2",
-        ACTIVE_DRIVER: "aykut_cekici_active_driver_v2",
-        ADMIN_UNLOCKED: "aykut_cekici_admin_unlocked_v2"
+        TRIPS: "aykut_cekici_trips_v3",
+        STAFF: "aykut_cekici_staff_v3",
+        ENTRIES: "aykut_cekici_entries_v3",
+        DRIVER_ACCOUNTS: "aykut_cekici_driver_accounts_v3",
+        ADMIN_ACCOUNTS: "aykut_cekici_admin_accounts_v3",
+        ACTIVE_DRIVER: "aykut_cekici_active_driver_v3",
+        ADMIN_UNLOCKED: "aykut_cekici_admin_unlocked_v3"
       };
 
       const CAR_CATALOG = {
@@ -403,15 +439,8 @@
           gmail: "mehmet.kaya@gmail.com",
           password: "1234",
           plate: "34 AYK 01",
-          status: "approved"
-        },
-        {
-          id: "drv_demo_2",
-          name: "Ali Demir",
-          gmail: "ali.demir@gmail.com",
-          password: "1234",
-          plate: "34 AYK 02",
-          status: "pending"
+          status: "approved",
+          updatedAt: 1000
         }
       ];
 
@@ -423,55 +452,16 @@
           plate: "34 AYK 01",
           startDate: "2025-03-10",
           salary: 42000,
-          insurance: 8500
-        },
-        {
-          id: "stf_2",
-          name: "Ali Demir",
-          gmail: "ali.demir@gmail.com",
-          plate: "34 AYK 02",
-          startDate: "2025-08-01",
-          salary: 39000,
-          insurance: 8500
+          insurance: 8500,
+          updatedAt: 1000
         }
       ];
 
-      const DEFAULT_TRIPS = [
-        {
-          id: "trp_demo_1",
-          driverName: "Mehmet Kaya",
-          driverGmail: "mehmet.kaya@gmail.com",
-          truckPlate: "34 AYK 01",
-          brand: "Volkswagen",
-          model: "Golf",
-          year: "2022",
-          vehiclePlate: "34 KLM 456",
-          pickupPlace: "TEM Mahmutbey Gişeler",
-          dropoffPlace: "İkitelli Aykut Oto Servis",
-          fee: 4500,
-          date: "2026-11-20",
-          photoData: ""
-        }
-      ];
-
-      const DEFAULT_ENTRIES = [
-        {
-          id: "ent_demo_1",
-          type: "expense",
-          title: "Mehmet Kaya - Kasım Maaş Ödemesi",
-          amount: 42000,
-          date: "2026-11-05"
-        },
-        {
-          id: "ent_demo_2",
-          type: "expense",
-          title: "Çekici Filosu Aylık Sigorta Gideri",
-          amount: 17000,
-          date: "2026-11-10"
-        }
-      ];
+      const DEFAULT_TRIPS = [];
+      const DEFAULT_ENTRIES = [];
 
       let currentTripPhoto = "";
+      let isSyncingFromCloud = false;
 
       function readList(key, fallback) {
         try {
@@ -482,12 +472,113 @@
         return [...fallback];
       }
 
-      function writeList(key, list) {
+      function writeListLocal(key, list) {
         try {
           localStorage.setItem(key, JSON.stringify(list));
         } catch (e) {
-          const trimmed = list.map((item, idx) => idx > 4 ? { ...item, photoData: "" } : item);
+          const trimmed = list.map((item, idx) => idx > 3 ? { ...item, photoData: "" } : item);
           try { localStorage.setItem(key, JSON.stringify(trimmed)); } catch (_) {}
+        }
+      }
+
+      function setCloudBadge(ok, label) {
+        const el = document.getElementById("cloudSyncStatus");
+        if (!el) return;
+        el.textContent = label || (ok ? "Bulut Canlı" : "Yerel Mod");
+        el.className = ok
+          ? "text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
+          : "text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30";
+      }
+
+      // Firebase Realtime Database REST senkronizasyonu
+      async function cloudPutNode(nodeName, list) {
+        writeListLocal(
+          nodeName === "driverAccounts" ? STORAGE.DRIVER_ACCOUNTS :
+          nodeName === "adminAccounts" ? STORAGE.ADMIN_ACCOUNTS :
+          nodeName === "trips" ? STORAGE.TRIPS :
+          nodeName === "staff" ? STORAGE.STAFF : STORAGE.ENTRIES,
+          list
+        );
+
+        try {
+          const mapObj = {};
+          list.forEach((item, index) => {
+            const key = item.id || `${nodeName}_${index}`;
+            mapObj[key] = { ...item, updatedAt: item.updatedAt || Date.now() };
+          });
+          const res = await fetch(`${RTDB_URL}/${nodeName}.json`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(mapObj)
+          });
+          if (res.ok) setCloudBadge(true, "Bulut Canlı");
+        } catch (err) {
+          setCloudBadge(false, "Çevrimdışı / Yerel");
+        }
+      }
+
+      async function cloudPullNode(nodeName, storageKey, fallbackList) {
+        try {
+          const res = await fetch(`${RTDB_URL}/${nodeName}.json`, { cache: "no-store" });
+          if (!res.ok) {
+            setCloudBadge(false, "Bulut Bekleniyor");
+            return readList(storageKey, fallbackList);
+          }
+          const data = await res.json();
+          setCloudBadge(true, "Bulut Canlı");
+
+          if (!data || typeof data !== "object") {
+            const local = readList(storageKey, fallbackList);
+            if (local.length) {
+              await cloudPutNode(nodeName, local);
+            }
+            return local;
+          }
+
+          const arr = Array.isArray(data)
+            ? data.filter(Boolean)
+            : Object.entries(data).map(([k, val]) => (val && typeof val === "object" ? { id: val.id || k, ...val } : null)).filter(Boolean);
+
+          arr.sort((a, b) => (Number(b.updatedAt) || 0) - (Number(a.updatedAt) || 0));
+          writeListLocal(storageKey, arr);
+          return arr;
+        } catch (err) {
+          setCloudBadge(false, "Yerel Önbellek");
+          return readList(storageKey, fallbackList);
+        }
+      }
+
+      async function syncAllFromCloud(showToast = false) {
+        if (isSyncingFromCloud) return;
+        isSyncingFromCloud = true;
+        try {
+          await Promise.all([
+            cloudPullNode("driverAccounts", STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS),
+            cloudPullNode("adminAccounts", STORAGE.ADMIN_ACCOUNTS, DEFAULT_ADMINS),
+            cloudPullNode("trips", STORAGE.TRIPS, DEFAULT_TRIPS),
+            cloudPullNode("staff", STORAGE.STAFF, DEFAULT_STAFF),
+            cloudPullNode("entries", STORAGE.ENTRIES, DEFAULT_ENTRIES)
+          ]);
+
+          // Aktif giriş yapmış şoförün onay durumu bulutta değiştiyse güncelle
+          const active = getLoggedInDriver();
+          if (active?.gmail) {
+            const drivers = readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS);
+            const freshMe = drivers.find(d => String(d.gmail || "").toLowerCase() === active.gmail.toLowerCase());
+            if (!freshMe || freshMe.status !== "approved") {
+              sessionStorage.removeItem(STORAGE.ACTIVE_DRIVER);
+              syncDriverPortalState();
+            } else {
+              renderDriverSentTrips();
+            }
+          }
+
+          if (sessionStorage.getItem(STORAGE.ADMIN_UNLOCKED) === "1") {
+            renderAdminAll();
+          }
+          if (showToast) toast("Buluttaki güncel veriler çekildi.");
+        } finally {
+          isSyncingFromCloud = false;
         }
       }
 
@@ -504,7 +595,7 @@
         window.__toastTimer = setTimeout(() => el.classList.add("hidden"), 3200);
       }
 
-      function compressPhoto(file, maxW = 900, quality = 0.72) {
+      function compressPhoto(file, maxW = 850, quality = 0.68) {
         return new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = () => {
@@ -564,22 +655,30 @@
           admBtn.className = "px-3.5 py-1.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold cursor-pointer transition";
           drvBtn.className = "px-3.5 py-1.5 rounded-xl text-slate-300 hover:text-white text-xs font-bold cursor-pointer transition";
           syncAdminLock();
+          syncAllFromCloud(false);
         } else {
           admSec.classList.add("hidden");
           drvSec.classList.remove("hidden");
           drvBtn.className = "px-3.5 py-1.5 rounded-xl bg-cyan-500 text-slate-950 text-xs font-extrabold cursor-pointer transition";
           admBtn.className = "px-3.5 py-1.5 rounded-xl text-slate-300 hover:text-white text-xs font-bold cursor-pointer transition";
           syncDriverPortalState();
+          syncAllFromCloud(false);
         }
       }
 
       document.getElementById("modeDriverBtn").addEventListener("click", () => switchMode("driver"));
       document.getElementById("modeAdminBtn").addEventListener("click", () => switchMode("admin"));
+      document.getElementById("manualSyncNowBtn").addEventListener("click", () => syncAllFromCloud(true));
+
+      function isValidAdminPassword(rawPass) {
+        const pass = String(rawPass || "").trim();
+        const admins = readList(STORAGE.ADMIN_ACCOUNTS, DEFAULT_ADMINS);
+        return admins.some(a => String(a.password || "").trim() === pass);
+      }
 
       function attemptAdminUnlock(rawPass) {
-        const pass = String(rawPass || "").trim();
-        if (pass !== "3454") {
-          toast("Yönetici şifresi hatalı (3454).");
+        if (!isValidAdminPassword(rawPass)) {
+          toast("Yönetici şifresi hatalı.");
           return false;
         }
         sessionStorage.setItem(STORAGE.ADMIN_UNLOCKED, "1");
@@ -644,13 +743,24 @@
         const authCard = document.getElementById("driverAuthCard");
         const workspace = document.getElementById("driverActiveWorkspace");
         const infoText = document.getElementById("activeDriverInfoText");
+        const modeAdminBtn = document.getElementById("modeAdminBtn");
+        const topAdminForm = document.getElementById("topAdminQuickForm");
 
         if (active && active.gmail) {
+          // Şoför oturumu açıkken yönetici alanları şoföre tamamen kapalıdır
+          if (modeAdminBtn) modeAdminBtn.classList.add("hidden");
+          if (topAdminForm) topAdminForm.classList.add("hidden");
+          if (sessionStorage.getItem(STORAGE.ADMIN_UNLOCKED) === "1") {
+            sessionStorage.removeItem(STORAGE.ADMIN_UNLOCKED);
+          }
+
           authCard.classList.add("hidden");
           workspace.classList.remove("hidden");
           infoText.textContent = `${active.name} (${active.gmail}) • Çekici: ${active.plate || "-"}`;
           renderDriverSentTrips();
         } else {
+          if (modeAdminBtn) modeAdminBtn.classList.remove("hidden");
+          if (topAdminForm) topAdminForm.classList.remove("hidden");
           authCard.classList.remove("hidden");
           workspace.classList.add("hidden");
         }
@@ -662,7 +772,7 @@
         toast("Şoför oturumu kapatıldı.");
       });
 
-      document.getElementById("driverRegisterForm").addEventListener("submit", (e) => {
+      document.getElementById("driverRegisterForm").addEventListener("submit", async (e) => {
         e.preventDefault();
         const name = document.getElementById("regNameInput").value.trim();
         const plate = document.getElementById("regPlateInput").value.trim().toUpperCase();
@@ -678,6 +788,7 @@
           return;
         }
 
+        await cloudPullNode("driverAccounts", STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS);
         const accounts = readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS);
         if (accounts.some(acc => String(acc.gmail || "").toLowerCase() === gmail)) {
           toast("Bu @gmail adresi zaten kayıtlı.");
@@ -690,38 +801,39 @@
           gmail,
           password,
           plate: plate || "ÇEKİCİ",
-          status: "pending"
+          status: "pending",
+          updatedAt: Date.now()
         });
-        writeList(STORAGE.DRIVER_ACCOUNTS, accounts);
+        await cloudPutNode("driverAccounts", accounts);
 
-        // Kadro listesine başlangıç tarihi ile otomatik ekle
-        const staff = readList(STORAGE.STAFF, DEFAULT_STAFF);
+        const staff = await cloudPullNode("staff", STORAGE.STAFF, DEFAULT_STAFF);
         if (!staff.some(s => String(s.gmail || "").toLowerCase() === gmail)) {
-          staff.push({
+          staff.unshift({
             id: `stf_${Date.now()}`,
             name,
             gmail,
             plate: plate || "ÇEKİCİ",
             startDate: new Date().toISOString().slice(0, 10),
             salary: 0,
-            insurance: 0
+            insurance: 0,
+            updatedAt: Date.now()
           });
-          writeList(STORAGE.STAFF, staff);
+          await cloudPutNode("staff", staff);
         }
 
         e.target.reset();
         setDriverAuthTab("login");
         document.getElementById("loginGmailInput").value = gmail;
         if (sessionStorage.getItem(STORAGE.ADMIN_UNLOCKED) === "1") renderAdminAll();
-        toast("Üyeliğiniz alındı. Yönetici onayından sonra giriş yapabilirsiniz.");
+        toast("Üyeliğiniz buluta kaydedildi. Yönetici onayından sonra giriş yapabilirsiniz.");
       });
 
-      document.getElementById("driverLoginForm").addEventListener("submit", (e) => {
+      document.getElementById("driverLoginForm").addEventListener("submit", async (e) => {
         e.preventDefault();
         const gmail = document.getElementById("loginGmailInput").value.trim().toLowerCase();
         const password = document.getElementById("loginPasswordInput").value.trim();
 
-        const accounts = readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS);
+        const accounts = await cloudPullNode("driverAccounts", STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS);
         const found = accounts.find(acc => String(acc.gmail || "").toLowerCase() === gmail);
 
         if (!found) {
@@ -764,7 +876,7 @@
         }
       });
 
-      document.getElementById("driverTripSubmitForm").addEventListener("submit", (e) => {
+      document.getElementById("driverTripSubmitForm").addEventListener("submit", async (e) => {
         e.preventDefault();
         const active = getLoggedInDriver();
         if (!active || !active.gmail) {
@@ -788,45 +900,85 @@
           driverName: active.name,
           driverGmail: active.gmail,
           truckPlate: active.plate || "ÇEKİCİ",
-          brand,
-          model,
-          year,
-          vehiclePlate: vPlate,
           vehicleInfo: vehicleSummary,
           pickupPlace,
           dropoffPlace,
           fee,
+          adminNote: "",
+          photoData: currentTripPhoto || "",
           date: new Date().toISOString().slice(0, 10),
-          photoData: currentTripPhoto || ""
+          updatedAt: Date.now()
         };
 
+        await cloudPullNode("trips", STORAGE.TRIPS, DEFAULT_TRIPS);
         const trips = readList(STORAGE.TRIPS, DEFAULT_TRIPS);
         trips.unshift(trip);
-        writeList(STORAGE.TRIPS, trips);
+        await cloudPutNode("trips", trips);
 
         e.target.reset();
-        document.getElementById("tripModelSelect").innerHTML = `<option value="">Önce Marka Seçin...</option>`;
         currentTripPhoto = "";
-        const prev = document.getElementById("tripPhotoPreview");
-        prev.src = "";
-        prev.classList.add("hidden");
-
+        document.getElementById("tripPhotoPreview").classList.add("hidden");
         renderDriverSentTrips();
         if (sessionStorage.getItem(STORAGE.ADMIN_UNLOCKED) === "1") renderAdminAll();
-        toast("Sefer bilgileri, ücret ve fotoğraf yöneticiye aktarıldı.");
+        toast("Sefer bilgileri ve fotoğraf yöneticiye aktarıldı.");
       });
 
       window.openPhoto = function (tripId) {
-        const trip = readList(STORAGE.TRIPS, DEFAULT_TRIPS).find(t => t.id === tripId);
-        if (!trip || !trip.photoData) return;
-        document.getElementById("photoModalTitle").textContent = `${trip.vehicleInfo} • ${trip.pickupPlace} → ${trip.dropoffPlace}`;
-        document.getElementById("photoModalImg").src = trip.photoData;
+        const trips = readList(STORAGE.TRIPS, DEFAULT_TRIPS);
+        const target = trips.find(t => t.id === tripId);
+        if (!target || !target.photoData) return;
+        document.getElementById("photoModalTitle").textContent = `${target.vehicleInfo} • ${target.driverName}`;
+        document.getElementById("photoModalImg").src = target.photoData;
         document.getElementById("photoModal").classList.remove("hidden");
       };
 
       document.getElementById("closePhotoModalBtn").addEventListener("click", () => {
         document.getElementById("photoModal").classList.add("hidden");
+        document.getElementById("photoModalImg").src = "";
       });
+
+      window.editTripDetails = async function (tripId) {
+        if (getLoggedInDriver() || sessionStorage.getItem(STORAGE.ADMIN_UNLOCKED) !== "1") {
+          toast("Bu işlem yalnızca yetkili yönetici tarafından yapılabilir.");
+          return;
+        }
+        const trips = readList(STORAGE.TRIPS, DEFAULT_TRIPS);
+        const target = trips.find(t => t.id === tripId);
+        if (!target) return;
+
+        const nextFeeRaw = prompt("Alınan Ücret (₺):", String(target.fee ?? 0));
+        if (nextFeeRaw === null) return;
+        const parsedFee = Number(String(nextFeeRaw).replace(",", "."));
+        if (Number.isNaN(parsedFee) || parsedFee < 0) {
+          toast("Geçerli bir ücret tutarı girin.");
+          return;
+        }
+
+        const nextNoteRaw = prompt("Yönetici Notu:", String(target.adminNote || ""));
+        if (nextNoteRaw === null) return;
+
+        const updated = trips.map(t => t.id === tripId ? {
+          ...t,
+          fee: parsedFee,
+          adminNote: nextNoteRaw.trim(),
+          updatedAt: Date.now()
+        } : t);
+
+        await cloudPutNode("trips", updated);
+        renderAdminAll();
+        toast("Sefer ücreti ve yönetici notu güncellendi.");
+      };
+
+      window.deleteTripItem = async function (tripId) {
+        if (getLoggedInDriver() || sessionStorage.getItem(STORAGE.ADMIN_UNLOCKED) !== "1") {
+          toast("Bu işlem yalnızca yetkili yönetici tarafından yapılabilir.");
+          return;
+        }
+        const filtered = readList(STORAGE.TRIPS, DEFAULT_TRIPS).filter(t => t.id !== tripId);
+        await cloudPutNode("trips", filtered);
+        renderAdminAll();
+        toast("Sefer kaydı silindi.");
+      };
 
       function renderDriverSentTrips() {
         const box = document.getElementById("driverSentTripsList");
@@ -861,32 +1013,32 @@
       }
 
       // ==================== YÖNETİCİ İŞLEMLERİ ====================
-      window.approveDriverAccount = function (accId) {
+      window.approveDriverAccount = async function (accId) {
         const list = readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS).map(acc =>
-          acc.id === accId ? { ...acc, status: "approved" } : acc
+          acc.id === accId ? { ...acc, status: "approved", updatedAt: Date.now() } : acc
         );
-        writeList(STORAGE.DRIVER_ACCOUNTS, list);
+        await cloudPutNode("driverAccounts", list);
         renderAdminAll();
-        toast("Şoför hesabı onaylandı; artık giriş yapabilir.");
+        toast("Şoför hesabı onaylandı; artık telefonundan giriş yapabilir.");
       };
 
-      window.rejectDriverAccount = function (accId) {
+      window.rejectDriverAccount = async function (accId) {
         const list = readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS).map(acc =>
-          acc.id === accId ? { ...acc, status: "pending" } : acc
+          acc.id === accId ? { ...acc, status: "pending", updatedAt: Date.now() } : acc
         );
-        writeList(STORAGE.DRIVER_ACCOUNTS, list);
+        await cloudPutNode("driverAccounts", list);
         renderAdminAll();
         toast("Şoför hesabı beklemeye alındı.");
       };
 
-      window.deleteDriverAccount = function (accId) {
+      window.deleteDriverAccount = async function (accId) {
         const list = readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS).filter(acc => acc.id !== accId);
-        writeList(STORAGE.DRIVER_ACCOUNTS, list);
+        await cloudPutNode("driverAccounts", list);
         renderAdminAll();
         toast("Şoför üyelik kaydı silindi.");
       };
 
-      document.getElementById("addStaffForm").addEventListener("submit", (e) => {
+      document.getElementById("addStaffForm").addEventListener("submit", async (e) => {
         e.preventDefault();
         const staffList = readList(STORAGE.STAFF, DEFAULT_STAFF);
         staffList.push({
@@ -895,15 +1047,16 @@
           plate: document.getElementById("staffPlateInput").value.trim().toUpperCase(),
           startDate: document.getElementById("staffStartDateInput").value,
           salary: Number(document.getElementById("staffSalaryInput").value) || 0,
-          insurance: Number(document.getElementById("staffInsuranceInput").value) || 0
+          insurance: Number(document.getElementById("staffInsuranceInput").value) || 0,
+          updatedAt: Date.now()
         });
-        writeList(STORAGE.STAFF, staffList);
+        await cloudPutNode("staff", staffList);
         e.target.reset();
         renderAdminAll();
-        toast("Çekici ve şoför kaydı eklendi.");
+        toast("Çekici ve şoför kaydı buluta eklendi.");
       });
 
-      window.payStaffSalary = function (staffId) {
+      window.payStaffSalary = async function (staffId) {
         const staff = readList(STORAGE.STAFF, DEFAULT_STAFF).find(s => s.id === staffId);
         if (!staff || !(Number(staff.salary) > 0)) {
           toast("Önce şoför maaş tutarını girin.");
@@ -915,14 +1068,15 @@
           type: "expense",
           title: `${staff.name} (${staff.plate}) - Maaş Ödemesi`,
           amount: Number(staff.salary),
-          date: new Date().toISOString().slice(0, 10)
+          date: new Date().toISOString().slice(0, 10),
+          updatedAt: Date.now()
         });
-        writeList(STORAGE.ENTRIES, entries);
+        await cloudPutNode("entries", entries);
         renderAdminAll();
         toast(`${staff.name} için ${formatTL(staff.salary)} maaş gideri işlendi.`);
       };
 
-      window.payStaffInsurance = function (staffId) {
+      window.payStaffInsurance = async function (staffId) {
         const staff = readList(STORAGE.STAFF, DEFAULT_STAFF).find(s => s.id === staffId);
         if (!staff || !(Number(staff.insurance) > 0)) {
           toast("Önce sigorta tutarını girin.");
@@ -934,14 +1088,15 @@
           type: "expense",
           title: `${staff.name} (${staff.plate}) - Sigorta Gideri`,
           amount: Number(staff.insurance),
-          date: new Date().toISOString().slice(0, 10)
+          date: new Date().toISOString().slice(0, 10),
+          updatedAt: Date.now()
         });
-        writeList(STORAGE.ENTRIES, entries);
+        await cloudPutNode("entries", entries);
         renderAdminAll();
         toast(`${staff.name} için ${formatTL(staff.insurance)} sigorta gideri işlendi.`);
       };
 
-      window.editStaffMember = function (staffId) {
+      window.editStaffMember = async function (staffId) {
         const list = readList(STORAGE.STAFF, DEFAULT_STAFF);
         const target = list.find(s => s.id === staffId);
         if (!target) return;
@@ -956,21 +1111,22 @@
           ...s,
           salary: Number(newSalary) || 0,
           insurance: Number(newInsurance) || 0,
-          startDate: newStart.trim() || s.startDate
+          startDate: newStart.trim() || s.startDate,
+          updatedAt: Date.now()
         } : s);
-        writeList(STORAGE.STAFF, updated);
+        await cloudPutNode("staff", updated);
         renderAdminAll();
         toast("Şoför maaş & sigorta bilgileri güncellendi.");
       };
 
-      window.deleteStaffMember = function (staffId) {
+      window.deleteStaffMember = async function (staffId) {
         const filtered = readList(STORAGE.STAFF, DEFAULT_STAFF).filter(s => s.id !== staffId);
-        writeList(STORAGE.STAFF, filtered);
+        await cloudPutNode("staff", filtered);
         renderAdminAll();
         toast("Kayıt silindi.");
       };
 
-      document.getElementById("addExpenseForm").addEventListener("submit", (e) => {
+      document.getElementById("addExpenseForm").addEventListener("submit", async (e) => {
         e.preventDefault();
         const entries = readList(STORAGE.ENTRIES, DEFAULT_ENTRIES);
         entries.unshift({
@@ -978,19 +1134,51 @@
           type: document.getElementById("expenseTypeSelect").value,
           title: document.getElementById("expenseTitleInput").value.trim(),
           amount: Number(document.getElementById("expenseAmountInput").value) || 0,
-          date: document.getElementById("expenseDateInput").value || new Date().toISOString().slice(0, 10)
+          date: document.getElementById("expenseDateInput").value || new Date().toISOString().slice(0, 10),
+          updatedAt: Date.now()
         });
-        writeList(STORAGE.ENTRIES, entries);
+        await cloudPutNode("entries", entries);
         e.target.reset();
         document.getElementById("expenseDateInput").value = new Date().toISOString().slice(0, 10);
         renderAdminAll();
         toast("Finans kaydı eklendi.");
       });
 
-      window.deleteEntryItem = function (entryId) {
+      window.deleteEntryItem = async function (entryId) {
         const filtered = readList(STORAGE.ENTRIES, DEFAULT_ENTRIES).filter(en => en.id !== entryId);
-        writeList(STORAGE.ENTRIES, filtered);
+        await cloudPutNode("entries", filtered);
         renderAdminAll();
+      };
+
+      document.getElementById("addAdminAccountForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("newAdminNameInput").value.trim();
+        const password = document.getElementById("newAdminPassInput").value.trim();
+        if (!password) return;
+
+        const admins = readList(STORAGE.ADMIN_ACCOUNTS, DEFAULT_ADMINS);
+        admins.push({
+          id: `adm_${Date.now()}`,
+          name: name || "Yönetici",
+          password,
+          updatedAt: Date.now()
+        });
+        await cloudPutNode("adminAccounts", admins);
+        e.target.reset();
+        renderAdminAll();
+        toast("Yeni yönetici hesabı ve şifresi eklendi.");
+      });
+
+      window.deleteAdminAccount = async function (admId) {
+        const admins = readList(STORAGE.ADMIN_ACCOUNTS, DEFAULT_ADMINS);
+        if (admins.length <= 1) {
+          toast("En az bir yönetici hesabı kalmalıdır.");
+          return;
+        }
+        const filtered = admins.filter(a => a.id !== admId);
+        await cloudPutNode("adminAccounts", filtered);
+        renderAdminAll();
+        toast("Yönetici hesabı silindi.");
       };
 
       function renderAdminAll() {
@@ -998,8 +1186,8 @@
         const trips = readList(STORAGE.TRIPS, DEFAULT_TRIPS);
         const staff = readList(STORAGE.STAFF, DEFAULT_STAFF);
         const manualEntries = readList(STORAGE.ENTRIES, DEFAULT_ENTRIES);
+        const admins = readList(STORAGE.ADMIN_ACCOUNTS, DEFAULT_ADMINS);
 
-        // 0. Şoför üyelik onay listesi
         const approvedCount = accounts.filter(a => a.status === "approved").length;
         document.getElementById("pendingDriversBadge").textContent = `${approvedCount} Onaylı / ${accounts.length} Toplam`;
         const accBox = document.getElementById("driverAccountsList");
@@ -1028,7 +1216,6 @@
           `;
         }).join("") : `<p class="text-xs text-slate-400">Kayıtlı şoför hesabı yok.</p>`;
 
-        // Tarih filtreleri
         const monthEl = document.getElementById("filterMonth");
         const yearEl = document.getElementById("filterYear");
         const now = new Date();
@@ -1040,7 +1227,6 @@
         const selMonth = monthEl.value || defMonth;
         const selYear = String(yearEl.value || defYear);
 
-        // 1. Şoförlerden gelen seferler
         document.getElementById("totalTripsCountBadge").textContent = `${trips.length} Sefer`;
         const tripsBox = document.getElementById("adminIncomingTripsList");
         tripsBox.innerHTML = trips.length ? trips.map(t => `
@@ -1053,6 +1239,18 @@
               <p class="text-xs font-semibold text-cyan-300">Nereden Alındı: ${t.pickupPlace}</p>
               <p class="text-xs font-semibold text-sky-300">Nereye Getirildi: ${t.dropoffPlace}</p>
               <p class="text-[11px] text-slate-400">Şoför: ${t.driverName} (${t.driverGmail || ""}) • Çekici: ${t.truckPlate} • ${t.date}</p>
+              ${t.adminNote
+                ? `<p class="text-xs text-amber-200 bg-amber-500/10 border border-amber-500/25 rounded-xl px-2.5 py-1.5 mt-1"><strong>Yönetici Notu:</strong> ${t.adminNote}</p>`
+                : `<p class="text-[11px] text-slate-500 italic">Yönetici notu eklenmemiş.</p>`
+              }
+              <div class="flex flex-wrap items-center gap-2 pt-1.5">
+                <button type="button" onclick="window.editTripDetails('${t.id}')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-[11px] font-bold cursor-pointer">
+                  Ücret Düzenle & Not Ekle
+                </button>
+                <button type="button" onclick="window.deleteTripItem('${t.id}')" class="px-2.5 py-1 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-[11px] font-bold cursor-pointer">
+                  Sil
+                </button>
+              </div>
             </div>
             ${t.photoData
               ? `<img src="${t.photoData}" onclick="window.openPhoto('${t.id}')" alt="Sefer Fotoğrafı" class="w-20 h-16 object-cover rounded-xl border border-slate-700 cursor-pointer shrink-0" />`
@@ -1061,7 +1259,6 @@
           </div>
         `).join("") : `<p class="text-xs text-slate-400">Henüz şoför seferi yok.</p>`;
 
-        // 2. Kayıtlı çekiciler & şoför maaş/sigorta listesi
         const staffBox = document.getElementById("staffRosterList");
         staffBox.innerHTML = staff.length ? staff.map(s => {
           const driverTripTotal = trips
@@ -1104,7 +1301,6 @@
           `;
         }).join("") : `<p class="text-xs text-slate-400">Kayıtlı çekici/şoför yok.</p>`;
 
-        // 3. Aylık & Yıllık Gelir - Gider Hesabı
         const tripIncomeItems = trips.map(t => ({
           id: `auto_${t.id}`,
           type: "income",
@@ -1159,22 +1355,39 @@
             </div>
           </div>
         `).join("") : `<p class="text-xs text-slate-400">${selYear} yılına ait kayıt bulunmuyor.</p>`;
+
+        const admBox = document.getElementById("adminAccountsList");
+        admBox.innerHTML = admins.map(a => `
+          <div class="rounded-xl bg-surface-950 border border-slate-800 px-3.5 py-2.5 flex items-center justify-between gap-3">
+            <div>
+              <span class="text-xs font-extrabold text-amber-300">${a.name}</span>
+              <span class="text-xs text-slate-400 ml-2">• Şifre: <strong class="text-white">${a.password}</strong></span>
+            </div>
+            ${admins.length > 1
+              ? `<button type="button" onclick="window.deleteAdminAccount('${a.id}')" class="text-xs text-rose-400 hover:text-rose-300 font-bold cursor-pointer">Sil</button>`
+              : `<span class="text-[10px] text-slate-500">Varsayılan</span>`
+            }
+          </div>
+        `).join("");
       }
 
       document.getElementById("filterMonth").addEventListener("change", renderAdminAll);
       document.getElementById("filterYear").addEventListener("change", renderAdminAll);
 
-      // İlk yükleme
+      // İlk yükleme & otomatik canlı senkronizasyon (her 6 saniyede bir tüm telefonlarla eşitler)
       const expDateEl = document.getElementById("expenseDateInput");
       if (expDateEl && !expDateEl.value) expDateEl.value = new Date().toISOString().slice(0, 10);
       readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS);
+      readList(STORAGE.ADMIN_ACCOUNTS, DEFAULT_ADMINS);
       readList(STORAGE.STAFF, DEFAULT_STAFF);
       readList(STORAGE.TRIPS, DEFAULT_TRIPS);
       readList(STORAGE.ENTRIES, DEFAULT_ENTRIES);
       populateVehicleSelectors();
       syncDriverPortalState();
       syncAdminLock();
+      syncAllFromCloud(false);
+      setInterval(() => syncAllFromCloud(false), 6000);
     })();
   </script>
 </body>
-</html>
+</html></selection-tag>
