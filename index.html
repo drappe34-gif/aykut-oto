@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr" class="dark">
 <head>
@@ -7,6 +6,8 @@
 <title>Aykut Oto Çekici | Yönetim Paneli</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 *{box-sizing:border-box}
 body{font-family:Inter,Arial,sans-serif;background:#070b14;color:#f8fafc}
@@ -23,6 +24,9 @@ label{display:block;font-size:12px;color:#cbd5e1;margin-bottom:6px;font-weight:6
 .card{background:#080e1b;border:1px solid #263449;border-radius:16px;padding:15px}
 .hidden{display:none!important}
 button:disabled{opacity:.5;cursor:not-allowed}
+#vehicleMap{height:430px;width:100%;border-radius:16px;z-index:1;background:#111827}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0f172a;color:#f8fafc}
+.leaflet-container{font-family:Inter,Arial,sans-serif}
 </style>
 </head>
 <body class="min-h-screen">
@@ -41,7 +45,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
  </div>
 </header>
 
-<div id="toast" class="hidden fixed bottom-5 right-5 z-[100] max-w-sm bg-slate-900 border border-amber-500 rounded-xl p-4 text-sm shadow-2xl"></div>
+<div id="toast" class="hidden fixed bottom-5 right-5 z-[100] max-w-sm bg-slate-900 border border-amber-500 rounded-xl p-4 text-sm shadow-2xl whitespace-pre-line"></div>
 
 <main class="max-w-6xl mx-auto p-4 space-y-5">
 
@@ -68,7 +72,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
  <div id="driverWorkspace" class="hidden space-y-5">
   <div class="glass rounded-2xl p-4 flex flex-wrap justify-between items-center gap-3">
-   <div><p class="text-xs text-emerald-400 font-bold">ŞOFÖR OTURUMU AÇIK</p><h2 id="driverWelcome" class="font-extrabold text-lg"></h2></div>
+   <div><p class="text-xs text-emerald-400 font-bold">ŞOFÖR OTURUMU AÇIK</p><h2 id="driverWelcome" class="font-extrabold text-lg"></h2><p id="gpsStatus" class="text-xs text-slate-400 mt-1">Konum takibi henüz başlatılmadı.</p></div>
    <button id="driverLogout" class="btn btn-red">Çıkış Yap</button>
   </div>
 
@@ -115,6 +119,15 @@ button:disabled{opacity:.5;cursor:not-allowed}
   <div class="glass rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
    <div><p class="text-xs text-amber-400 font-bold">YÖNETİCİ PANELİ</p><h2 class="text-xl font-extrabold">Genel Yönetim</h2></div>
    <div class="flex gap-2"><button id="syncBtn" class="btn btn-cyan">Buluttan Yenile</button><button id="adminLogout" class="btn btn-red">Kilitle</button></div>
+  </div>
+
+  <div class="glass rounded-3xl p-5 space-y-4">
+   <div class="flex flex-wrap justify-between items-center gap-2">
+    <div><p class="text-xs text-emerald-400 font-bold">CANLI GPS TAKİBİ</p><h3 class="text-lg font-extrabold">Araç Takip Haritası</h3><p class="text-xs text-slate-400 mt-1">Konum paylaşımı açık şoförlerin son konumları gösterilir.</p></div>
+    <button id="refreshLocationsBtn" class="btn btn-cyan">Konumları Yenile</button>
+   </div>
+   <div id="vehicleMap"></div>
+   <div id="vehicleLocationList" class="grid grid-cols-1 md:grid-cols-2 gap-3"><p class="text-sm text-slate-400">Araç konumları bekleniyor...</p></div>
   </div>
 
   <div class="glass rounded-3xl p-5 space-y-4">
@@ -197,7 +210,8 @@ const K={
  staff:"aykut_cekici_staff_v3",
  entries:"aykut_cekici_entries_v3",
  admins:"aykut_cekici_admin_accounts_v3",
- jobs:"aykut_cekici_jobs_v1"
+ jobs:"aykut_cekici_jobs_v1",
+ locations:"aykut_cekici_live_locations_v1"
 };
 
 const DEFAULT_ADMINS=[{id:"adm_1",name:"Aykut Yönetici",password:"3454"}];
@@ -331,7 +345,10 @@ function showMode(mode){
  $("driverSection").classList.toggle("hidden",mode!=="driver");
  $("adminSection").classList.toggle("hidden",mode!=="admin");
  if(mode==="driver")renderDriver();
- if(mode==="admin")renderAdmin();
+ if(mode==="admin"){
+  renderAdmin();
+  if(adminUnlocked){startLocationRefresh();setTimeout(()=>vehicleMap&&vehicleMap.invalidateSize(),150);}
+ }
 }
 $("driverModeBtn").onclick=()=>showMode("driver");
 $("adminModeBtn").onclick=()=>showMode("admin");
@@ -401,16 +418,18 @@ $("driverLoginForm").onsubmit=async e=>{
   $("driverAuth").classList.add("hidden");
   $("driverWorkspace").classList.remove("hidden");
   renderDriver();
+  startDriverTracking();
   notify("Hoş geldiniz "+found.name);
  }catch(err){notify("Giriş yapılamadı: "+err.message)}
 };
 
-$("driverLogout").onclick=()=>{
+$("driverLogout").onclick=async()=>{
+ await stopDriverTracking();
  activeDriver=null;
  sessionStorage.removeItem("aykut_active_driver");
  $("driverWorkspace").classList.add("hidden");
  $("driverAuth").classList.remove("hidden");
- notify("Çıkış yapıldı.");
+ notify("Çıkış yapıldı. Konum takibi durduruldu.");
 };
 
 /* ARAÇ SEÇİMİ */
@@ -578,6 +597,157 @@ function renderDriver(){
   </div>`).join(""):'<p class="text-sm text-slate-400">Henüz sefer göndermediniz.</p>';
 }
 
+/* GPS - ŞOFÖR KONUM TAKİBİ */
+const LOCATION_NODE=K.locations;
+let driverWatchId=null;
+let lastLocationSent=0;
+let locationRefreshTimer=null;
+let vehicleMap=null;
+const vehicleMarkers={};
+
+function setGpsStatus(message,isError=false){
+ const el=$("gpsStatus");
+ if(el){el.textContent=message;el.className="text-xs mt-1 "+(isError?"text-rose-400":"text-emerald-400")}
+}
+async function saveDriverLocation(position){
+ if(!activeDriver)return;
+ const now=Date.now();
+ if(now-lastLocationSent<10000)return;
+ lastLocationSent=now;
+ const coords=position.coords;
+ const location={
+  driverId:activeDriver.id,driverName:activeDriver.name,gmail:activeDriver.gmail,plate:activeDriver.plate,
+  latitude:coords.latitude,longitude:coords.longitude,accuracy:coords.accuracy,
+  speed:coords.speed,heading:coords.heading,updatedAt:now,online:true
+ };
+ try{
+  const response=await fetch(`${DB}/${LOCATION_NODE}/${encodeURIComponent(activeDriver.id)}.json`,{
+   method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(location)
+  });
+  if(!response.ok)throw new Error("Firebase HTTP "+response.status);
+  setGpsStatus("● Konum paylaşımı aktif • Son gönderim: "+new Date(now).toLocaleTimeString("tr-TR"));
+ }catch(error){
+  console.warn("GPS Firebase hatası:",error);
+  setGpsStatus("Konum Firebase'e gönderilemedi.",true);
+ }
+}
+function startDriverTracking(){
+ if(!activeDriver)return;
+ if(!window.isSecureContext){
+  setGpsStatus("GPS için HTTPS bağlantısı gerekiyor.",true);
+  notify("Konum takibi için site HTTPS üzerinden açılmalıdır.");
+  return;
+ }
+ if(!navigator.geolocation){
+  setGpsStatus("Bu cihazda konum özelliği desteklenmiyor.",true);
+  notify("Cihazınız konum özelliğini desteklemiyor.");
+  return;
+ }
+ if(driverWatchId!==null)navigator.geolocation.clearWatch(driverWatchId);
+ lastLocationSent=0;
+ setGpsStatus("Konum izni bekleniyor...");
+ driverWatchId=navigator.geolocation.watchPosition(
+  position=>saveDriverLocation(position),
+  error=>{
+   let message="Konum alınamadı.";
+   if(error.code===1)message="Konum izni verilmedi. Tarayıcı ayarlarından izin verin.";
+   else if(error.code===2)message="GPS konumu belirlenemedi. Konum servislerini kontrol edin.";
+   else if(error.code===3)message="Konum isteği zaman aşımına uğradı.";
+   setGpsStatus(message,true);
+   console.warn("GPS:",error.message);
+  },
+  {enableHighAccuracy:true,maximumAge:5000,timeout:20000}
+ );
+}
+async function stopDriverTracking(){
+ if(driverWatchId!==null){
+  navigator.geolocation.clearWatch(driverWatchId);
+  driverWatchId=null;
+ }
+ if(!activeDriver)return;
+ try{
+  await fetch(`${DB}/${LOCATION_NODE}/${encodeURIComponent(activeDriver.id)}.json`,{
+   method:"PATCH",headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({online:false,stoppedAt:Date.now(),updatedAt:Date.now()})
+  });
+ }catch(error){console.warn("GPS durdurma kaydı gönderilemedi:",error)}
+ setGpsStatus("Konum paylaşımı durduruldu.");
+}
+
+/* GPS - YÖNETİCİ CANLI HARİTASI */
+function initVehicleMap(){
+ if(vehicleMap)return;
+ if(!window.L){notify("Harita yüklenemedi. İnternet bağlantısını kontrol edin.");return}
+ const mapElement=$("vehicleMap");
+ if(!mapElement)return;
+ vehicleMap=L.map(mapElement).setView([39,35],6);
+ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+  attribution:'&copy; OpenStreetMap katkıcıları',maxZoom:19
+ }).addTo(vehicleMap);
+}
+async function refreshVehicleLocations(){
+ if(!adminUnlocked)return;
+ try{
+  const response=await fetch(`${DB}/${LOCATION_NODE}.json`,{cache:"no-store"});
+  if(!response.ok)throw new Error("Konumlar okunamadı. HTTP "+response.status);
+  const raw=await response.json();
+  const locations=raw&&typeof raw==="object"?Object.values(raw):[];
+  initVehicleMap();
+  if(!vehicleMap)return;
+  const now=Date.now();
+  const valid=locations.filter(x=>x&&Number.isFinite(Number(x.latitude))&&Number.isFinite(Number(x.longitude)));
+  const list=$("vehicleLocationList");
+  list.innerHTML=valid.length?valid.map(x=>{
+   const online=x.online===true&&now-(Number(x.updatedAt)||0)<90000;
+   return `<div class="card">
+    <div class="flex justify-between items-center gap-2"><b>${safe(x.driverName||"Şoför")}</b>
+    <span class="${online?"text-emerald-400":"text-rose-400"} text-xs font-bold">${online?"● ÇEVRİM İÇİ":"● ÇEVRİM DIŞI"}</span></div>
+    <p class="text-xs text-slate-400 mt-1">Plaka: ${safe(x.plate||"-")}</p>
+    <p class="text-xs text-slate-400">Son güncelleme: ${x.updatedAt?new Date(x.updatedAt).toLocaleString("tr-TR"):"Bilinmiyor"}</p>
+    <p class="text-xs text-slate-400">GPS hassasiyeti: ${Math.round(Number(x.accuracy)||0)} metre</p>
+    <button class="btn btn-dark mt-2" onclick="focusVehicle('${safe(x.driverId)}')">Haritada Göster</button>
+   </div>`;
+  }).join(""):'<p class="text-sm text-slate-400">Henüz konum paylaşan araç yok.</p>';
+
+  const currentIds=new Set();
+  valid.forEach(x=>{
+   const id=String(x.driverId||"");
+   if(!id)return;
+   currentIds.add(id);
+   const lat=Number(x.latitude),lng=Number(x.longitude);
+   const online=x.online===true&&now-(Number(x.updatedAt)||0)<90000;
+   const popup=`<b>${safe(x.driverName||"Şoför")}</b><br>Plaka: ${safe(x.plate||"-")}<br>Durum: ${online?"Çevrim içi":"Çevrim dışı"}<br>Son güncelleme: ${x.updatedAt?new Date(x.updatedAt).toLocaleString("tr-TR"):"-"}`;
+   if(vehicleMarkers[id]){
+    vehicleMarkers[id].setLatLng([lat,lng]);
+    vehicleMarkers[id].setPopupContent(popup);
+   }else{
+    vehicleMarkers[id]=L.marker([lat,lng]).addTo(vehicleMap).bindPopup(popup);
+   }
+  });
+  Object.keys(vehicleMarkers).forEach(id=>{
+   if(!currentIds.has(id)){vehicleMap.removeLayer(vehicleMarkers[id]);delete vehicleMarkers[id]}
+  });
+ }catch(error){
+  console.warn("Araç konumları:",error);
+  $("vehicleLocationList").innerHTML='<p class="text-sm text-rose-400">Konumlar alınamadı. Firebase bağlantı ve erişim kurallarını kontrol edin.</p>';
+ }
+}
+window.focusVehicle=function(id){
+ const marker=vehicleMarkers[id];
+ if(marker&&vehicleMap){vehicleMap.setView(marker.getLatLng(),16);marker.openPopup()}
+};
+$("refreshLocationsBtn").onclick=refreshVehicleLocations;
+function startLocationRefresh(){
+ if(locationRefreshTimer)clearInterval(locationRefreshTimer);
+ refreshVehicleLocations();
+ locationRefreshTimer=setInterval(()=>{
+  if(adminUnlocked&&!document.hidden)refreshVehicleLocations();
+ },5000);
+}
+function stopLocationRefresh(){
+ if(locationRefreshTimer){clearInterval(locationRefreshTimer);locationRefreshTimer=null}
+}
+
 /* YÖNETİCİ GİRİŞİ */
 $("adminLoginForm").onsubmit=async e=>{
  e.preventDefault();
@@ -593,11 +763,16 @@ $("adminLoginForm").onsubmit=async e=>{
   $("adminLoginBox").classList.add("hidden");
   $("adminDashboard").classList.remove("hidden");
   renderAdmin();
+  startLocationRefresh();
+  setTimeout(()=>vehicleMap&&vehicleMap.invalidateSize(),150);
+  unlockNotificationSound();
+  enableTripNotifications();
   notify("Yönetici paneli açıldı.");
  }catch(err){notify("Yönetici bilgileri alınamadı: "+err.message)}
 };
 $("adminLogout").onclick=()=>{
  adminUnlocked=false;
+ stopLocationRefresh();
  $("adminDashboard").classList.add("hidden");
  $("adminLoginBox").classList.remove("hidden");
  notify("Yönetici paneli kilitlendi.");
@@ -851,161 +1026,78 @@ function renderAdmin(){
 }
 
 /* YÖNETİCİ ANLIK SEFER BİLDİRİM SİSTEMİ */
-
-let knownTripIds = new Set();
-let tripNotificationReady = false;
-let notificationAudio = null;
+let knownTripIds=new Set();
+let tripNotificationReady=false;
+let notificationAudio=null;
 
 function unlockNotificationSound(){
  try{
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  if(!AudioCtx) return;
-
-  if(!notificationAudio){
-   notificationAudio = new AudioCtx();
-  }
-
-  if(notificationAudio.state === "suspended"){
-   notificationAudio.resume();
-  }
- }catch(e){
-  console.warn("Bildirim sesi açılamadı:",e);
- }
+  const AudioCtx=window.AudioContext||window.webkitAudioContext;
+  if(!AudioCtx)return;
+  if(!notificationAudio)notificationAudio=new AudioCtx();
+  if(notificationAudio.state==="suspended")notificationAudio.resume();
+ }catch(e){console.warn("Bildirim sesi açılamadı:",e)}
 }
-
 function playTripNotificationSound(){
  try{
-  if(!notificationAudio) return;
-
-  if(notificationAudio.state === "suspended"){
-   notificationAudio.resume();
-  }
-
-  const ctx = notificationAudio;
-  const now = ctx.currentTime;
-
-  [0,0.25,0.5].forEach((delay)=>{
-   const oscillator = ctx.createOscillator();
-   const gain = ctx.createGain();
-
-   oscillator.type = "sine";
-   oscillator.frequency.value = 880;
-
-   gain.gain.setValueAtTime(0.0001,now+delay);
-   gain.gain.exponentialRampToValueAtTime(0.25,now+delay+0.03);
-   gain.gain.exponentialRampToValueAtTime(0.0001,now+delay+0.18);
-
-   oscillator.connect(gain);
-   gain.connect(ctx.destination);
-
-   oscillator.start(now+delay);
-   oscillator.stop(now+delay+0.2);
+  if(!notificationAudio)return;
+  if(notificationAudio.state==="suspended")notificationAudio.resume();
+  const ctx=notificationAudio,now=ctx.currentTime;
+  [0,.25,.5].forEach(delay=>{
+   const oscillator=ctx.createOscillator(),gain=ctx.createGain();
+   oscillator.type="sine";oscillator.frequency.value=880;
+   gain.gain.setValueAtTime(.0001,now+delay);
+   gain.gain.exponentialRampToValueAtTime(.25,now+delay+.03);
+   gain.gain.exponentialRampToValueAtTime(.0001,now+delay+.18);
+   oscillator.connect(gain);gain.connect(ctx.destination);
+   oscillator.start(now+delay);oscillator.stop(now+delay+.2);
   });
- }catch(e){
-  console.warn("Bildirim sesi çalınamadı:",e);
- }
+ }catch(e){console.warn("Bildirim sesi çalınamadı:",e)}
 }
-
 async function enableTripNotifications(){
- if("Notification" in window && Notification.permission==="default"){
-  try{
-   await Notification.requestPermission();
-  }catch(e){
-   console.warn("Bildirim izni alınamadı:",e);
-  }
+ if("Notification" in window&&Notification.permission==="default"){
+  try{await Notification.requestPermission()}catch(e){console.warn("Bildirim izni alınamadı:",e)}
  }
 }
-
 function sendTripNotification(trip){
- const message =
-  (trip.driverName || "Şoför")+
-  " yeni sefer gönderdi.\n"+
-  (trip.vehicleInfo || "Araç bilgisi")+
-  "\n"+(trip.pickup || "-")+" → "+(trip.dropoff || "-")+
-  "\nÜcret: "+money(trip.fee);
-
- // Panel açıksa ekran bildirimi
- if(adminUnlocked){
-  notify("🔔 YENİ SEFER!\n"+message);
- }
-
- // Tarayıcı bildirimi
- if("Notification" in window && Notification.permission==="granted"){
+ const message=(trip.driverName||"Şoför")+" yeni sefer gönderdi.\n"+
+ (trip.vehicleInfo||"Araç bilgisi")+"\n"+(trip.pickup||"-")+" → "+(trip.dropoff||"-")+
+ "\nÜcret: "+money(trip.fee);
+ if(adminUnlocked)notify("🔔 YENİ SEFER!\n"+message);
+ if("Notification" in window&&Notification.permission==="granted"){
   try{
-   const n = new Notification("🚨 Aykut Oto Çekici - Yeni Sefer!",{
-    body:message,
-    tag:"aykut-trip-"+trip.id,
-    requireInteraction:true
-   });
-
+   const n=new Notification("🚨 Aykut Oto Çekici - Yeni Sefer!",{body:message,tag:"aykut-trip-"+trip.id,requireInteraction:true});
    n.onclick=()=>{
-    window.focus();
-    showMode("admin");
-    if(adminUnlocked){
-     $("adminTrips").scrollIntoView({behavior:"smooth",block:"start"});
-    }
+    window.focus();showMode("admin");
+    if(adminUnlocked)$("adminTrips").scrollIntoView({behavior:"smooth",block:"start"});
     n.close();
    };
-  }catch(e){
-   console.warn("Tarayıcı bildirimi gösterilemedi:",e);
-  }
+  }catch(e){console.warn("Tarayıcı bildirimi gösterilemedi:",e)}
  }
-
- // Sesli uyarı
  playTripNotificationSound();
 }
-
-
 async function checkNewTrips(){
  try{
-  const response=await fetch(
-   `${DB}/${K.trips}.json`,
-   {cache:"no-store"}
-  );
-
-  if(!response.ok) throw new Error("Sefer kontrolü yapılamadı.");
-
+  const response=await fetch(`${DB}/${K.trips}.json`,{cache:"no-store"});
+  if(!response.ok)throw new Error("Sefer kontrolü yapılamadı.");
   const result=normalize(await response.json());
-
-  // İlk kontrolde mevcut kayıtları tanı
   if(!tripNotificationReady){
    result.forEach(t=>knownTripIds.add(t.id));
    tripNotificationReady=true;
    data.trips=result;
+   localWrite(K.trips,result);
+   if(adminUnlocked)renderAdmin();
    return;
   }
-
-  // Yeni gelen seferleri bul
-  const newTrips=result.filter(t=>t.id && !knownTripIds.has(t.id));
-
+  const newTrips=result.filter(t=>t.id&&!knownTripIds.has(t.id));
   result.forEach(t=>knownTripIds.add(t.id));
-
-  // Veriyi güncelle
   data.trips=result;
   localWrite(K.trips,result);
-
-  // Yeni sefer varsa bildir
-  if(newTrips.length){
-   newTrips.forEach(trip=>{
-    sendTripNotification(trip);
-   });
-  }
-
-  // Yönetici panelini her kontrolde güncel tut
-  if(adminUnlocked){
-   renderAdmin();
-  }
-
-  // Şoför panelini de güncel tut
-  if(activeDriver){
-   renderDriver();
-  }
-
- }catch(e){
-  console.warn("Anlık sefer kontrolü:",e.message);
- }
+  if(newTrips.length)newTrips.forEach(sendTripNotification);
+  if(adminUnlocked)renderAdmin();
+  if(activeDriver)renderDriver();
+ }catch(e){console.warn("Anlık sefer kontrolü:",e.message)}
 }
-
 
 window.changeDriverStatus=changeDriverStatus;
 window.deleteDriver=deleteDriver;
@@ -1017,11 +1109,18 @@ window.deleteFinance=deleteFinance;
 window.deleteAdmin=deleteAdmin;
 window.updateJobStatus=updateJobStatus;
 
+$("syncBtn").onclick=async()=>{
+ const ok=await loadAll();
+ if(ok){
+  if(adminUnlocked)refreshVehicleLocations();
+  notify("Veriler başarıyla yenilendi.");
+ }
+};
+
 $("financeDate").value=new Date().toISOString().slice(0,10);
 $("jobDate").value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
 
 initLocal();
-
 try{
  const saved=JSON.parse(sessionStorage.getItem("aykut_active_driver")||"null");
  if(saved){
@@ -1033,11 +1132,35 @@ try{
 
 showMode("driver");
 renderDriver();
-loadAll();
-
+loadAll().then(()=>{
+ if(activeDriver)startDriverTracking();
+ checkNewTrips();
+});
 setInterval(()=>{
  if(!document.hidden)loadAll();
 },30000);
+
+/* Şoför seferlerini sayfa yenilemeden kontrol et */
+setInterval(()=>{
+ if(!document.hidden)checkNewTrips();
+},3000);
+
+/* Sekme görünür olduğunda verileri ve konumları tazele */
+document.addEventListener("visibilitychange",()=>{
+ if(!document.hidden){
+  checkNewTrips();
+  if(adminUnlocked)refreshVehicleLocations();
+ }
+});
+
+/* Sekme kapanırken GPS watch tarayıcı tarafından sonlandırılır.
+   Sunucu kaydı güncellenemese bile yönetici ekranı 90 sn sonra çevrim dışı gösterir. */
+window.addEventListener("pagehide",()=>{
+ if(driverWatchId!==null){
+  navigator.geolocation.clearWatch(driverWatchId);
+  driverWatchId=null;
+ }
+});
 </script>
 </body>
 </html>
