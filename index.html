@@ -822,6 +822,50 @@
         showToast("Kayıt silindi.");
       };
 
+      // Şoför sefer fotoğrafını büyük önizleme penceresinde aç
+      window.openTowPhotoModal = function(recordId) {
+        const rec = getRecords().find(r => r.id === recordId);
+        if (!rec || !rec.photoData) {
+          showToast("Bu kayda ait fotoğraf bulunamadı.");
+          return;
+        }
+        let modal = document.getElementById("towPhotoLightbox");
+        if (!modal) {
+          modal = document.createElement("div");
+          modal.id = "towPhotoLightbox";
+          modal.className = "fixed inset-0 z-[70] hidden bg-black/85 backdrop-blur-sm p-4 flex items-center justify-center";
+          modal.innerHTML = `
+            <div class="max-w-3xl w-full glass-panel rounded-3xl border border-slate-700 overflow-hidden p-4 sm:p-6 space-y-4">
+              <div class="flex items-center justify-between gap-2">
+                <div>
+                  <p id="towLightboxTitle" class="text-sm sm:text-base font-extrabold text-amber-300">-</p>
+                  <p id="towLightboxMeta" class="text-xs text-slate-300">-</p>
+                </div>
+                <button id="closeTowLightboxBtn" type="button" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white cursor-pointer">
+                  Kapat ✕
+                </button>
+              </div>
+              <img id="towLightboxImg" src="" alt="Çekici Sefer Fotoğrafı" class="w-full max-h-[70vh] object-contain rounded-2xl bg-surface-950 border border-slate-800" />
+            </div>
+          `;
+          document.body.appendChild(modal);
+          modal.addEventListener("click", (e) => {
+            if (e.target === modal) modal.classList.add("hidden");
+          });
+          document.getElementById("closeTowLightboxBtn")?.addEventListener("click", () => {
+            modal.classList.add("hidden");
+          });
+        }
+
+        const titleEl = document.getElementById("towLightboxTitle");
+        const metaEl = document.getElementById("towLightboxMeta");
+        const imgEl = document.getElementById("towLightboxImg");
+        if (titleEl) titleEl.textContent = `${rec.plate} • ${rec.serviceName} • ${formatCurrency(rec.fee)}`;
+        if (metaEl) metaEl.textContent = `${rec.pickupLocation || "-"} → ${rec.dropoffLocation || "-"} ${rec.driver ? "• " + rec.driver : ""}`;
+        if (imgEl) imgEl.src = rec.photoData;
+        modal.classList.remove("hidden");
+      };
+
       window.__aykutSyncCloudRecords = function(cloudItems) {
         if (!Array.isArray(cloudItems)) return;
         const localItems = getRecords();
@@ -1634,22 +1678,46 @@
           return;
         }
 
-        box.innerHTML = list.map(r => `
-          <div class="rounded-2xl bg-surface-950 border border-slate-800 p-4 flex flex-wrap items-center justify-between gap-3">
-            <div class="space-y-0.5">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-extrabold text-amber-300">${r.plate}</span>
-                <span class="text-xs font-semibold text-white">• ${r.serviceName}</span>
-                <span class="text-xs font-bold text-emerald-300">(${formatCurrency(r.fee)})</span>
+        box.innerHTML = list.map(r => {
+          const isTow = r.source === "tow" || Boolean(r.pickupLocation || r.dropoffLocation || r.photoData);
+          const routeLine = (r.pickupLocation || r.dropoffLocation)
+            ? `<p class="text-xs text-cyan-300 font-semibold mt-1">Konum: ${r.pickupLocation || "-"} → ${r.dropoffLocation || "-"}</p>`
+            : "";
+          const driverLine = r.driver
+            ? `<p class="text-[11px] text-slate-400">Şoför: <span class="text-slate-200 font-semibold">${r.driver}</span></p>`
+            : "";
+          const photoBlock = r.photoData
+            ? `
+              <div class="flex items-center gap-3 mt-2">
+                <button type="button" onclick="window.openTowPhotoModal('${r.id}')" class="group relative rounded-xl overflow-hidden border border-slate-700 hover:border-amber-400 transition cursor-pointer shrink-0">
+                  <img src="${r.photoData}" alt="${r.plate} sefer fotoğrafı" class="w-24 h-16 object-cover group-hover:scale-105 transition" />
+                  <span class="block text-[10px] font-bold bg-slate-950/90 text-amber-300 px-2 py-0.5 text-center">Resmi Büyüt</span>
+                </button>
               </div>
-              <p class="text-xs text-slate-400">${[r.brand, r.model, r.year].filter(Boolean).join(" ")} • ${r.date || "-"}</p>
-              ${r.notes ? `<p class="text-xs text-slate-300">${r.notes}</p>` : ""}
+            `
+            : "";
+
+          return `
+            <div class="rounded-2xl bg-surface-950 border border-slate-800 p-4 flex flex-wrap items-start justify-between gap-3">
+              <div class="space-y-0.5 min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-sm font-extrabold text-amber-300">${r.plate}</span>
+                  <span class="text-xs font-semibold text-white">• ${r.serviceName}</span>
+                  ${isTow ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">Çekici Seferi</span>` : ""}
+                  <span class="text-xs font-bold text-emerald-300">(${formatCurrency(r.fee)})</span>
+                </div>
+                <p class="text-xs text-slate-400">${[r.brand, r.model, r.year].filter(Boolean).join(" ")} • ${r.date || "-"}</p>
+                ${routeLine}
+                ${driverLine}
+                ${r.notes ? `<p class="text-xs text-slate-300 mt-1">${r.notes}</p>` : ""}
+                ${photoBlock}
+              </div>
+              <button type="button" onclick="window.deleteServiceRecord('${r.id}')" class="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-bold cursor-pointer">
+                Sil
+              </button>
             </div>
-            <button type="button" onclick="window.deleteServiceRecord('${r.id}')" class="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-bold cursor-pointer">
-              Sil
-            </button>
-          </div>
-        `).join("");
+          `;
+        }).join("");
       }
 
       // ==================== AYLIK & YILLIK GELİR - GİDER ====================
