@@ -23,11 +23,11 @@
   </script>
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; background: #070b14; color: #f8fafc; overflow-x: hidden; }
-    .glass { background: rgba(13, 20, 36, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.14); }
+    .glass { background: rgba(13, 20, 36, 0.92); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.14); }
   </style>
 </head>
 <body class="min-h-screen bg-surface-950 text-slate-100 antialiased">
-  <!-- Üst Başlık & Mod Seçimi -->
+  <!-- Üst Başlık & Yönetici Girişi -->
   <header class="sticky top-0 z-40 glass border-b border-slate-800/80">
     <div class="max-w-6xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
@@ -36,17 +36,28 @@
         </div>
         <div>
           <h1 class="text-base sm:text-lg font-extrabold text-white leading-tight">Aykut Oto Çekici Paneli</h1>
-          <p class="text-xs text-slate-400">Çekici Sefer Aktarımı • Aylık/Yıllık Gelir-Gider • Maaş & Sigorta</p>
+          <p class="text-xs text-slate-400">Şoför Üyelik & Sefer Aktarımı • Aylık/Yıllık Gelir-Gider • Maaş & Sigorta</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 bg-surface-950 p-1 rounded-2xl border border-slate-800">
-        <button id="modeDriverBtn" type="button" class="px-4 py-2 rounded-xl bg-cyan-500 text-slate-950 text-xs sm:text-sm font-extrabold cursor-pointer transition">
-          Çekici Şoför Paneli
-        </button>
-        <button id="modeAdminBtn" type="button" class="px-4 py-2 rounded-xl text-slate-300 hover:text-white text-xs sm:text-sm font-bold cursor-pointer transition">
-          Yönetici Paneli
-        </button>
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Üst Bar Hızlı Yönetici Girişi -->
+        <form id="topAdminQuickForm" class="flex items-center gap-1.5 bg-surface-950 px-2.5 py-1.5 rounded-2xl border border-amber-500/30">
+          <span class="text-[11px] font-bold text-amber-300 hidden sm:inline px-1">Yönetici Girişi:</span>
+          <input id="topAdminPassInput" type="password" placeholder="Şifre (3454)" class="w-24 sm:w-28 rounded-lg bg-surface-900 border border-slate-700 focus:border-amber-400 focus:outline-none px-2.5 py-1 text-xs text-white" />
+          <button type="submit" class="px-3 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold cursor-pointer transition">
+            Giriş
+          </button>
+        </form>
+
+        <div class="flex items-center gap-1.5 bg-surface-950 p-1 rounded-2xl border border-slate-800">
+          <button id="modeDriverBtn" type="button" class="px-3.5 py-1.5 rounded-xl bg-cyan-500 text-slate-950 text-xs font-extrabold cursor-pointer transition">
+            Şoför Ekranı
+          </button>
+          <button id="modeAdminBtn" type="button" class="px-3.5 py-1.5 rounded-xl text-slate-300 hover:text-white text-xs font-bold cursor-pointer transition">
+            Yönetici Paneli
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -68,112 +79,150 @@
   <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
     <!-- ==================== 1. ÇEKİCİ ŞOFÖR PANELİ ==================== -->
     <section id="driverPanelSection" class="space-y-6">
-      <!-- Şoför Hızlı Giriş / Seçim -->
-      <div class="glass rounded-3xl p-5 sm:p-6 space-y-4">
+      <!-- Giriş & Üye Ol Kartı -->
+      <div id="driverAuthCard" class="glass rounded-3xl p-5 sm:p-6 max-w-2xl mx-auto space-y-5">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-cyan-400">Giriş & Sefer Aktarımı</span>
-            <h2 class="text-xl font-extrabold text-white">Çekici Şoför Ekranı</h2>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-cyan-400">Çekici Şoför Portalı</span>
+            <h2 class="text-xl font-extrabold text-white">Şoför Giriş & Üyelik Ekranı</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Kayıt olduktan sonra yönetici onayının ardından @gmail ve şifrenizle giriş yapabilirsiniz.</p>
           </div>
-          <span id="activeDriverBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
-            Şoför Seçilmedi
-          </span>
-        </div>
-
-        <form id="driverQuickLoginForm" class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
-          <div>
-            <label for="driverGmailInput" class="block text-xs font-semibold text-slate-300 mb-1">Şoför @gmail Adresi</label>
-            <input id="driverGmailInput" list="knownDriversDatalist" type="email" required placeholder="ornek@gmail.com" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
-            <datalist id="knownDriversDatalist"></datalist>
-          </div>
-          <div>
-            <label for="driverPinInput" class="block text-xs font-semibold text-slate-300 mb-1">Şifre</label>
-            <input id="driverPinInput" type="password" required placeholder="Şifrenizi girin" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
-          </div>
-          <div>
-            <label for="driverSelectOrName" class="block text-xs font-semibold text-slate-300 mb-1">Ad Soyad & Çekici Plaka</label>
-            <div class="grid grid-cols-2 gap-2">
-              <input id="driverSelectOrName" type="text" placeholder="Ad Soyad" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-2.5 py-2.5 text-xs text-white" />
-              <input id="driverTruckPlate" type="text" placeholder="34 AYK 01" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-2.5 py-2.5 text-xs uppercase font-semibold text-white" />
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <button type="submit" class="w-full py-2.5 px-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-xs sm:text-sm cursor-pointer transition">
+          <div class="flex bg-surface-950 p-1 rounded-xl border border-slate-800">
+            <button id="tabDriverLogin" type="button" class="px-3.5 py-1.5 rounded-lg bg-cyan-500 text-slate-950 text-xs font-extrabold cursor-pointer">
               Giriş Yap
             </button>
-            <button id="driverLogoutBtn" type="button" class="hidden py-2.5 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 font-bold text-xs cursor-pointer transition shrink-0">
-              Çıkış
+            <button id="tabDriverRegister" type="button" class="px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white text-xs font-bold cursor-pointer">
+              Üye Ol
             </button>
           </div>
-        </form>
-      </div>
-
-      <!-- Şoför Sefer Gönderim Formu -->
-      <div id="driverTripCard" class="glass rounded-3xl p-5 sm:p-6 space-y-5 opacity-60 pointer-events-none">
-        <div>
-          <h3 class="text-lg font-extrabold text-white">Çekilen Araç Bilgilerini Yöneticiye Aktar</h3>
-          <p id="driverLockHint" class="text-xs text-amber-300">Önce @gmail ve şifrenizle giriş yapın; giriş yaptıktan sonra sefer aktarabilirsiniz.</p>
         </div>
-          <div>
-            <label for="driverTruckPlate" class="block text-xs font-semibold text-slate-300 mb-1">Çekici Plakası</label>
-            <input id="driverTruckPlate" type="text" required placeholder="Örn: 34 AYK 01" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm uppercase font-semibold text-white" />
+
+        <!-- Giriş Yap Formu -->
+        <form id="driverLoginForm" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="loginGmailInput" class="block text-xs font-semibold text-slate-300 mb-1">E-posta (@gmail.com)</label>
+              <input id="loginGmailInput" type="email" required placeholder="sofor@gmail.com" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
+            </div>
+            <div>
+              <label for="loginPasswordInput" class="block text-xs font-semibold text-slate-300 mb-1">Şifre</label>
+              <input id="loginPasswordInput" type="password" required placeholder="Şifrenizi girin" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
+            </div>
           </div>
-          <div>
-            <label for="driverPinInput" class="block text-xs font-semibold text-slate-300 mb-1">Şoför Giriş Şifresi</label>
-            <input id="driverPinInput" type="password" required placeholder="Örn: 1234" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
+          <button type="submit" class="w-full py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-sm cursor-pointer transition">
+            Şoför Girişi Yap
+          </button>
+        </form>
+
+        <!-- Üye Ol Formu -->
+        <form id="driverRegisterForm" class="hidden space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="regNameInput" class="block text-xs font-semibold text-slate-300 mb-1">Ad Soyad</label>
+              <input id="regNameInput" type="text" required placeholder="Örn: Ahmet Yılmaz" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
+            </div>
+            <div>
+              <label for="regPlateInput" class="block text-xs font-semibold text-slate-300 mb-1">Çekici Plakası</label>
+              <input id="regPlateInput" type="text" required placeholder="Örn: 34 AYK 03" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm uppercase font-semibold text-white" />
+            </div>
+            <div>
+              <label for="regGmailInput" class="block text-xs font-semibold text-slate-300 mb-1">E-posta (@gmail.com)</label>
+              <input id="regGmailInput" type="email" required placeholder="ahmet.yilmaz@gmail.com" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
+            </div>
+            <div>
+              <label for="regPasswordInput" class="block text-xs font-semibold text-slate-300 mb-1">Şifre Belirle</label>
+              <input id="regPasswordInput" type="password" required minlength="4" placeholder="En az 4 karakter" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
+            </div>
           </div>
-          <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-sm cursor-pointer transition">
-            Şoför Paneline Gir
+          <button type="submit" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm cursor-pointer transition">
+            Üyelik Başvurusu Gönder
           </button>
         </form>
       </div>
 
-      <!-- Şoför Sefer Gönderim Formu -->
-      <div class="glass rounded-3xl p-5 sm:p-6 space-y-5">
-        <div>
-          <h3 class="text-lg font-extrabold text-white">Çekilen Araç Bilgilerini Yöneticiye Aktar</h3>
-          <p class="text-xs text-slate-400">Çekilen aracın bilgisini, nereden alınıp nereye bırakıldığını, alınan ücreti ve varsa fotoğrafını girip gönderin.</p>
+      <!-- Onaylı Şoför Çalışma & Sefer Aktarım Ekranı -->
+      <div id="driverActiveWorkspace" class="hidden space-y-6">
+        <div class="glass rounded-3xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <span class="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-extrabold">
+              Onaylı Şoför
+            </span>
+            <span id="activeDriverInfoText" class="text-sm font-extrabold text-white">-</span>
+          </div>
+          <button id="driverLogoutBtn" type="button" class="px-4 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-bold cursor-pointer">
+            Çıkış Yap
+          </button>
         </div>
 
-        <form id="driverTripSubmitForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Sefer Gönderim Formu -->
+        <div class="glass rounded-3xl p-5 sm:p-6 space-y-5">
           <div>
-            <label for="tripVehicleInfo" class="block text-xs font-semibold text-slate-300 mb-1">Çekilen Araç Bilgisi (Plaka / Marka / Model)</label>
-            <input id="tripVehicleInfo" type="text" required placeholder="Örn: 34 ABC 789 - Fiat Egea" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
+            <span class="text-[11px] font-bold uppercase tracking-wider text-cyan-400">Sefer Bilgisi Aktarımı</span>
+            <h3 class="text-lg font-extrabold text-white">Çekilen Araç Bilgilerini Yöneticiye Gönder</h3>
+            <p class="text-xs text-slate-400">Araç marka/model/yıl seçin, nereden alınıp nereye getirildiğini, alınan ücreti ve fotoğrafı ekleyip gönderin.</p>
           </div>
 
-          <div>
-            <label for="tripFeeAmount" class="block text-xs font-semibold text-slate-300 mb-1">Alınan Ücret (₺)</label>
-            <input id="tripFeeAmount" type="number" min="0" step="50" required placeholder="Örn: 4000" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm font-bold text-emerald-300" />
-          </div>
+          <form id="driverTripSubmitForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label for="tripBrandSelect" class="block text-xs font-semibold text-slate-300 mb-1">Araç Markası</label>
+              <select id="tripBrandSelect" required class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white">
+                <option value="">Marka Seçin...</option>
+              </select>
+            </div>
 
-          <div>
-            <label for="tripPickupPlace" class="block text-xs font-semibold text-slate-300 mb-1">Nereden Alındı?</label>
-            <input id="tripPickupPlace" type="text" required placeholder="Örn: E-5 Avcılar Metrobüs Durağı" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
-          </div>
+            <div>
+              <label for="tripModelSelect" class="block text-xs font-semibold text-slate-300 mb-1">Araç Modeli</label>
+              <select id="tripModelSelect" required class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white">
+                <option value="">Önce Marka Seçin...</option>
+              </select>
+            </div>
 
-          <div>
-            <label for="tripDropoffPlace" class="block text-xs font-semibold text-slate-300 mb-1">Nereye Bırakıldı?</label>
-            <input id="tripDropoffPlace" type="text" required placeholder="Örn: İkitelli Aykut Oto Servis" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
-          </div>
+            <div>
+              <label for="tripYearSelect" class="block text-xs font-semibold text-slate-300 mb-1">Model Yılı</label>
+              <select id="tripYearSelect" required class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white">
+                <option value="">Yıl Seçin...</option>
+              </select>
+            </div>
 
-          <div class="md:col-span-2 space-y-2">
-            <label for="tripPhotoFile" class="block text-xs font-semibold text-slate-300">Araç / Yük Fotoğrafı (Telefon Kamerası veya Galeri)</label>
-            <input id="tripPhotoFile" type="file" accept="image/*" capture="environment" class="block w-full text-xs text-slate-300 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-950 hover:file:bg-cyan-400 cursor-pointer" />
-            <img id="tripPhotoPreview" alt="Önizleme" class="hidden w-full max-h-56 object-cover rounded-2xl border border-slate-700 mt-2" />
-          </div>
+            <div>
+              <label for="tripPlateInput" class="block text-xs font-semibold text-slate-300 mb-1">Çekilen Araç Plakası (Opsiyonel)</label>
+              <input id="tripPlateInput" type="text" placeholder="Örn: 34 ABC 789" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm uppercase text-white" />
+            </div>
 
-          <div class="md:col-span-2 flex justify-end pt-1">
-            <button type="submit" class="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm cursor-pointer transition shadow-lg shadow-emerald-500/20">
-              Yöneticiye Aktar
-            </button>
-          </div>
-        </form>
-      </div>
+            <div>
+              <label for="tripPickupPlace" class="block text-xs font-semibold text-slate-300 mb-1">Nereden Alındı?</label>
+              <input id="tripPickupPlace" type="text" required placeholder="Örn: E-5 Avcılar Metrobüs Durağı" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
+            </div>
 
-      <!-- Şoförün Gönderdiği Son Seferler -->
-      <div class="glass rounded-3xl p-5 sm:p-6 space-y-3">
-        <h3 class="text-sm font-bold text-white">Gönderilen Son Seferler</h3>
-        <div id="driverSentTripsList" class="space-y-2.5"></div>
+            <div>
+              <label for="tripDropoffPlace" class="block text-xs font-semibold text-slate-300 mb-1">Nereye Getirildi?</label>
+              <input id="tripDropoffPlace" type="text" required placeholder="Örn: İkitelli Aykut Oto Servis" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm text-white" />
+            </div>
+
+            <div>
+              <label for="tripFeeAmount" class="block text-xs font-semibold text-slate-300 mb-1">Ne Kadar Ücret Alındı? (₺)</label>
+              <input id="tripFeeAmount" type="number" min="0" step="50" required placeholder="Örn: 4500" class="w-full rounded-xl bg-surface-950 border border-slate-700 focus:border-cyan-400 focus:outline-none px-3.5 py-2.5 text-sm font-bold text-emerald-300" />
+            </div>
+
+            <div class="md:col-span-2 space-y-2">
+              <label for="tripPhotoFile" class="block text-xs font-semibold text-slate-300">Fotoğraf Ekle (Kamera veya Galeri)</label>
+              <input id="tripPhotoFile" type="file" accept="image/*" capture="environment" class="block w-full text-xs text-slate-300 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-cyan-500 file:text-slate-950 hover:file:bg-cyan-400 cursor-pointer" />
+              <img id="tripPhotoPreview" alt="Önizleme" class="hidden w-full max-h-56 object-cover rounded-2xl border border-slate-700 mt-2" />
+            </div>
+
+            <div class="md:col-span-3 flex justify-end pt-1">
+              <button type="submit" class="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm cursor-pointer transition shadow-lg shadow-emerald-500/20">
+                Yöneticiye Aktar
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Şoförün Gönderdiği Seferler -->
+        <div class="glass rounded-3xl p-5 sm:p-6 space-y-3">
+          <h3 class="text-sm font-bold text-white">Gönderdiğim Son Seferler</h3>
+          <div id="driverSentTripsList" class="space-y-2.5"></div>
+        </div>
       </div>
     </section>
 
@@ -183,7 +232,7 @@
       <div id="adminLoginCard" class="glass rounded-3xl p-6 max-w-md mx-auto space-y-4">
         <div>
           <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Yönetici Erişimi</span>
-          <h2 class="text-xl font-extrabold text-white">Yönetici Girişi</h2>
+          <h2 class="text-xl font-extrabold text-white">Yönetici Paneli Girişi</h2>
           <p class="text-xs text-slate-400 mt-1">Varsayılan şifre: <span class="text-amber-300 font-bold">3454</span></p>
         </div>
         <form id="adminAuthForm" class="space-y-3">
@@ -217,7 +266,7 @@
           </button>
         </div>
 
-        <!-- Aylık & Yıllık Gelir - Gider Özet Kartları (Tüm Çekiciler + Maaş/Sigorta/Giderler) -->
+        <!-- Aylık & Yıllık Gelir - Gider Özet Kartları -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="glass rounded-2xl p-4">
             <p class="text-xs text-slate-400">Seçili Ay Gelir (Tüm Çekiciler)</p>
@@ -226,7 +275,7 @@
           <div class="glass rounded-2xl p-4">
             <p class="text-xs text-slate-400">Seçili Ay Gider (Maaş + Sigorta + Gider)</p>
             <p id="statMonthExpense" class="text-xl font-extrabold text-rose-400 mt-1">0 ₺</p>
-            <p id="statMonthNet" class="text-xs font-bold text-amber-300 mt-1">Net: 0 ₺</p>
+            <p id="statMonthNet" class="text-xs font-bold text-amber-300 mt-1">Aylık Net: 0 ₺</p>
           </div>
           <div class="glass rounded-2xl p-4">
             <p class="text-xs text-slate-400">Seçili Yıl Toplam Gelir</p>
@@ -239,21 +288,35 @@
           </div>
         </div>
 
+        <!-- Şoför Üyelik Onay & Hesap Yönetimi -->
+        <div class="glass rounded-3xl p-5 sm:p-6 space-y-4">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Üyelik Onayı</span>
+              <h3 class="text-lg font-extrabold text-white">Kayıt Olan Şoförler (Onay / Giriş Yetkisi)</h3>
+            </div>
+            <span id="pendingDriversBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              0 Onaylı
+            </span>
+          </div>
+          <div id="driverAccountsList" class="space-y-2.5"></div>
+        </div>
+
         <!-- Şoförlerin Gönderdiği Seferler -->
         <div class="glass rounded-3xl p-5 sm:p-6 space-y-4">
           <div class="flex items-center justify-between gap-2">
             <div>
               <span class="text-[11px] font-bold uppercase tracking-wider text-cyan-400">Şoför Aktarımları</span>
-              <h3 class="text-lg font-extrabold text-white">Şoförlerden Gelen Sefer Bilgileri</h3>
+              <h3 class="text-lg font-extrabold text-white">Şoförlerden Gelen Sefer Bilgileri & Fotoğraflar</h3>
             </div>
-            <span id="totalTripsCountBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+            <span id="totalTripsCountBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
               0 Sefer
             </span>
           </div>
           <div id="adminIncomingTripsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
 
-        <!-- Kayıtlı Çekici & Şoför Listesi: Başlangıç Tarihi, Maaş, Sigorta & Ödenen Maaş Kaydı -->
+        <!-- Kayıtlı Çekici & Şoför Listesi: Başlangıç Tarihi, Maaş, Sigorta -->
         <div class="glass rounded-3xl p-5 sm:p-6 space-y-5">
           <div>
             <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Kadro & Çekici Takibi</span>
@@ -283,7 +346,7 @@
               <option value="expense">Gider (-)</option>
               <option value="income">Ek Gelir (+)</option>
             </select>
-            <input id="expenseTitleInput" type="text" required placeholder="Açıklama (Örn: Ahmet Maaş Ödemesi, Mazot)" class="rounded-xl bg-surface-900 border border-slate-700 px-3 py-2 text-xs text-white sm:col-span-2" />
+            <input id="expenseTitleInput" type="text" required placeholder="Açıklama (Örn: Maaş Ödemesi, Mazot)" class="rounded-xl bg-surface-900 border border-slate-700 px-3 py-2 text-xs text-white sm:col-span-2" />
             <input id="expenseAmountInput" type="number" min="1" step="50" required placeholder="Tutar (₺)" class="rounded-xl bg-surface-900 border border-slate-700 px-3 py-2 text-xs text-white" />
             <div class="flex gap-2">
               <input id="expenseDateInput" type="date" required class="rounded-xl bg-surface-900 border border-slate-700 px-2.5 py-2 text-xs text-white w-full" />
@@ -302,12 +365,55 @@
   <script>
     (function () {
       const STORAGE = {
-        TRIPS: "aykut_cekici_trips_v1",
-        STAFF: "aykut_cekici_staff_v1",
-        ENTRIES: "aykut_cekici_entries_v1",
-        ACTIVE_DRIVER: "aykut_cekici_active_driver_v1",
-        ADMIN_UNLOCKED: "aykut_cekici_admin_unlocked_v1"
+        TRIPS: "aykut_cekici_trips_v2",
+        STAFF: "aykut_cekici_staff_v2",
+        ENTRIES: "aykut_cekici_entries_v2",
+        DRIVER_ACCOUNTS: "aykut_cekici_driver_accounts_v2",
+        ACTIVE_DRIVER: "aykut_cekici_active_driver_v2",
+        ADMIN_UNLOCKED: "aykut_cekici_admin_unlocked_v2"
       };
+
+      const CAR_CATALOG = {
+        "Fiat": ["Egea Sedan", "Egea Cross", "Linea", "Doblo", "Fiorino", "500X", "Tipo"],
+        "Renault": ["Clio", "Megane", "Taliant", "Austral", "Captur", "Koleos", "Kangoo", "Express"],
+        "Volkswagen": ["Passat", "Golf", "Polo", "Tiguan", "T-Roc", "Jetta", "Caddy", "Transporter", "Amarok"],
+        "Toyota": ["Corolla", "C-HR", "Yaris", "Rav4", "Hilux", "Auris", "Avensis"],
+        "Ford": ["Focus", "Fiesta", "Puma", "Kuga", "Transit", "Courier", "Ranger", "Mondeo"],
+        "Hyundai": ["i20", "i30", "Tucson", "Bayon", "Elantra", "Accent Blue", "Kona"],
+        "Peugeot": ["208", "308", "408", "2008", "3008", "5008", "Rifter", "Partner"],
+        "Opel": ["Corsa", "Astra", "Mokka", "Grandland", "Crossland", "Insignia"],
+        "BMW": ["1 Serisi", "2 Serisi", "3 Serisi", "5 Serisi", "X1", "X3", "X5"],
+        "Mercedes-Benz": ["A Serisi", "C Serisi", "E Serisi", "CLA", "GLA", "GLC", "Vito", "Sprinter"],
+        "Audi": ["A3", "A4", "A5", "A6", "Q2", "Q3", "Q5"],
+        "Honda": ["Civic", "City", "HR-V", "CR-V", "Jazz"],
+        "Nissan": ["Qashqai", "Juke", "X-Trail", "Micra", "Navara"],
+        "Dacia": ["Duster", "Sandero", "Jogger", "Logan"],
+        "Skoda": ["Octavia", "Superb", "Fabia", "Kamiq", "Karoq", "Kodiaq"],
+        "Kia": ["Stonic", "Sportage", "Ceed", "Rio", "XCeed"],
+        "Citroen": ["C3", "C4", "C4 X", "C5 Aircross", "Berlingo"],
+        "Chery": ["Tiggo 7 Pro", "Tiggo 8 Pro", "Omoda 5"],
+        "Togg": ["T10X"],
+        "Diğer": ["Binek Araç", "SUV / 4x4", "Ticari Araç", "Motosiklet"]
+      };
+
+      const DEFAULT_DRIVER_ACCOUNTS = [
+        {
+          id: "drv_demo_1",
+          name: "Mehmet Kaya",
+          gmail: "mehmet.kaya@gmail.com",
+          password: "1234",
+          plate: "34 AYK 01",
+          status: "approved"
+        },
+        {
+          id: "drv_demo_2",
+          name: "Ali Demir",
+          gmail: "ali.demir@gmail.com",
+          password: "1234",
+          plate: "34 AYK 02",
+          status: "pending"
+        }
+      ];
 
       const DEFAULT_STAFF = [
         {
@@ -317,8 +423,7 @@
           plate: "34 AYK 01",
           startDate: "2025-03-10",
           salary: 42000,
-          insurance: 8500,
-          pin: "1234"
+          insurance: 8500
         },
         {
           id: "stf_2",
@@ -327,8 +432,7 @@
           plate: "34 AYK 02",
           startDate: "2025-08-01",
           salary: 39000,
-          insurance: 8500,
-          pin: "1234"
+          insurance: 8500
         }
       ];
 
@@ -336,8 +440,12 @@
         {
           id: "trp_demo_1",
           driverName: "Mehmet Kaya",
+          driverGmail: "mehmet.kaya@gmail.com",
           truckPlate: "34 AYK 01",
-          vehicleInfo: "34 KLM 456 - Volkswagen Golf",
+          brand: "Volkswagen",
+          model: "Golf",
+          year: "2022",
+          vehiclePlate: "34 KLM 456",
           pickupPlace: "TEM Mahmutbey Gişeler",
           dropoffPlace: "İkitelli Aykut Oto Servis",
           fee: 4500,
@@ -393,7 +501,7 @@
         el.textContent = text;
         el.classList.remove("hidden");
         clearTimeout(window.__toastTimer);
-        window.__toastTimer = setTimeout(() => el.classList.add("hidden"), 3000);
+        window.__toastTimer = setTimeout(() => el.classList.add("hidden"), 3200);
       }
 
       function compressPhoto(file, maxW = 900, quality = 0.72) {
@@ -419,7 +527,31 @@
         });
       }
 
-      // ==================== MOD GEÇİŞİ (ŞOFÖR / YÖNETİCİ) ====================
+      // ==================== ARAÇ MARKA / MODEL / YIL SEÇİCİLERİ ====================
+      function populateVehicleSelectors() {
+        const brandSel = document.getElementById("tripBrandSelect");
+        const modelSel = document.getElementById("tripModelSelect");
+        const yearSel = document.getElementById("tripYearSelect");
+
+        brandSel.innerHTML = `<option value="">Marka Seçin...</option>` +
+          Object.keys(CAR_CATALOG).map(b => `<option value="${b}">${b}</option>`).join("");
+
+        modelSel.innerHTML = `<option value="">Önce Marka Seçin...</option>`;
+
+        const years = [];
+        for (let y = 2026; y >= 1985; y--) years.push(y);
+        yearSel.innerHTML = `<option value="">Yıl Seçin...</option>` +
+          years.map(y => `<option value="${y}">${y}</option>`).join("");
+
+        brandSel.addEventListener("change", () => {
+          const models = CAR_CATALOG[brandSel.value] || [];
+          modelSel.innerHTML = models.length
+            ? `<option value="">Model Seçin...</option>` + models.map(m => `<option value="${m}">${m}</option>`).join("")
+            : `<option value="">Önce Marka Seçin...</option>`;
+        });
+      }
+
+      // ==================== MOD GEÇİŞİ & YÖNETİCİ GİRİŞİ ====================
       function switchMode(mode) {
         const drvBtn = document.getElementById("modeDriverBtn");
         const admBtn = document.getElementById("modeAdminBtn");
@@ -429,129 +561,194 @@
         if (mode === "admin") {
           drvSec.classList.add("hidden");
           admSec.classList.remove("hidden");
-          admBtn.className = "px-4 py-2 rounded-xl bg-amber-500 text-slate-950 text-xs sm:text-sm font-extrabold cursor-pointer transition";
-          drvBtn.className = "px-4 py-2 rounded-xl text-slate-300 hover:text-white text-xs sm:text-sm font-bold cursor-pointer transition";
+          admBtn.className = "px-3.5 py-1.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-extrabold cursor-pointer transition";
+          drvBtn.className = "px-3.5 py-1.5 rounded-xl text-slate-300 hover:text-white text-xs font-bold cursor-pointer transition";
           syncAdminLock();
         } else {
           admSec.classList.add("hidden");
           drvSec.classList.remove("hidden");
-          drvBtn.className = "px-4 py-2 rounded-xl bg-cyan-500 text-slate-950 text-xs sm:text-sm font-extrabold cursor-pointer transition";
-          admBtn.className = "px-4 py-2 rounded-xl text-slate-300 hover:text-white text-xs sm:text-sm font-bold cursor-pointer transition";
-          renderDriverDatalist();
-          renderDriverSentTrips();
+          drvBtn.className = "px-3.5 py-1.5 rounded-xl bg-cyan-500 text-slate-950 text-xs font-extrabold cursor-pointer transition";
+          admBtn.className = "px-3.5 py-1.5 rounded-xl text-slate-300 hover:text-white text-xs font-bold cursor-pointer transition";
+          syncDriverPortalState();
         }
       }
 
       document.getElementById("modeDriverBtn").addEventListener("click", () => switchMode("driver"));
       document.getElementById("modeAdminBtn").addEventListener("click", () => switchMode("admin"));
 
-      // ==================== ŞOFÖR GİRİŞ & SEFER GÖNDERİMİ ====================
-      function getActiveDriver() {
-        try { return JSON.parse(sessionStorage.getItem(STORAGE.ACTIVE_DRIVER) || "null"); } catch (e) { return null; }
+      function attemptAdminUnlock(rawPass) {
+        const pass = String(rawPass || "").trim();
+        if (pass !== "3454") {
+          toast("Yönetici şifresi hatalı (3454).");
+          return false;
+        }
+        sessionStorage.setItem(STORAGE.ADMIN_UNLOCKED, "1");
+        switchMode("admin");
+        toast("Yönetici paneli açıldı.");
+        return true;
       }
 
-      function applyActiveDriverBadge() {
-        const act = getActiveDriver();
-        const badge = document.getElementById("activeDriverBadge");
-        const tripCard = document.getElementById("driverTripCard");
-        const lockHint = document.getElementById("driverLockHint");
-        const logoutBtn = document.getElementById("driverLogoutBtn");
+      document.getElementById("topAdminQuickForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const inp = document.getElementById("topAdminPassInput");
+        if (attemptAdminUnlock(inp.value)) inp.value = "";
+      });
 
-        if (act && act.gmail) {
-          badge.textContent = `${act.name || act.gmail} • ${act.plate || ""}`;
-          document.getElementById("driverGmailInput").value = act.gmail;
-          if (act.name) document.getElementById("driverSelectOrName").value = act.name;
-          if (act.plate) document.getElementById("driverTruckPlate").value = act.plate;
-          tripCard.classList.remove("opacity-60", "pointer-events-none");
-          lockHint.textContent = `Giriş aktif (${act.gmail}). Çekilen araç bilgisini, konumları, ücreti ve varsa fotoğrafı girip gönderin.`;
-          lockHint.className = "text-xs text-slate-400";
-          logoutBtn.classList.remove("hidden");
+      document.getElementById("adminAuthForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const inp = document.getElementById("adminPassInput");
+        if (attemptAdminUnlock(inp.value)) inp.value = "";
+      });
+
+      document.getElementById("adminLogoutBtn").addEventListener("click", () => {
+        sessionStorage.removeItem(STORAGE.ADMIN_UNLOCKED);
+        syncAdminLock();
+      });
+
+      function syncAdminLock() {
+        const unlocked = sessionStorage.getItem(STORAGE.ADMIN_UNLOCKED) === "1";
+        document.getElementById("adminLoginCard").classList.toggle("hidden", unlocked);
+        document.getElementById("adminDashboardContent").classList.toggle("hidden", !unlocked);
+        if (unlocked) renderAdminAll();
+      }
+
+      // ==================== ŞOFÖR ÜYELİK, ONAY & GİRİŞ ====================
+      function setDriverAuthTab(tab) {
+        const loginTabBtn = document.getElementById("tabDriverLogin");
+        const regTabBtn = document.getElementById("tabDriverRegister");
+        const loginForm = document.getElementById("driverLoginForm");
+        const regForm = document.getElementById("driverRegisterForm");
+
+        if (tab === "register") {
+          regTabBtn.className = "px-3.5 py-1.5 rounded-lg bg-emerald-500 text-slate-950 text-xs font-extrabold cursor-pointer";
+          loginTabBtn.className = "px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white text-xs font-bold cursor-pointer";
+          regForm.classList.remove("hidden");
+          loginForm.classList.add("hidden");
         } else {
-          badge.textContent = "Giriş Yapılmadı";
-          tripCard.classList.add("opacity-60", "pointer-events-none");
-          lockHint.textContent = "Önce @gmail ve şifrenizle giriş yapın; giriş yaptıktan sonra sefer aktarabilirsiniz.";
-          lockHint.className = "text-xs text-amber-300";
-          logoutBtn.classList.add("hidden");
+          loginTabBtn.className = "px-3.5 py-1.5 rounded-lg bg-cyan-500 text-slate-950 text-xs font-extrabold cursor-pointer";
+          regTabBtn.className = "px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white text-xs font-bold cursor-pointer";
+          loginForm.classList.remove("hidden");
+          regForm.classList.add("hidden");
         }
       }
 
-      function renderDriverDatalist() {
-        const dl = document.getElementById("knownDriversDatalist");
-        const staff = readList(STORAGE.STAFF, DEFAULT_STAFF);
-        dl.innerHTML = staff.filter(s => s.gmail).map(s => `<option value="${s.gmail}">${s.name} (${s.plate})</option>`).join("");
+      document.getElementById("tabDriverLogin").addEventListener("click", () => setDriverAuthTab("login"));
+      document.getElementById("tabDriverRegister").addEventListener("click", () => setDriverAuthTab("register"));
+
+      function getLoggedInDriver() {
+        try { return JSON.parse(sessionStorage.getItem(STORAGE.ACTIVE_DRIVER) || "null"); } catch (e) { return null; }
+      }
+
+      function syncDriverPortalState() {
+        const active = getLoggedInDriver();
+        const authCard = document.getElementById("driverAuthCard");
+        const workspace = document.getElementById("driverActiveWorkspace");
+        const infoText = document.getElementById("activeDriverInfoText");
+
+        if (active && active.gmail) {
+          authCard.classList.add("hidden");
+          workspace.classList.remove("hidden");
+          infoText.textContent = `${active.name} (${active.gmail}) • Çekici: ${active.plate || "-"}`;
+          renderDriverSentTrips();
+        } else {
+          authCard.classList.remove("hidden");
+          workspace.classList.add("hidden");
+        }
       }
 
       document.getElementById("driverLogoutBtn").addEventListener("click", () => {
         sessionStorage.removeItem(STORAGE.ACTIVE_DRIVER);
-        document.getElementById("driverPinInput").value = "";
-        applyActiveDriverBadge();
+        syncDriverPortalState();
         toast("Şoför oturumu kapatıldı.");
       });
 
-      document.getElementById("driverQuickLoginForm").addEventListener("submit", (e) => {
+      document.getElementById("driverRegisterForm").addEventListener("submit", (e) => {
         e.preventDefault();
-        const gmail = document.getElementById("driverGmailInput").value.trim().toLowerCase();
-        const pin = document.getElementById("driverPinInput").value.trim();
-        const typedName = document.getElementById("driverSelectOrName").value.trim();
-        const typedPlate = document.getElementById("driverTruckPlate").value.trim().toUpperCase();
+        const name = document.getElementById("regNameInput").value.trim();
+        const plate = document.getElementById("regPlateInput").value.trim().toUpperCase();
+        const gmail = document.getElementById("regGmailInput").value.trim().toLowerCase();
+        const password = document.getElementById("regPasswordInput").value.trim();
 
         if (!gmail.endsWith("@gmail.com")) {
           toast("Lütfen geçerli bir @gmail.com adresi girin.");
           return;
         }
-        if (pin.length < 3) {
-          toast("Lütfen şifrenizi girin.");
+        if (password.length < 4) {
+          toast("Şifre en az 4 karakter olmalıdır.");
           return;
         }
 
-        const staffList = readList(STORAGE.STAFF, DEFAULT_STAFF);
-        const matched = staffList.find(s => String(s.gmail || "").toLowerCase() === gmail);
-
-        if (matched) {
-          if (matched.pin && matched.pin !== pin) {
-            toast("Bu @gmail hesabı için şifre hatalı.");
-            return;
-          }
-          const sessionDriver = {
-            name: typedName || matched.name || gmail.split("@")[0],
-            gmail,
-            plate: typedPlate || matched.plate || "ÇEKİCİ"
-          };
-          sessionStorage.setItem(STORAGE.ACTIVE_DRIVER, JSON.stringify(sessionDriver));
-          applyActiveDriverBadge();
-          toast(`${sessionDriver.name} giriş yaptı.`);
+        const accounts = readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS);
+        if (accounts.some(acc => String(acc.gmail || "").toLowerCase() === gmail)) {
+          toast("Bu @gmail adresi zaten kayıtlı.");
           return;
         }
 
-        // Yeni @gmail hesabı oluşturma
-        const newName = typedName || gmail.split("@")[0];
-        const newPlate = typedPlate || "ÇEKİCİ";
-        staffList.push({
-          id: `stf_${Date.now()}`,
-          name: newName,
+        accounts.unshift({
+          id: `drv_${Date.now()}`,
+          name,
           gmail,
-          plate: newPlate,
-          startDate: new Date().toISOString().slice(0, 10),
-          salary: 0,
-          insurance: 0,
-          pin
+          password,
+          plate: plate || "ÇEKİCİ",
+          status: "pending"
         });
-        writeList(STORAGE.STAFF, staffList);
+        writeList(STORAGE.DRIVER_ACCOUNTS, accounts);
 
-        const sessionDriver = { name: newName, gmail, plate: newPlate };
-        sessionStorage.setItem(STORAGE.ACTIVE_DRIVER, JSON.stringify(sessionDriver));
-        applyActiveDriverBadge();
-        renderDriverDatalist();
-        toast(`${gmail} ile şoför hesabı oluşturuldu ve giriş yapıldı.`);
-      });
-          writeList(STORAGE.STAFF, staffList);
+        // Kadro listesine başlangıç tarihi ile otomatik ekle
+        const staff = readList(STORAGE.STAFF, DEFAULT_STAFF);
+        if (!staff.some(s => String(s.gmail || "").toLowerCase() === gmail)) {
+          staff.push({
+            id: `stf_${Date.now()}`,
+            name,
+            gmail,
+            plate: plate || "ÇEKİCİ",
+            startDate: new Date().toISOString().slice(0, 10),
+            salary: 0,
+            insurance: 0
+          });
+          writeList(STORAGE.STAFF, staff);
         }
 
-        applyActiveDriverBadge();
-        renderDriverDatalist();
-        toast(`${name} şoför paneline giriş yaptı.`);
+        e.target.reset();
+        setDriverAuthTab("login");
+        document.getElementById("loginGmailInput").value = gmail;
+        if (sessionStorage.getItem(STORAGE.ADMIN_UNLOCKED) === "1") renderAdminAll();
+        toast("Üyeliğiniz alındı. Yönetici onayından sonra giriş yapabilirsiniz.");
       });
 
+      document.getElementById("driverLoginForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const gmail = document.getElementById("loginGmailInput").value.trim().toLowerCase();
+        const password = document.getElementById("loginPasswordInput").value.trim();
+
+        const accounts = readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS);
+        const found = accounts.find(acc => String(acc.gmail || "").toLowerCase() === gmail);
+
+        if (!found) {
+          toast("Bu @gmail adresi ile kayıtlı şoför hesabı bulunamadı.");
+          return;
+        }
+        if (found.password !== password) {
+          toast("Şifre hatalı.");
+          return;
+        }
+        if (found.status !== "approved") {
+          toast("Hesabınız henüz yönetici tarafından onaylanmadı.");
+          return;
+        }
+
+        sessionStorage.setItem(STORAGE.ACTIVE_DRIVER, JSON.stringify({
+          id: found.id,
+          name: found.name,
+          gmail: found.gmail,
+          plate: found.plate
+        }));
+        e.target.reset();
+        syncDriverPortalState();
+        toast(`Hoş geldiniz, ${found.name}.`);
+      });
+
+      // ==================== SEFER FOTOĞRAF & GÖNDERİM ====================
       document.getElementById("tripPhotoFile").addEventListener("change", async (e) => {
         const file = e.target.files?.[0];
         const prev = document.getElementById("tripPhotoPreview");
@@ -569,18 +766,36 @@
 
       document.getElementById("driverTripSubmitForm").addEventListener("submit", (e) => {
         e.preventDefault();
-        const active = getActiveDriver();
+        const active = getLoggedInDriver();
         if (!active || !active.gmail) {
-          toast("Önce @gmail ve şifrenizle giriş yapın.");
+          toast("Önce şoför girişi yapın.");
+          syncDriverPortalState();
           return;
         }
-        const fallbackName = active.name || active.gmail;
-        const fallbackPlate = (active.plate || "ÇEKİCİ").toUpperCase();
-          truckPlate: active?.plate || fallbackPlate,
-          vehicleInfo: document.getElementById("tripVehicleInfo").value.trim(),
-          pickupPlace: document.getElementById("tripPickupPlace").value.trim(),
-          dropoffPlace: document.getElementById("tripDropoffPlace").value.trim(),
-          fee: Number(document.getElementById("tripFeeAmount").value) || 0,
+
+        const brand = document.getElementById("tripBrandSelect").value;
+        const model = document.getElementById("tripModelSelect").value;
+        const year = document.getElementById("tripYearSelect").value;
+        const vPlate = document.getElementById("tripPlateInput").value.trim().toUpperCase();
+        const pickupPlace = document.getElementById("tripPickupPlace").value.trim();
+        const dropoffPlace = document.getElementById("tripDropoffPlace").value.trim();
+        const fee = Number(document.getElementById("tripFeeAmount").value) || 0;
+
+        const vehicleSummary = `${vPlate ? vPlate + " • " : ""}${brand} ${model} (${year})`;
+
+        const trip = {
+          id: `trp_${Date.now()}`,
+          driverName: active.name,
+          driverGmail: active.gmail,
+          truckPlate: active.plate || "ÇEKİCİ",
+          brand,
+          model,
+          year,
+          vehiclePlate: vPlate,
+          vehicleInfo: vehicleSummary,
+          pickupPlace,
+          dropoffPlace,
+          fee,
           date: new Date().toISOString().slice(0, 10),
           photoData: currentTripPhoto || ""
         };
@@ -590,17 +805,18 @@
         writeList(STORAGE.TRIPS, trips);
 
         e.target.reset();
+        document.getElementById("tripModelSelect").innerHTML = `<option value="">Önce Marka Seçin...</option>`;
         currentTripPhoto = "";
         const prev = document.getElementById("tripPhotoPreview");
         prev.src = "";
         prev.classList.add("hidden");
 
         renderDriverSentTrips();
-        renderAdminAll();
-        toast("Sefer bilgileri ve ücret yöneticiye aktarıldı.");
+        if (sessionStorage.getItem(STORAGE.ADMIN_UNLOCKED) === "1") renderAdminAll();
+        toast("Sefer bilgileri, ücret ve fotoğraf yöneticiye aktarıldı.");
       });
 
-      window.openPhoto = function(tripId) {
+      window.openPhoto = function (tripId) {
         const trip = readList(STORAGE.TRIPS, DEFAULT_TRIPS).find(t => t.id === tripId);
         if (!trip || !trip.photoData) return;
         document.getElementById("photoModalTitle").textContent = `${trip.vehicleInfo} • ${trip.pickupPlace} → ${trip.dropoffPlace}`;
@@ -614,12 +830,18 @@
 
       function renderDriverSentTrips() {
         const box = document.getElementById("driverSentTripsList");
-        const trips = readList(STORAGE.TRIPS, DEFAULT_TRIPS);
-        if (!trips.length) {
-          box.innerHTML = `<p class="text-xs text-slate-400">Henüz sefer gönderilmedi.</p>`;
+        const active = getLoggedInDriver();
+        const allTrips = readList(STORAGE.TRIPS, DEFAULT_TRIPS);
+        const myTrips = active?.gmail
+          ? allTrips.filter(t => String(t.driverGmail || "").toLowerCase() === active.gmail.toLowerCase())
+          : allTrips;
+
+        if (!myTrips.length) {
+          box.innerHTML = `<p class="text-xs text-slate-400">Henüz gönderilmiş seferiniz bulunmuyor.</p>`;
           return;
         }
-        box.innerHTML = trips.slice(0, 6).map(t => `
+
+        box.innerHTML = myTrips.slice(0, 8).map(t => `
           <div class="rounded-2xl bg-surface-950 border border-slate-800 p-3.5 flex items-center justify-between gap-3">
             <div class="space-y-0.5 min-w-0">
               <div class="flex flex-wrap items-center gap-2">
@@ -627,41 +849,43 @@
                 <span class="text-xs font-extrabold text-emerald-400">${formatTL(t.fee)}</span>
                 <span class="text-[11px] text-slate-400">${t.date}</span>
               </div>
-              <p class="text-xs text-cyan-300 truncate">${t.pickupPlace} → ${t.dropoffPlace}</p>
-              <p class="text-[11px] text-slate-400">Şoför: ${t.driverName} (${t.truckPlate})</p>
+              <p class="text-xs text-cyan-300 truncate">Alındı: ${t.pickupPlace} → Getirildi: ${t.dropoffPlace}</p>
+              <p class="text-[11px] text-slate-400">Şoför: ${t.driverName} • Çekici: ${t.truckPlate}</p>
             </div>
-            ${t.photoData ? `<img src="${t.photoData}" onclick="window.openPhoto('${t.id}')" alt="Fotoğraf" class="w-16 h-14 object-cover rounded-xl border border-slate-700 cursor-pointer shrink-0" />` : ""}
+            ${t.photoData
+              ? `<img src="${t.photoData}" onclick="window.openPhoto('${t.id}')" alt="Fotoğraf" class="w-16 h-14 object-cover rounded-xl border border-slate-700 cursor-pointer shrink-0" />`
+              : ""
+            }
           </div>
         `).join("");
       }
 
-      // ==================== YÖNETİCİ PANELİ ====================
-      function syncAdminLock() {
-        const unlocked = sessionStorage.getItem(STORAGE.ADMIN_UNLOCKED) === "1";
-        document.getElementById("adminLoginCard").classList.toggle("hidden", unlocked);
-        document.getElementById("adminDashboardContent").classList.toggle("hidden", !unlocked);
-        if (unlocked) renderAdminAll();
-      }
+      // ==================== YÖNETİCİ İŞLEMLERİ ====================
+      window.approveDriverAccount = function (accId) {
+        const list = readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS).map(acc =>
+          acc.id === accId ? { ...acc, status: "approved" } : acc
+        );
+        writeList(STORAGE.DRIVER_ACCOUNTS, list);
+        renderAdminAll();
+        toast("Şoför hesabı onaylandı; artık giriş yapabilir.");
+      };
 
-      document.getElementById("adminAuthForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const pass = document.getElementById("adminPassInput").value.trim();
-        if (pass !== "3454") {
-          toast("Yönetici şifresi hatalı (3454).");
-          return;
-        }
-        sessionStorage.setItem(STORAGE.ADMIN_UNLOCKED, "1");
-        e.target.reset();
-        syncAdminLock();
-        toast("Yönetici paneli açıldı.");
-      });
+      window.rejectDriverAccount = function (accId) {
+        const list = readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS).map(acc =>
+          acc.id === accId ? { ...acc, status: "pending" } : acc
+        );
+        writeList(STORAGE.DRIVER_ACCOUNTS, list);
+        renderAdminAll();
+        toast("Şoför hesabı beklemeye alındı.");
+      };
 
-      document.getElementById("adminLogoutBtn").addEventListener("click", () => {
-        sessionStorage.removeItem(STORAGE.ADMIN_UNLOCKED);
-        syncAdminLock();
-      });
+      window.deleteDriverAccount = function (accId) {
+        const list = readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS).filter(acc => acc.id !== accId);
+        writeList(STORAGE.DRIVER_ACCOUNTS, list);
+        renderAdminAll();
+        toast("Şoför üyelik kaydı silindi.");
+      };
 
-      // Yeni Çekici / Şoför Ekleme
       document.getElementById("addStaffForm").addEventListener("submit", (e) => {
         e.preventDefault();
         const staffList = readList(STORAGE.STAFF, DEFAULT_STAFF);
@@ -671,8 +895,7 @@
           plate: document.getElementById("staffPlateInput").value.trim().toUpperCase(),
           startDate: document.getElementById("staffStartDateInput").value,
           salary: Number(document.getElementById("staffSalaryInput").value) || 0,
-          insurance: Number(document.getElementById("staffInsuranceInput").value) || 0,
-          pin: "1234"
+          insurance: Number(document.getElementById("staffInsuranceInput").value) || 0
         });
         writeList(STORAGE.STAFF, staffList);
         e.target.reset();
@@ -680,8 +903,7 @@
         toast("Çekici ve şoför kaydı eklendi.");
       });
 
-      // Maaş ödemesini gider hareketine işle
-      window.payStaffSalary = function(staffId) {
+      window.payStaffSalary = function (staffId) {
         const staff = readList(STORAGE.STAFF, DEFAULT_STAFF).find(s => s.id === staffId);
         if (!staff || !(Number(staff.salary) > 0)) {
           toast("Önce şoför maaş tutarını girin.");
@@ -700,8 +922,7 @@
         toast(`${staff.name} için ${formatTL(staff.salary)} maaş gideri işlendi.`);
       };
 
-      // Sigorta giderini hareketlere işle
-      window.payStaffInsurance = function(staffId) {
+      window.payStaffInsurance = function (staffId) {
         const staff = readList(STORAGE.STAFF, DEFAULT_STAFF).find(s => s.id === staffId);
         if (!staff || !(Number(staff.insurance) > 0)) {
           toast("Önce sigorta tutarını girin.");
@@ -720,8 +941,7 @@
         toast(`${staff.name} için ${formatTL(staff.insurance)} sigorta gideri işlendi.`);
       };
 
-      // Şoför maaş/sigorta/başlangıç düzenleme
-      window.editStaffMember = function(staffId) {
+      window.editStaffMember = function (staffId) {
         const list = readList(STORAGE.STAFF, DEFAULT_STAFF);
         const target = list.find(s => s.id === staffId);
         if (!target) return;
@@ -743,14 +963,13 @@
         toast("Şoför maaş & sigorta bilgileri güncellendi.");
       };
 
-      window.deleteStaffMember = function(staffId) {
+      window.deleteStaffMember = function (staffId) {
         const filtered = readList(STORAGE.STAFF, DEFAULT_STAFF).filter(s => s.id !== staffId);
         writeList(STORAGE.STAFF, filtered);
         renderAdminAll();
         toast("Kayıt silindi.");
       };
 
-      // Manuel Gelir / Gider Ekleme
       document.getElementById("addExpenseForm").addEventListener("submit", (e) => {
         e.preventDefault();
         const entries = readList(STORAGE.ENTRIES, DEFAULT_ENTRIES);
@@ -768,17 +987,48 @@
         toast("Finans kaydı eklendi.");
       });
 
-      window.deleteEntryItem = function(entryId) {
+      window.deleteEntryItem = function (entryId) {
         const filtered = readList(STORAGE.ENTRIES, DEFAULT_ENTRIES).filter(en => en.id !== entryId);
         writeList(STORAGE.ENTRIES, filtered);
         renderAdminAll();
       };
 
       function renderAdminAll() {
+        const accounts = readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS);
         const trips = readList(STORAGE.TRIPS, DEFAULT_TRIPS);
         const staff = readList(STORAGE.STAFF, DEFAULT_STAFF);
         const manualEntries = readList(STORAGE.ENTRIES, DEFAULT_ENTRIES);
 
+        // 0. Şoför üyelik onay listesi
+        const approvedCount = accounts.filter(a => a.status === "approved").length;
+        document.getElementById("pendingDriversBadge").textContent = `${approvedCount} Onaylı / ${accounts.length} Toplam`;
+        const accBox = document.getElementById("driverAccountsList");
+        accBox.innerHTML = accounts.length ? accounts.map(acc => {
+          const isApproved = acc.status === "approved";
+          return `
+            <div class="rounded-2xl bg-surface-950 border border-slate-800 p-3.5 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-sm font-extrabold text-white">${acc.name}</span>
+                  <span class="text-xs text-cyan-300">${acc.gmail}</span>
+                  <span class="text-xs font-bold text-slate-300">• ${acc.plate || "-"}</span>
+                  <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${isApproved ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" : "bg-amber-500/15 text-amber-300 border border-amber-500/30"}">
+                    ${isApproved ? "Onaylı" : "Onay Bekliyor"}
+                  </span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                ${!isApproved
+                  ? `<button type="button" onclick="window.approveDriverAccount('${acc.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold cursor-pointer">Onayla</button>`
+                  : `<button type="button" onclick="window.rejectDriverAccount('${acc.id}')" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-xs font-bold cursor-pointer">Beklemeye Al</button>`
+                }
+                <button type="button" onclick="window.deleteDriverAccount('${acc.id}')" class="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-bold cursor-pointer">Sil</button>
+              </div>
+            </div>
+          `;
+        }).join("") : `<p class="text-xs text-slate-400">Kayıtlı şoför hesabı yok.</p>`;
+
+        // Tarih filtreleri
         const monthEl = document.getElementById("filterMonth");
         const yearEl = document.getElementById("filterYear");
         const now = new Date();
@@ -800,9 +1050,9 @@
                 <span class="text-sm font-extrabold text-amber-300">${t.vehicleInfo}</span>
                 <span class="text-xs font-extrabold text-emerald-400">${formatTL(t.fee)}</span>
               </div>
-              <p class="text-xs font-semibold text-cyan-300">Alındı: ${t.pickupPlace}</p>
-              <p class="text-xs font-semibold text-sky-300">Bırakıldı: ${t.dropoffPlace}</p>
-              <p class="text-[11px] text-slate-400">Şoför: ${t.driverName} • Çekici: ${t.truckPlate} • ${t.date}</p>
+              <p class="text-xs font-semibold text-cyan-300">Nereden Alındı: ${t.pickupPlace}</p>
+              <p class="text-xs font-semibold text-sky-300">Nereye Getirildi: ${t.dropoffPlace}</p>
+              <p class="text-[11px] text-slate-400">Şoför: ${t.driverName} (${t.driverGmail || ""}) • Çekici: ${t.truckPlate} • ${t.date}</p>
             </div>
             ${t.photoData
               ? `<img src="${t.photoData}" onclick="window.openPhoto('${t.id}')" alt="Sefer Fotoğrafı" class="w-20 h-16 object-cover rounded-xl border border-slate-700 cursor-pointer shrink-0" />`
@@ -815,7 +1065,11 @@
         const staffBox = document.getElementById("staffRosterList");
         staffBox.innerHTML = staff.length ? staff.map(s => {
           const driverTripTotal = trips
-            .filter(t => t.driverName.toLowerCase() === s.name.toLowerCase() || t.truckPlate.toUpperCase() === s.plate.toUpperCase())
+            .filter(t =>
+              (s.gmail && String(t.driverGmail || "").toLowerCase() === s.gmail.toLowerCase()) ||
+              String(t.driverName || "").toLowerCase() === String(s.name || "").toLowerCase() ||
+              String(t.truckPlate || "").toUpperCase() === String(s.plate || "").toUpperCase()
+            )
             .reduce((acc, cur) => acc + (Number(cur.fee) || 0), 0);
 
           return `
@@ -850,7 +1104,7 @@
           `;
         }).join("") : `<p class="text-xs text-slate-400">Kayıtlı çekici/şoför yok.</p>`;
 
-        // 3. Aylık & Yıllık Gelir - Gider Hesabı (Tüm sefer gelirleri + manuel gelir/gider/maaş/sigorta)
+        // 3. Aylık & Yıllık Gelir - Gider Hesabı
         const tripIncomeItems = trips.map(t => ({
           id: `auto_${t.id}`,
           type: "income",
@@ -913,12 +1167,12 @@
       // İlk yükleme
       const expDateEl = document.getElementById("expenseDateInput");
       if (expDateEl && !expDateEl.value) expDateEl.value = new Date().toISOString().slice(0, 10);
+      readList(STORAGE.DRIVER_ACCOUNTS, DEFAULT_DRIVER_ACCOUNTS);
       readList(STORAGE.STAFF, DEFAULT_STAFF);
       readList(STORAGE.TRIPS, DEFAULT_TRIPS);
       readList(STORAGE.ENTRIES, DEFAULT_ENTRIES);
-      applyActiveDriverBadge();
-      renderDriverDatalist();
-      renderDriverSentTrips();
+      populateVehicleSelectors();
+      syncDriverPortalState();
       syncAdminLock();
     })();
   </script>
