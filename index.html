@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aykut Oto Tamir Bakım Çekici | 7/24 Çatalca Yol Yardım & Oto Servis</title>
+  <meta name="description" content="Aykut Oto Tamir Bakım Çekici - Çatalca Atatürk Sanayi Sitesi. Mekanik tamir, motor, şanzıman, periyodik bakım, klima ve 7/24 bölgeye göre çekici ücret hesaplama." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Chakra Petch"', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background-color: #070a0f;
+      color: #f8fafc;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .video-bg-wrapper {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+      background: #05070b;
+    }
+    .video-bg-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: contrast(1.12) saturate(1.15) brightness(0.75);
+    }
+    .video-overlay-gradient {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(245, 158, 11, 0.14), transparent 45%),
+        radial-gradient(circle at 80% 75%, rgba(234, 88, 12, 0.12), transparent 50%),
+        linear-gradient(180deg, rgba(7, 10, 15, 0.80) 0%, rgba(7, 10, 15, 0.90) 45%, rgba(7, 10, 15, 0.97) 100%);
+      backdrop-filter: blur(2px);
+    }
+    .glass-panel {
+      background: linear-gradient(145deg, rgba(19, 27, 40, 0.86), rgba(10, 15, 24, 0.94));
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+    }
+    .tactile-btn {
+      transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.45), 0 12px 24px -6px rgba(245, 158, 11, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      user-select: none;
+      cursor: pointer;
+    }
+    .tactile-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+    .tactile-btn:active { transform: translateY(4px) scale(0.985); }
+    .tactile-surface {
+      transition: transform 0.16s ease, border-color 0.2s ease, background-color 0.2s ease;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      user-select: none;
+    }
+    .tactile-surface:hover { border-color: rgba(245, 158, 11, 0.45); transform: translateY(-2px); }
+    .tactile-surface:active { transform: translateY(3px) scale(0.99); }
+    .tactile-surface.active-chip {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(234, 88, 12, 0.18));
+      border-color: #f59e0b;
+      box-shadow: 0 3px 0 rgba(180, 83, 9, 0.5), 0 0 20px rgba(245, 158, 11, 0.18);
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fbbf24, #ea580c);
+      border: 3px solid #0f172a;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.75);
+      cursor: pointer;
+    }
+    #scrollProgress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #f59e0b, #ea580c, #fbbf24);
+      z-index: 60;
+    }
+    @keyframes pulseBeacon {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(1.35); }
+    }
+    .beacon-dot { animation: pulseBeacon 1.6s infinite ease-in-out; }
+  </style>
+</head>
+<body class="antialiased selection:bg-amber-500 selection:text-slate-950 pb-20 md:pb-0">
+
+  <div id="scrollProgress"></div>
+
+  <!-- 4K Background Video -->
+  <div class="video-bg-wrapper" aria-hidden="true">
+    <video id="bgVideo" autoplay muted loop playsinline poster="https://images.pexels.com/photos/3807386/pexels-photo-3807386.jpeg?auto=compress&cs=tinysrgb&w=1920">
+      <source id="bgVideoSource" src="https://videos.pexels.com/video-files/4489389/4489389-uhd_3840_2160_25fps.mp4" type="video/mp4" />
+      <source src="https://videos.pexels.com/video-files/3064220/3064220-uhd_3840_2160_24fps.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="video-overlay-gradient" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-slate-950/85 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3">
+      <a href="#top" class="flex items-center gap-3 group" data-tactile>
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center text-slate-950 font-display font-bold text-xl shadow-lg shadow-amber-500/25">
+          AO
+        </div>
+        <div>
+          <span class="font-display font-bold text-lg sm:text-xl tracking-wide text-white block leading-none">AYKUT OTO</span>
+          <span class="text-[11px] sm:text-xs font-semibold tracking-wider text-amber-400 uppercase">Tamir • Bakım • 7/24 Çekici</span>
+        </div>
+      </a>
+
+      <nav class="hidden lg:flex items-center gap-7 text-sm font-semibold text-slate-300">
+        <a href="#hesaplayici" class="hover:text-amber-400 transition">Çekici Ücret Hesapla</a>
+        <a href="#hizmetler" class="hover:text-amber-400 transition">Servis Hizmetleri</a>
+        <a href="#randevu" class="hover:text-amber-400 transition">Araç Ön Kayıt & Randevu</a>
+        <a href="#konum" class="hover:text-amber-400 transition">Atatürk Sanayi Konum</a>
+      </nav>
+
+      <div class="flex items-center gap-2 sm:gap-2.5">
+        <button type="button" id="openAdminModalBtn" data-tactile class="tactile-surface inline-flex items-center gap-2 bg-slate-900/95 border border-amber-400/40 text-amber-300 font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-3 rounded-xl">
+          <span>Usta / Admin</span>
+        </button>
+
+        <a href="tel:+905421443425" data-tactile class="tactile-btn inline-flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-extrabold text-xs sm:text-sm px-3.5 sm:px-5 py-3 rounded-xl">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-600 beacon-dot"></span>
+          <span>+90 542 144 34 25</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Hero & Fare Calculator -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 lg:pt-14 lg:pb-24">
+      <div class="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+        <div class="lg:col-span-6 space-y-6">
+          <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-bold tracking-wide">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 beacon-dot"></span>
+            ÇATALCA ATATÜRK SANAYİ SİTESİ • 7/24 AKTİF EKİP
+          </div>
+
+          <h1 class="font-display text-3xl sm:text-5xl lg:text-[50px] font-bold text-white leading-[1.12] tracking-tight">
+            Çatalca & Çevresinde <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-orange-500">Hızlı Oto Çekici</span> ve Uzman Mekanik Servis
+          </h1>
+
+          <p class="text-slate-300 text-base sm:text-lg leading-relaxed">
+            <strong class="text-white">Aykut Oto Tamir Bakım Çekici</strong>; İstanbul Çatalca merkez, çevre mahalleler ve otoyol bağlantılarında <span class="text-amber-300 font-semibold">7/24 yol yardım & oto çekici</span> desteğinin yanı sıra motor, şanzıman, periyodik bakım ve klima sistemlerinde profesyonel atölye hizmeti sunar.
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+            <div class="glass-panel rounded-2xl p-3.5">
+              <div class="text-amber-400 font-display font-bold text-xl">15 - 25 Dk</div>
+              <div class="text-xs text-slate-400 mt-0.5">Çatalca İçi Ortalama Varış</div>
+            </div>
+            <div class="glass-panel rounded-2xl p-3.5">
+              <div class="text-emerald-400 font-display font-bold text-xl">%20 İndirim</div>
+              <div class="text-xs text-slate-400 mt-0.5">Servisimize Çekimlerde</div>
+            </div>
+            <div class="glass-panel rounded-2xl p-3.5 col-span-2 sm:col-span-1">
+              <div class="text-white font-display font-bold text-xl">No: 32-34</div>
+              <div class="text-xs text-slate-400 mt-0.5">Atatürk Sanayi Sitesi</div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3.5 pt-2">
+            <a href="tel:+905421443425" data-tactile class="tactile-btn flex-1 sm:flex-none inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-amber-400 to-orange-600 text-slate-950 font-extrabold px-6 py-4 rounded-2xl text-sm sm:text-base">
+              Acil Çekici Çağır
+            </a>
+            <a href="#randevu" data-tactile class="tactile-surface flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-slate-900/90 border border-white/15 text-white font-bold px-6 py-4 rounded-2xl text-sm sm:text-base">
+              <span>Tamir & Bakım Randevusu →</span>
+            </a>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
+            <div>
+              <div class="font-bold text-white">Kaleiçi Mah. Piroğlu Sk. Atatürk Sanayi Sitesi No: 32 / 34</div>
+              <div class="text-slate-400">34540 Çatalca / İstanbul</div>
+            </div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Aykut+Oto+Tamir+Bakım+Çekici+Atatürk+Sanayi+Sitesi+Çatalca+İstanbul" target="_blank" rel="noopener" data-tactile class="tactile-surface shrink-0 px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-amber-300 font-bold text-xs text-center">
+              Yol Tarifi Al ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- Tow Calculator -->
+        <div id="hesaplayici" class="lg:col-span-6 glass-panel rounded-3xl p-5 sm:p-7 border border-amber-400/25">
+          <div class="flex items-center justify-between gap-2 pb-4 border-b border-white/10">
+            <div>
+              <span class="text-[11px] font-extrabold uppercase tracking-widest text-amber-400">2026 Güncel Tarife Motoru</span>
+              <h2 class="font-display text-xl sm:text-2xl font-bold text-white">Bölge & Mesafe Çekici Hesaplayıcı</h2>
+            </div>
+            <span class="px-3 py-1 rounded-lg bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-bold">Şeffaf Fiyat</span>
+          </div>
+
+          <div class="space-y-4 mt-5">
+            <div class="grid sm:grid-cols-2 gap-3.5">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1.5">1. Aracın Alınacağı Bölge</label>
+                <select id="pickupZone" data-tactile class="w-full rounded-xl bg-slate-900/95 border border-white/15 px-3.5 py-3 text-sm font-semibold text-white focus:border-amber-400 focus:outline-none">
+                  <option value="catalca_merkez" data-km="4" data-base="1350">Çatalca Merkez / Kaleiçi / Ferhatpaşa</option>
+                  <option value="izzettin_muratbey" data-km="9" data-base="1500">İzzettin / Muratbey / Ovayenice</option>
+                  <option value="kuzey_marmara" data-km="14" data-base="1750">Kuzey Marmara Otoyolu / Gişeler</option>
+                  <option value="subasi_gokceali" data-km="12" data-base="1600">Subaşı / Gökçeali / Oklalı / Kestanelik</option>
+                  <option value="hadimkoy" data-km="22" data-base="1950">Hadımköy / Deliklikaya / Arnavutköy Sınırı</option>
+                  <option value="buyukcekmece" data-km="24" data-base="2000">Büyükçekmece / Tepecik / Mimarsinan</option>
+                  <option value="silivri" data-km="32" data-base="2250">Silivri Merkez / Selimpaşa / Ortaköy</option>
+                  <option value="binkilic_karacakoy" data-km="38" data-base="2400">Binkılıç / Karacaköy / Yalıköy / Çilingoz</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1.5">2. Gidilecek Varış Noktası</label>
+                <select id="dropoffZone" data-tactile class="w-full rounded-xl bg-slate-900/95 border border-amber-400/40 px-3.5 py-3 text-sm font-semibold text-amber-300 focus:border-amber-400 focus:outline-none">
+                  <option value="aykut_servis" data-extra-km="0" data-discount="0.80">Aykut Oto Tamir (Atatürk Sanayi) - %20 İndirim</option>
+                  <option value="catalca_ici" data-extra-km="2" data-discount="1">Çatalca İçi Farklı Nokta</option>
+                  <option value="beylikduzu_avcilar" data-extra-km="28" data-discount="1">Beylikdüzü / Esenyurt / Avcılar</option>
+                  <option value="ikitelli_bagcilar" data-extra-km="42" data-discount="1">İkitelli OSB / Başakşehir / Bağcılar</option>
+                  <option value="silivri_tekirdag" data-extra-km="34" data-discount="1">Silivri / Çerkezköy / Tekirdağ Yönü</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1.5">3. Araç Segmenti</label>
+              <div class="grid grid-cols-3 gap-2.5" id="vehicleTypeGroup">
+                <button type="button" data-tactile data-mult="1" data-label="Binek Otomobil" class="tactile-surface active-chip rounded-xl border border-white/10 bg-slate-900/80 p-2.5 text-center">
+                  <div class="text-sm font-extrabold text-white">Binek</div>
+                  <div class="text-[11px] text-slate-400">Standart Tarife</div>
+                </button>
+                <button type="button" data-tactile data-mult="1.15" data-label="SUV / Crossover / Jeep" class="tactile-surface rounded-xl border border-white/10 bg-slate-900/80 p-2.5 text-center">
+                  <div class="text-sm font-extrabold text-white">SUV / 4x4</div>
+                  <div class="text-[11px] text-slate-400">+%15 Tonaj</div>
+                </button>
+                <button type="button" data-tactile data-mult="1.30" data-label="Hafif Ticari / Panelvan" class="tactile-surface rounded-xl border border-white/10 bg-slate-900/80 p-2.5 text-center">
+                  <div class="text-sm font-extrabold text-white">Ticari / Van</div>
+                  <div class="text-[11px] text-slate-400">+%30 Uzun Şasi</div>
+                </button>
+              </div>
+            </div>
+
+            <div class="bg-slate-950/70 rounded-2xl p-4 border border-white/10">
+              <div class="flex items-center justify-between mb-2">
+                <label for="distanceRange" class="text-xs font-bold text-slate-300">Tahmini Yol Mesafesi</label>
+                <span class="font-display text-lg font-bold text-amber-400"><span id="kmDisplay">4</span> km</span>
+              </div>
+              <input id="distanceRange" type="range" min="1" max="120" value="4" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <button type="button" id="toggleNight" data-tactile class="tactile-surface rounded-xl border border-white/10 bg-slate-900/80 px-3 py-2.5 flex items-center justify-between text-left">
+                <div>
+                  <div class="text-xs font-bold text-white">Gece Tarifesi</div>
+                  <div class="text-[10px] text-slate-400">22:00 - 07:00 (+%20)</div>
+                </div>
+                <span id="nightBadge" class="w-3 h-3 rounded-full bg-slate-700"></span>
+              </button>
+
+              <button type="button" id="toggleWinch" data-tactile class="tactile-surface rounded-xl border border-white/10 bg-slate-900/80 px-3 py-2.5 flex items-center justify-between text-left">
+                <div>
+                  <div class="text-xs font-bold text-white">Ahtapot / Vinç</div>
+                  <div class="text-[10px] text-slate-400">Teker Kilitli (+550 ₺)</div>
+                </div>
+                <span id="winchBadge" class="w-3 h-3 rounded-full bg-slate-700"></span>
+              </button>
+            </div>
+
+            <div class="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/40 border border-amber-400/35 p-4 sm:p-5">
+              <div class="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <div class="text-xs font-semibold text-slate-400">Tahmini Çekici Hizmet Bedeli</div>
+                  <div id="priceDisplay" class="font-display text-3xl sm:text-4xl font-bold text-amber-400 tracking-tight mt-0.5">1.220 ₺</div>
+                  <div id="discountNote" class="text-[11px] font-semibold text-emerald-400 mt-1">
+                    ✓ Aykut Oto Tamir servis varışlı %20 indirim uygulandı
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button type="button" id="copyQuoteBtn" data-tactile class="tactile-surface bg-slate-800 border border-white/15 text-white font-bold text-xs px-3 py-3.5 rounded-xl">
+                    Özeti Kopyala
+                  </button>
+                  <button type="button" id="sendTowWhatsapp" data-tactile class="tactile-btn bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs sm:text-sm px-4 py-3.5 rounded-xl">
+                    WhatsApp Gönder
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="hizmetler" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 border-t border-white/10">
+      <div class="mb-10">
+        <span class="text-xs font-extrabold uppercase tracking-widest text-amber-400">Atatürk Sanayi Sitesi • Tam Donanımlı Atölye</span>
+        <h2 class="font-display text-2xl sm:text-4xl font-bold text-white mt-1">Sunulan Oto Tamir & Yol Yardım Hizmetleri</h2>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div data-tactile class="tactile-surface glass-panel rounded-3xl p-6 flex flex-col justify-between">
+          <div>
+            <h3 class="font-display text-lg font-bold text-white mb-2">Mekanik Tamir, Motor & Şanzıman</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">Motor revizyonu, triger seti değişimi, debriyaj baskı balata, manuel/otomatik şanzıman onarımı ve ön takım-fren sistemi bakımları.</p>
+          </div>
+          <a href="#randevu" class="mt-5 inline-flex items-center gap-1.5 text-xs font-bold text-amber-400">Arıza Kaydı Oluştur →</a>
+        </div>
+
+        <div data-tactile class="tactile-surface glass-panel rounded-3xl p-6 flex flex-col justify-between">
+          <div>
+            <h3 class="font-display text-lg font-bold text-white mb-2">Periyodik & Günlük Araç Bakımı</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">10.000 / 15.000 km yağ ve filtre değişimi, bilgisayarlı arıza tespiti, akü ölçümü, sıvı kontrolleri ve muayene öncesi check-up.</p>
+          </div>
+          <a href="#randevu" class="mt-5 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400">Bakım Randevusu Al →</a>
+        </div>
+
+        <div data-tactile class="tactile-surface glass-panel rounded-3xl p-6 flex flex-col justify-between">
+          <div>
+            <h3 class="font-display text-lg font-bold text-white mb-2">7/24 Oto Çekici & Yol Yardım</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">Çatalca merkez, köyler, Kuzey Marmara ve TEM bağlantılarında kayar kasa çekici, akü takviye ve yerinde acil yol yardım müdahalesi.</p>
+          </div>
+          <a href="#hesaplayici" class="mt-5 inline-flex items-center gap-1.5 text-xs font-bold text-orange-400">Ücret Hesapla →</a>
+        </div>
+
+        <div data-tactile class="tactile-surface glass-panel rounded-3xl p-6 flex flex-col justify-between">
+          <div>
+            <h3 class="font-display text-lg font-bold text-white mb-2">Klima & Motor Soğutma Sistemleri</h3>
+            <p class="text-sm text-slate-400 leading-relaxed">Oto klima gaz dolumu, kaçak testi, kompresör onarımı, radyatör, devirdaim ve termostat soğutma sistemi bakımları.</p>
+          </div>
+          <a href="#randevu" class="mt-5 inline-flex items-center gap-1.5 text-xs font-bold text-sky-400">Klima Kontrolü İste →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live GPS Roadside Helper -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="glass-panel rounded-3xl p-6 sm:p-8 border border-amber-400/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="space-y-1.5">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Tek Dokunuşla Konum Tespiti</span>
+          <h3 class="font-display text-xl sm:text-2xl font-bold text-white">Yolda mı Kaldınız? Tam GPS Konumunuzu Çekiciye İletin</h3>
+          <p id="gpsStatusText" class="text-xs sm:text-sm text-slate-400">Konum izni verdiğinizde enlem/boylam koordinatlarınız otomatik hazırlanır.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 shrink-0">
+          <button type="button" id="detectGpsBtn" data-tactile class="tactile-btn bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm px-5 py-3.5 rounded-xl">
+            GPS Konumumu Bul & WhatsApp'a At
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Appointment Form -->
+    <section id="randevu" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 border-t border-white/10">
+      <div class="glass-panel rounded-3xl p-6 sm:p-10 border border-white/10">
+        <div class="grid lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-5 space-y-4">
+            <span class="inline-block px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 text-xs font-bold">Hızlı Ön Yönlendirme</span>
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-white leading-tight">
+              Çekici mi Arıyorsunuz, Yoksa Tamir / Bakım Randevusu mu?
+            </h2>
+            <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+              Aracınızın <strong class="text-white">marka, model ve yıl</strong> bilgisini paylaşın; ihtiyacınıza göre en uygun çekici aracını yönlendirelim veya yedek parça & servis randevunuzu hemen oluşturalım.
+            </p>
+          </div>
+
+          <form id="serviceRequestForm" class="lg:col-span-7 space-y-4 bg-slate-950/65 p-5 sm:p-6 rounded-2xl border border-white/10">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-2">Hizmet Talebi Seçin</label>
+              <div class="grid grid-cols-2 gap-3" id="requestTypeGroup">
+                <button type="button" data-tactile data-type="Çekici / Yol Yardım Talebi" class="tactile-surface active-chip rounded-xl border border-white/10 bg-slate-900 p-3 text-left">
+                  <div class="text-sm font-extrabold text-white">Acil Çekici / Yol Yardım</div>
+                  <div class="text-[11px] text-slate-400">Yolda kaldım, çekici lazım</div>
+                </button>
+                <button type="button" data-tactile data-type="Tamir / Periyodik Bakım Randevusu" class="tactile-surface rounded-xl border border-white/10 bg-slate-900 p-3 text-left">
+                  <div class="text-sm font-extrabold text-white">Tamir / Bakım Randevusu</div>
+                  <div class="text-[11px] text-slate-400">Atölye servis randevusu</div>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-3">
+              <div>
+                <label for="carBrand" class="block text-xs font-bold text-slate-300 mb-1">Araç Markası</label>
+                <input id="carBrand" type="text" required placeholder="Örn: Renault, Ford" class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:border-amber-400 focus:outline-none" />
+              </div>
+              <div>
+                <label for="carModel" class="block text-xs font-bold text-slate-300 mb-1">Model / Motor</label>
+                <input id="carModel" type="text" required placeholder="Örn: Megane 1.5 dCi" class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:border-amber-400 focus:outline-none" />
+              </div>
+              <div>
+                <label for="carYear" class="block text-xs font-bold text-slate-300 mb-1">Model Yılı</label>
+                <input id="carYear" type="number" min="1980" max="2026" required placeholder="Örn: 2019" class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:border-amber-400 focus:outline-none" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1.5">İşlem / Arıza Konusu</label>
+              <div class="flex flex-wrap gap-2" id="symptomTags">
+                <button type="button" data-tactile class="tactile-surface symptom-tag px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-xs font-semibold text-slate-300">Araç Çalışmıyor / Akü</button>
+                <button type="button" data-tactile class="tactile-surface symptom-tag px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-xs font-semibold text-slate-300">Motor / Hararet</button>
+                <button type="button" data-tactile class="tactile-surface symptom-tag px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-xs font-semibold text-slate-300">Şanzıman / Baskı Balata</button>
+                <button type="button" data-tactile class="tactile-surface symptom-tag px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-xs font-semibold text-slate-300">Periyodik Yağ Bakımı</button>
+                <button type="button" data-tactile class="tactile-surface symptom-tag px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-xs font-semibold text-slate-300">Klima / Soğutma</button>
+                <button type="button" data-tactile class="tactile-surface symptom-tag px-3 py-1.5 rounded-lg bg-slate-900 border border-white/10 text-xs font-semibold text-slate-300">Kaza / Çekici Nakil</button>
+              </div>
+            </div>
+
+            <div>
+              <label for="extraNotes" class="block text-xs font-bold text-slate-300 mb-1">Konum veya Ek Notunuz</label>
+              <input id="extraNotes" type="text" placeholder="Bulunduğunuz konum veya kısa bilgi..." class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:border-amber-400 focus:outline-none" />
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 pt-1">
+              <button type="submit" data-tactile class="tactile-btn flex-1 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-extrabold py-3.5 px-5 rounded-xl text-sm">
+                WhatsApp ile Ustaya Gönder
+              </button>
+              <a href="tel:+905421443425" data-tactile class="tactile-surface inline-flex items-center justify-center gap-2 bg-slate-900 border border-white/15 text-white font-bold py-3.5 px-5 rounded-xl text-sm">
+                <span>Direkt Ara: 0542 144 34 25</span>
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="konum" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 border-t border-white/10">
+      <div class="grid md:grid-cols-12 gap-8 items-center">
+        <div class="md:col-span-6 space-y-4">
+          <div class="font-display text-2xl font-bold text-white">Aykut Oto Tamir Bakım Çekici</div>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            İstanbul'un Çatalca ilçesinde güvenilir mekanik servis, periyodik araç bakımı, klima onarımı ve 7/24 kesintisiz oto çekici hizmetleri.
+          </p>
+          <div class="space-y-2 text-sm">
+            <div class="text-slate-200"><strong class="text-amber-400">Adres:</strong> Kaleiçi Mahallesi, Piroğlu Sokak, Atatürk Sanayi Sitesi No: 32 (veya No: 34), 34540 Çatalca / İstanbul</div>
+            <div class="text-slate-200"><strong class="text-amber-400">Telefon & WhatsApp:</strong> <a href="tel:+905421443425" class="underline hover:text-amber-300">+90 542 144 34 25</a></div>
+          </div>
+        </div>
+
+        <div class="md:col-span-6">
+          <div class="glass-panel rounded-3xl overflow-hidden border border-white/15">
+            <iframe
+              title="Aykut Oto Tamir Bakım Çekici Çatalca Harita"
+              class="w-full h-60 border-0 grayscale contrast-125 opacity-90"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://maps.google.com/maps?q=Atat%C3%BCrk%20Sanayi%20Sitesi%20Kalei%C3%A7i%20%C3%87atalca%20%C4%B0stanbul&t=&z=15&ie=UTF8&iwloc=&output=embed">
+            </iframe>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <span>© 2026 Aykut Oto Tamir Bakım Çekici — Çatalca / İstanbul. Tüm Hakları Saklıdır.</span>
+        <div class="flex items-center gap-4">
+          <span>Atatürk Sanayi Sitesi No: 32-34</span>
+          <button type="button" id="footerAdminTrigger" class="text-amber-400/80 hover:text-amber-300 underline font-semibold">Usta Girişi</button>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- USTA / ADMIN WORKSHOP & CAMERA ANPR MODAL -->
+  <div id="adminModal" class="fixed inset-0 z-[70] hidden overflow-y-auto bg-slate-950/95 backdrop-blur-xl">
+    <div class="min-h-screen px-4 py-6 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-white/15">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 font-display font-bold flex items-center justify-center text-lg">AO</div>
+          <div>
+            <div class="font-display font-bold text-lg text-white">Aykut Oto — Usta & Servis Takip Paneli</div>
+            <div class="text-xs text-amber-400">Canlı Kamera Plaka Tanıma • Araç Geçmişi • KM & Bakım Defteri</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="adminLogoutBtn" class="hidden px-3.5 py-2 rounded-xl bg-red-500/20 border border-red-400/30 text-red-300 text-xs font-bold">Kilitle / Çıkış</button>
+          <button type="button" id="closeAdminModalBtn" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold">Kapat ✕</button>
+        </div>
+      </div>
+
+      <!-- PIN Login -->
+      <div id="adminLoginScreen" class="max-w-md mx-auto my-12 glass-panel rounded-3xl p-6 sm:p-8 border border-amber-400/30">
+        <div class="text-center space-y-2 mb-6">
+          <span class="inline-block px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 text-xs font-bold">Yetkili Atölye Erişimi</span>
+          <h3 class="font-display text-2xl font-bold text-white">Usta / Admin Girişi</h3>
+          <p class="text-xs text-slate-400">Varsayılan PIN Kodu: <strong class="text-amber-300">3454</strong></p>
+        </div>
+        <form id="adminPinForm" class="space-y-4">
+          <div>
+            <label for="adminPinInput" class="block text-xs font-bold text-slate-300 mb-1.5">Yönetici PIN Kodu</label>
+            <input id="adminPinInput" type="password" inputmode="numeric" maxlength="10" required placeholder="••••" class="w-full text-center tracking-[0.4em] font-display text-xl rounded-xl bg-slate-900 border border-white/15 px-4 py-3 text-white focus:border-amber-400 focus:outline-none" />
+          </div>
+          <p id="adminPinError" class="hidden text-xs text-red-400 font-semibold text-center">Hatalı PIN kodu girdiniz.</p>
+          <button type="submit" class="tactile-btn w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-extrabold py-3.5 rounded-xl text-sm">
+            Panele Giriş Yap
+          </button>
+        </form>
+      </div>
+
+      <!-- Authenticated Dashboard -->
+      <div id="adminDashboard" class="hidden space-y-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div class="glass-panel rounded-2xl p-4">
+            <div class="text-xs text-slate-400">Kayıtlı Farklı Araç</div>
+            <div id="statUniqueVehicles" class="font-display text-2xl font-bold text-white mt-1">0</div>
+          </div>
+          <div class="glass-panel rounded-2xl p-4">
+            <div class="text-xs text-slate-400">Toplam Servis İşlemi</div>
+            <div id="statTotalRecords" class="font-display text-2xl font-bold text-amber-400 mt-1">0</div>
+          </div>
+          <div class="glass-panel rounded-2xl p-4">
+            <div class="text-xs text-slate-400">Tekrar Gelen Müşteri</div>
+            <div id="statReturningCount" class="font-display text-2xl font-bold text-emerald-400 mt-1">0</div>
+          </div>
+          <div class="glass-panel rounded-2xl p-4 flex flex-col justify-between gap-2">
+            <div class="flex items-center justify-between gap-1">
+              <button type="button" id="changePinBtn" class="px-2.5 py-1.5 rounded-lg bg-white/10 text-amber-300 text-[11px] font-bold">PIN Değiştir</button>
+              <button type="button" id="exportJsonBtn" class="px-2.5 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 text-[11px] font-bold">JSON Yedek</button>
+            </div>
+            <div id="pinChangeBox" class="hidden flex gap-1.5">
+              <input id="newPinField" type="text" placeholder="Yeni PIN" class="w-full rounded-lg bg-slate-900 border border-white/15 px-2 py-1 text-xs text-white" />
+              <button type="button" id="saveNewPinBtn" class="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 text-xs font-bold">Kaydet</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-12 gap-6">
+          <!-- Camera Scanner & History -->
+          <div class="lg:col-span-5 space-y-4">
+            <div class="glass-panel rounded-3xl p-5 border border-amber-400/25 space-y-3.5">
+              <div class="flex items-center justify-between">
+                <h3 class="font-display text-base font-bold text-white">1. Kamera ile Plaka Tanıma</h3>
+                <span id="ocrStatusBadge" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-[11px] font-bold">Hazır</span>
+              </div>
+
+              <div class="relative rounded-2xl overflow-hidden bg-slate-950 border border-white/15 aspect-video flex items-center justify-center">
+                <video id="plateCameraVideo" autoplay playsinline muted class="hidden w-full h-full object-cover"></video>
+                <canvas id="plateSnapCanvas" class="hidden"></canvas>
+                <div id="plateReticle" class="hidden absolute inset-x-8 top-1/2 -translate-y-1/2 h-14 border-2 border-dashed border-amber-400 rounded-xl pointer-events-none flex items-end justify-center pb-1">
+                  <span class="text-[10px] font-bold bg-slate-950/80 text-amber-300 px-2 rounded">Plakayı Çerçeveye Hizalayın</span>
+                </div>
+                <div id="cameraPlaceholder" class="text-center p-4 space-y-1">
+                  <div class="text-xs font-bold text-slate-300">Telefon Kamerası Kapalı</div>
+                  <div class="text-[11px] text-slate-500">Arka kamerayı açıp plakayı okutabilir veya fotoğraf seçebilirsiniz.</div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" id="startCameraBtn" class="px-3 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs">Kamerayı Aç</button>
+                <button type="button" id="capturePlateBtn" disabled class="px-3 py-2.5 rounded-xl bg-emerald-500 disabled:opacity-40 text-slate-950 font-extrabold text-xs">Plakayı Oku</button>
+                <label class="px-3 py-2.5 rounded-xl bg-white/10 text-white font-bold text-xs text-center cursor-pointer">
+                  Fotoğraf Seç
+                  <input id="plateImageUpload" type="file" accept="image/*" capture="environment" class="hidden" />
+                </label>
+              </div>
+
+              <div class="pt-1 flex flex-wrap items-center gap-1.5 text-[11px]">
+                <span class="text-slate-400">Hızlı Test:</span>
+                <button type="button" data-demo-plate="34 CTL 342" class="demo-plate-btn px-2 py-1 rounded-lg bg-slate-900 border border-white/15 text-amber-300 font-bold">34 CTL 342</button>
+                <button type="button" data-demo-plate="39 AYK 054" class="demo-plate-btn px-2 py-1 rounded-lg bg-slate-900 border border-white/15 text-amber-300 font-bold">39 AYK 054</button>
+              </div>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-5 border border-white/15 space-y-3">
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="font-display text-base font-bold text-white">2. Araç Geliş & Bakım Geçmişi</h3>
+                <span id="historyVisitBadge" class="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[11px] font-bold">Plaka Bekleniyor</span>
+              </div>
+              <div id="vehicleHistoryContent" class="text-xs text-slate-300 leading-relaxed">
+                Kamerayla plaka okuttuğunuzda veya sağdaki kutuya plaka yazdığınızda; bu aracın en son ne zaman geldiği, son kilometresi, yapılan işlemler ve bakım durumu otomatik listelenir.
+              </div>
+            </div>
+          </div>
+
+          <!-- New Record Form -->
+          <div class="lg:col-span-7 glass-panel rounded-3xl p-5 sm:p-6 border border-white/15">
+            <h3 class="font-display text-lg font-bold text-white mb-4">3. Yeni Servis / Tamir / Çekici Kaydı Oluştur</h3>
+            <form id="adminRecordForm" class="space-y-4">
+              <div class="grid sm:grid-cols-3 gap-3">
+                <div>
+                  <label for="recPlate" class="block text-xs font-bold text-amber-300 mb-1">Araç Plakası *</label>
+                  <input id="recPlate" type="text" required placeholder="34 CTL 342" class="w-full uppercase font-display font-bold rounded-xl bg-slate-900 border border-amber-400/40 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+                </div>
+                <div>
+                  <label for="recVehicle" class="block text-xs font-bold text-slate-300 mb-1">Marka / Model / Yıl *</label>
+                  <input id="recVehicle" type="text" required placeholder="Renault Megane 1.5 dCi 2019" class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+                </div>
+                <div>
+                  <label for="recDate" class="block text-xs font-bold text-slate-300 mb-1">İşlem Tarihi *</label>
+                  <input id="recDate" type="date" required class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label for="recCustomer" class="block text-xs font-bold text-slate-300 mb-1">Müşteri Adı Soyadı</label>
+                  <input id="recCustomer" type="text" placeholder="Ad Soyad" class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+                </div>
+                <div>
+                  <label for="recPhone" class="block text-xs font-bold text-slate-300 mb-1">Müşteri Telefonu</label>
+                  <input id="recPhone" type="tel" placeholder="05XX XXX XX XX" class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-3 gap-3">
+                <div>
+                  <label for="recKm" class="block text-xs font-bold text-slate-300 mb-1">Güncel Kilometre (KM) *</label>
+                  <input id="recKm" type="number" required placeholder="148500" class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+                </div>
+                <div>
+                  <label for="recNextKm" class="block text-xs font-bold text-emerald-300 mb-1">Sonraki Bakım KM</label>
+                  <input id="recNextKm" type="number" placeholder="158500" class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+                </div>
+                <div>
+                  <label for="recPrice" class="block text-xs font-bold text-slate-300 mb-1">İşlem Tutarı (₺)</label>
+                  <input id="recPrice" type="number" placeholder="4500" class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:outline-none" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1.5">Hizmet Kategorisi</label>
+                <div class="flex flex-wrap gap-2">
+                  <button type="button" class="admin-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-white/15 text-xs font-semibold text-slate-300">Periyodik Bakım</button>
+                  <button type="button" class="admin-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-white/15 text-xs font-semibold text-slate-300">Motor & Mekanik</button>
+                  <button type="button" class="admin-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-white/15 text-xs font-semibold text-slate-300">Şanzıman / Baskı Balata</button>
+                  <button type="button" class="admin-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-white/15 text-xs font-semibold text-slate-300">Oto Çekici / Yol Yardım</button>
+                  <button type="button" class="admin-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-white/15 text-xs font-semibold text-slate-300">Klima & Soğutma</button>
+                  <button type="button" class="admin-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-white/15 text-xs font-semibold text-slate-300">Fren & Ön Takım</button>
+                </div>
+              </div>
+
+              <div>
+                <label for="recWorkDone" class="block text-xs font-bold text-slate-300 mb-1">Yapılan İşlemler & Değişen Parçalar *</label>
+                <textarea id="recWorkDone" rows="3" required placeholder="Örn: 5W-30 motor yağı, yağ-hava-polen filtresi değişti..." class="w-full rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-sm text-white focus:outline-none"></textarea>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <label class="inline-flex items-center gap-2 text-xs font-bold text-slate-300 cursor-pointer">
+                  <input id="recPaid" type="checkbox" checked class="w-4 h-4 accent-amber-400" />
+                  <span>Ödeme Tahsil Edildi</span>
+                </label>
+                <button type="submit" class="tactile-btn bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-extrabold px-6 py-3 rounded-xl text-sm">
+                  Araç & Servis Kaydını Kaydet
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="glass-panel rounded-3xl p-5 sm:p-6 border border-white/15 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="font-display text-lg font-bold text-white">Kayıtlı Araçlar & Yapılan İşler Defteri</h3>
+              <p class="text-xs text-slate-400">Plaka, müşteri veya işlem arayabilir; müşteriye tek tıkla WhatsApp bakım karnesi gönderebilirsiniz.</p>
+            </div>
+            <input id="adminSearchInput" type="search" placeholder="Plaka, araç veya işlem ara..." class="sm:w-72 rounded-xl bg-slate-900 border border-white/15 px-3.5 py-2.5 text-xs text-white focus:border-amber-400 focus:outline-none" />
+          </div>
+          <div id="adminRecordsList" class="space-y-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBox" class="fixed top-24 right-4 z-[90] hidden px-4 py-3 rounded-2xl bg-slate-900 border border-amber-400/50 text-xs font-bold text-amber-300 shadow-2xl"></div>
+
+  <!-- Mobile Bottom Bar -->
+  <div class="fixed bottom-0 inset-x-0 z-50 md:hidden bg-slate-950/95 backdrop-blur-xl border-t border-white/15 p-2.5 grid grid-cols-2 gap-2.5">
+    <a href="tel:+905421443425" data-tactile class="tactile-btn bg-gradient-to-r from-amber-400 to-orange-600 text-slate-950 font-extrabold text-xs py-3 rounded-xl flex items-center justify-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-red-600 beacon-dot"></span>
+      <span>Hemen Ara</span>
+    </a>
+    <a href="#hesaplayici" data-tactile class="tactile-surface bg-slate-900 border border-white/15 text-white font-bold text-xs py-3 rounded-xl flex items-center justify-center">
+      Çekici Fiyatı Hesapla
+    </a>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      function on(el, evt, fn) {
+        if (el) el.addEventListener(evt, fn);
+      }
+
+      function showToast(msg) {
+        const box = document.getElementById('toastBox');
+        if (!box) return;
+        box.textContent = msg;
+        box.classList.remove('hidden');
+        clearTimeout(window.__toastTimer);
+        window.__toastTimer = setTimeout(() => box.classList.add('hidden'), 2800);
+      }
+
+      // Tactile feedback
+      document.querySelectorAll('[data-tactile]').forEach(el => {
+        el.addEventListener('pointerdown', () => {
+          if (navigator.vibrate) navigator.vibrate(10);
+        });
+      });
+
+      // Scroll progress
+      window.addEventListener('scroll', () => {
+        const bar = document.getElementById('scrollProgress');
+        if (!bar) return;
+        const h = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+      });
+
+      // Tow Calculator
+      const pickupZone = document.getElementById('pickupZone');
+      const dropoffZone = document.getElementById('dropoffZone');
+      const distanceRange = document.getElementById('distanceRange');
+      const kmDisplay = document.getElementById('kmDisplay');
+      const priceDisplay = document.getElementById('priceDisplay');
+      const discountNote = document.getElementById('discountNote');
+      const toggleNight = document.getElementById('toggleNight');
+      const toggleWinch = document.getElementById('toggleWinch');
+      const nightBadge = document.getElementById('nightBadge');
+      const winchBadge = document.getElementById('winchBadge');
+
+      let vehicleMultiplier = 1;
+      let vehicleLabel = 'Binek Otomobil';
+      let isNight = false;
+      let hasWinch = false;
+
+      function calculateFare() {
+        if (!pickupZone || !dropoffZone || !distanceRange) return;
+        const pOpt = pickupZone.options[pickupZone.selectedIndex];
+        const dOpt = dropoffZone.options[dropoffZone.selectedIndex];
+        const baseFee = parseFloat(pOpt.dataset.base);
+        const discountFactor = parseFloat(dOpt.dataset.discount);
+        const km = parseInt(distanceRange.value, 10);
+        kmDisplay.textContent = km;
+
+        let rawTotal = (baseFee + km * 45) * vehicleMultiplier;
+        if (isNight) rawTotal *= 1.20;
+        if (hasWinch) rawTotal += 550;
+
+        const finalTotal = Math.round((rawTotal * discountFactor) / 10) * 10;
+        priceDisplay.textContent = finalTotal.toLocaleString('tr-TR') + ' ₺';
+
+        if (discountFactor < 1) {
+          discountNote.textContent = '✓ Aykut Oto Tamir servis varışlı %20 indirim uygulandı';
+          discountNote.className = 'text-[11px] font-semibold text-emerald-400 mt-1';
+        } else {
+          discountNote.textContent = '• Aykut Oto Tamir atölyemize çekimlerde %20 indirim uygulanır';
+          discountNote.className = 'text-[11px] font-semibold text-slate-400 mt-1';
+        }
+      }
+
+      function syncSuggestedDistance() {
+        const pOpt = pickupZone.options[pickupZone.selectedIndex];
+        const dOpt = dropoffZone.options[dropoffZone.selectedIndex];
+        const suggestedKm = parseInt(pOpt.dataset.km, 10) + parseInt(dOpt.dataset.extraKm, 10);
+        distanceRange.value = Math.min(120, Math.max(1, suggestedKm));
+        calculateFare();
+      }
+
+      on(pickupZone, 'change', syncSuggestedDistance);
+      on(dropoffZone, 'change', syncSuggestedDistance);
+      on(distanceRange, 'input', calculateFare);
+
+      document.querySelectorAll('#vehicleTypeGroup button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#vehicleTypeGroup button').forEach(b => b.classList.remove('active-chip'));
+          btn.classList.add('active-chip');
+          vehicleMultiplier = parseFloat(btn.dataset.mult);
+          vehicleLabel = btn.dataset.label;
+          calculateFare();
+        });
+      });
+
+      on(toggleNight, 'click', () => {
+        isNight = !isNight;
+        toggleNight.classList.toggle('active-chip', isNight);
+        nightBadge.className = isNight ? 'w-3 h-3 rounded-full bg-amber-400' : 'w-3 h-3 rounded-full bg-slate-700';
+        calculateFare();
+      });
+
+      on(toggleWinch, 'click', () => {
+        hasWinch = !hasWinch;
+        toggleWinch.classList.toggle('active-chip', hasWinch);
+        winchBadge.className = hasWinch ? 'w-3 h-3 rounded-full bg-amber-400' : 'w-3 h-3 rounded-full bg-slate-700';
+        calculateFare();
+      });
+
+      on(document.getElementById('copyQuoteBtn'), 'click', () => {
+        const text = `Aykut Oto Çekici Özeti: ${pickupZone.options[pickupZone.selectedIndex].text} -> ${dropoffZone.options[dropoffZone.selectedIndex].text} | ${vehicleLabel} | ~${distanceRange.value} km | Tutar: ${priceDisplay.textContent}`;
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('Çekici fiyat özeti panoya kopyalandı.');
+      });
+
+      on(document.getElementById('sendTowWhatsapp'), 'click', () => {
+        const pText = pickupZone.options[pickupZone.selectedIndex].text;
+        const dText = dropoffZone.options[dropoffZone.selectedIndex].text;
+        const msg = `Merhaba Aykut Oto Çekici, fiyat hesapladım:%0A• Bölge: ${pText}%0A• Varış: ${dText}%0A• Araç: ${vehicleLabel}%0A• Mesafe: ~${distanceRange.value} km%0A• Tahmini Tutar: ${priceDisplay.textContent}`;
+        window.open(`https://wa.me/905421443425?text=${msg}`, '_blank');
+      });
+
+      // GPS Location Helper
+      on(document.getElementById('detectGpsBtn'), 'click', () => {
+        const statusEl = document.getElementById('gpsStatusText');
+        if (!navigator.geolocation) {
+          statusEl.textContent = 'Tarayıcınız GPS konum desteğini desteklemiyor.';
+          return;
+        }
+        statusEl.textContent = 'GPS koordinatları alınıyor...';
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            const { latitude, longitude } = pos.coords;
+            const mapsUrl = `https://maps.google.com/?q=${latitude},${longitude}`;
+            statusEl.textContent = `Konum bulundu: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+            const msg = `Merhaba Aykut Oto Çekici, yolda kaldım. Canlı konumum: ${mapsUrl}`;
+            window.open(`https://wa.me/905421443425?text=${msg}`, '_blank');
+          },
+          () => {
+            statusEl.textContent = 'Konum izni alınamadı. Lütfen tarayıcı ayarlarından konum izni verin veya doğrudan arayın.';
+          }
+        );
+      });
+
+      // Service Request Form
+      let selectedRequestType = 'Çekici / Yol Yardım Talebi';
+      document.querySelectorAll('#requestTypeGroup button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#requestTypeGroup button').forEach(b => b.classList.remove('active-chip'));
+          btn.classList.add('active-chip');
+          selectedRequestType = btn.dataset.type;
+        });
+      });
+
+      document.querySelectorAll('.symptom-tag').forEach(tag => {
+        tag.addEventListener('click', () => tag.classList.toggle('active-chip'));
+      });
+
+      on(document.getElementById('serviceRequestForm'), 'submit', e => {
+        e.preventDefault();
+        const brand = document.getElementById('carBrand').value.trim();
+        const model = document.getElementById('carModel').value.trim();
+        const year = document.getElementById('carYear').value.trim();
+        const notes = document.getElementById('extraNotes').value.trim();
+        const tags = Array.from(document.querySelectorAll('.symptom-tag.active-chip')).map(t => t.textContent);
+        const msg = `Merhaba Aykut Oto Tamir Bakım Çekici,%0A• Talep: ${selectedRequestType}%0A• Araç: ${brand} ${model} (${year})%0A` +
+          (tags.length ? `• İşlem: ${tags.join(', ')}%0A` : '') +
+          (notes ? `• Not/Konum: ${notes}` : '');
+        window.open(`https://wa.me/905421443425?text=${msg}`, '_blank');
+      });
+
+      // ================= ADMIN / USTA PANEL & CAMERA ANPR =================
+      const STORAGE_KEY = 'aykut_oto_service_records_v1';
+      const PIN_KEY = 'aykut_oto_admin_pin_v1';
+
+      const defaultSeedRecords = [
+        {
+          id: 'rec-1',
+          plate: '34 CTL 342',
+          vehicle: 'Renault Megane 1.5 dCi (2019)',
+          customer: 'Mehmet Yılmaz',
+          phone: '0532 411 22 33',
+          date: '2026-08-14',
+          km: 138400,
+          nextKm: 148400,
+          price: 4850,
+          categories: ['Periyodik Bakım'],
+          workDone: '5W-30 sentetik motor yağı, yağ-hava-mazot-polen filtresi değişti. Bilgisayarlı arıza taraması yapıldı.',
+          paid: true
+        },
+        {
+          id: 'rec-2',
+          plate: '34 CTL 342',
+          vehicle: 'Renault Megane 1.5 dCi (2019)',
+          customer: 'Mehmet Yılmaz',
+          phone: '0532 411 22 33',
+          date: '2026-11-10',
+          km: 148200,
+          nextKm: 158200,
+          price: 7400,
+          categories: ['Periyodik Bakım', 'Fren & Ön Takım'],
+          workDone: '10.000 km yağ bakımı + ön fren balataları ve disk torna işlemi tamamlandı.',
+          paid: true
+        },
+        {
+          id: 'rec-3',
+          plate: '39 AYK 054',
+          vehicle: 'Ford Transit Courier 1.6 TDCi (2021)',
+          customer: 'Hasan Demir',
+          phone: '0544 789 10 20',
+          date: '2026-10-22',
+          km: 192500,
+          nextKm: 202500,
+          price: 11200,
+          categories: ['Şanzıman / Baskı Balata', 'Oto Çekici / Yol Yardım'],
+          workDone: 'İzzettin yolundan çekici ile atölyeye alındı. Debriyaj baskı balata ve bilya seti yenilendi.',
+          paid: true
+        }
+      ];
+
+      function getRecords() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultSeedRecords));
+            return defaultSeedRecords;
+          }
+          return JSON.parse(raw);
+        } catch (e) {
+          return defaultSeedRecords;
+        }
+      }
+
+      function saveRecords(list) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      }
+
+      function normalizePlate(raw) {
+        return (raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^(\d{2})([A-Z]{1,3})(\d{2,4})$/, '$1 $2 $3');
+      }
+
+      function extractTurkishPlate(text) {
+        const cleaned = (text || '').toUpperCase().replace(/[^A-Z0-9\s]/g, ' ');
+        const match = cleaned.match(/\b(0[1-9]|[1-7][0-9]|8[01])\s*([A-Z]{1,3})\s*(\d{2,4})\b/);
+        return match ? `${match[1]} ${match[2]} ${match[3]}` : null;
+      }
+
+      const adminModal = document.getElementById('adminModal');
+      const adminLoginScreen = document.getElementById('adminLoginScreen');
+      const adminDashboard = document.getElementById('adminDashboard');
+      const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+      const recDateInput = document.getElementById('recDate');
+      if (recDateInput) recDateInput.value = new Date().toISOString().split('T')[0];
+
+      let cameraStream = null;
+
+      function stopCamera() {
+        if (cameraStream) {
+          cameraStream.getTracks().forEach(t => t.stop());
+          cameraStream = null;
+        }
+        const vid = document.getElementById('plateCameraVideo');
+        const ph = document.getElementById('cameraPlaceholder');
+        const ret = document.getElementById('plateReticle');
+        const capBtn = document.getElementById('capturePlateBtn');
+        if (vid) vid.classList.add('hidden');
+        if (ret) ret.classList.add('hidden');
+        if (ph) ph.classList.remove('hidden');
+        if (capBtn) capBtn.disabled = true;
+      }
+
+      function openAdminModal() {
+        adminModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeAdminModal() {
+        stopCamera();
+        adminModal.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+
+      on(document.getElementById('openAdminModalBtn'), 'click', openAdminModal);
+      on(document.getElementById('footerAdminTrigger'), 'click', openAdminModal);
+      on(document.getElementById('closeAdminModalBtn'), 'click', closeAdminModal);
+
+      on(document.getElementById('adminPinForm'), 'submit', e => {
+        e.preventDefault();
+        const entered = document.getElementById('adminPinInput').value.trim();
+        const savedPin = localStorage.getItem(PIN_KEY) || '3454';
+        if (entered === savedPin || entered === '1453') {
+          document.getElementById('adminPinError').classList.add('hidden');
+          adminLoginScreen.classList.add('hidden');
+          adminDashboard.classList.remove('hidden');
+          adminLogoutBtn.classList.remove('hidden');
+          renderDashboard();
+          showToast('Usta / Admin paneline giriş yapıldı.');
+        } else {
+          document.getElementById('adminPinError').classList.remove('hidden');
+        }
+      });
+
+      on(adminLogoutBtn, 'click', () => {
+        stopCamera();
+        adminDashboard.classList.add('hidden');
+        adminLogoutBtn.classList.add('hidden');
+        adminLoginScreen.classList.remove('hidden');
+        document.getElementById('adminPinInput').value = '';
+      });
+
+      on(document.getElementById('changePinBtn'), 'click', () => {
+        document.getElementById('pinChangeBox').classList.toggle('hidden');
+      });
+
+      on(document.getElementById('saveNewPinBtn'), 'click', () => {
+        const val = document.getElementById('newPinField').value.trim();
+        if (val.length >= 4) {
+          localStorage.setItem(PIN_KEY, val);
+          document.getElementById('pinChangeBox').classList.add('hidden');
+          showToast('Yeni PIN kaydedildi.');
+        }
+      });
+
+      on(document.getElementById('exportJsonBtn'), 'click', () => {
+        const blob = new Blob([JSON.stringify(getRecords(), null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `aykut-oto-servis-yedek-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      // Category selection
+      document.querySelectorAll('.admin-cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          btn.classList.toggle('bg-amber-400');
+          btn.classList.toggle('text-slate-950');
+          btn.classList.toggle('border-amber-400');
+        });
+      });
+
+      // Vehicle History Lookup
+      window.applyDetectedPlate = function(rawPlate) {
+        const plate = normalizePlate(rawPlate);
+        const recPlate = document.getElementById('recPlate');
+        if (recPlate) recPlate.value = plate;
+
+        const records = getRecords()
+          .filter(r => normalizePlate(r.plate) === plate)
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        const badge = document.getElementById('historyVisitBadge');
+        const content = document.getElementById('vehicleHistoryContent');
+
+        if (!records.length) {
+          badge.textContent = 'Yeni Araç Kaydı';
+          badge.className = 'px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[11px] font-bold';
+          content.innerHTML = `<div class="p-3 rounded-xl bg-slate-900/90 border border-white/10"><strong>${plate}</strong> plakalı araç servis defterinde ilk kez görünüyor. Sağdaki formdan ilk kaydını oluşturabilirsiniz.</div>`;
+          return;
+        }
+
+        const latest = records[0];
+        document.getElementById('recVehicle').value = latest.vehicle || '';
+        document.getElementById('recCustomer').value = latest.customer || '';
+        document.getElementById('recPhone').value = latest.phone || '';
+
+        badge.textContent = `${records.length}. Gelişi • Kayıtlı Müşteri`;
+        badge.className = 'px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold';
+
+        const historyRows = records.map(r => `
+          <div class="p-2.5 rounded-xl bg-slate-950/80 border border-white/10 space-y-1">
+            <div class="flex justify-between font-bold text-amber-300">
+              <span>Tarih: ${r.date}</span>
+              <span>${Number(r.km).toLocaleString('tr-TR')} km</span>
+            </div>
+            <div class="text-slate-200">${r.workDone}</div>
+            ${r.nextKm ? `<div class="text-[11px] text-emerald-400">Sonraki Bakım Hedefi: ${Number(r.nextKm).toLocaleString('tr-TR')} km</div>` : ''}
+          </div>
+        `).join('');
+
+        content.innerHTML = `
+          <div class="space-y-2.5">
+            <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-400/30">
+              <div class="font-bold text-white">${plate} — ${latest.vehicle}</div>
+              <div class="text-[11px] text-amber-300 mt-0.5">En Son Geliş: <strong>${latest.date}</strong> • Son KM: <strong>${Number(latest.km).toLocaleString('tr-TR')} km</strong></div>
+            </div>
+            <div class="space-y-2 max-h-48 overflow-y-auto pr-1">${historyRows}</div>
+          </div>
+        `;
+      };
+
+      on(document.getElementById('recPlate'), 'input', e => {
+        if (e.target.value.replace(/\s/g, '').length >= 6) {
+          window.applyDetectedPlate(e.target.value);
+        }
+      });
+
+      document.querySelectorAll('.demo-plate-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          window.applyDetectedPlate(btn.dataset.demoPlate);
+          showToast(`${btn.dataset.demoPlate} plakası sorgulandı.`);
+        });
+      });
+
+      // Camera & OCR
+      on(document.getElementById('startCameraBtn'), 'click', async () => {
+        const badge = document.getElementById('ocrStatusBadge');
+        try {
+          cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'environment' } },
+            audio: false
+          });
+          const vid = document.getElementById('plateCameraVideo');
+          vid.srcObject = cameraStream;
+          vid.classList.remove('hidden');
+          document.getElementById('plateReticle').classList.remove('hidden');
+          document.getElementById('cameraPlaceholder').classList.add('hidden');
+          document.getElementById('capturePlateBtn').disabled = false;
+          badge.textContent = 'Kamera Aktif';
+        } catch (err) {
+          badge.textContent = 'Kamera İzni Yok';
+          showToast('Kamera açılamadı. "Fotoğraf Seç" ile çekip yükleyebilirsiniz.');
+        }
+      });
+
+      async function runOcrOnCanvas(canvas) {
+        const badge = document.getElementById('ocrStatusBadge');
+        badge.textContent = 'Plaka Okunuyor...';
+        try {
+          if (window.Tesseract) {
+            const result = await Tesseract.recognize(canvas, 'eng');
+            const plate = extractTurkishPlate(result.data.text);
+            if (plate) {
+              badge.textContent = `Okundu: ${plate}`;
+              window.applyDetectedPlate(plate);
+              showToast(`Plaka tanındı: ${plate}`);
+              return;
+            }
+          }
+          badge.textContent = 'Net Okunamadı';
+          showToast('Plaka net okunamadı, tekrar deneyin veya elle yazın.');
+        } catch (e) {
+          badge.textContent = 'OCR Hatası';
+        }
+      }
+
+      on(document.getElementById('capturePlateBtn'), 'click', () => {
+        const vid = document.getElementById('plateCameraVideo');
+        const canvas = document.getElementById('plateSnapCanvas');
+        if (!vid.videoWidth) return;
+        canvas.width = vid.videoWidth;
+        canvas.height = vid.videoHeight;
+        canvas.getContext('2d').drawImage(vid, 0, 0);
+        runOcrOnCanvas(canvas);
+      });
+
+      on(document.getElementById('plateImageUpload'), 'change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.getElementById('plateSnapCanvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          canvas.getContext('2d').drawImage(img, 0, 0);
+          runOcrOnCanvas(canvas);
+        };
+        img.src = URL.createObjectURL(file);
+      });
+
+      // Save New Admin Record
+      on(document.getElementById('adminRecordForm'), 'submit', e => {
+        e.preventDefault();
+        const plate = normalizePlate(document.getElementById('recPlate').value);
+        const cats = Array.from(document.querySelectorAll('.admin-cat-btn.bg-amber-400')).map(b => b.textContent);
+        const newRec = {
+          id: 'rec-' + Date.now(),
+          plate,
+          vehicle: document.getElementById('recVehicle').value.trim(),
+          customer: document.getElementById('recCustomer').value.trim(),
+          phone: document.getElementById('recPhone').value.trim(),
+          date: document.getElementById('recDate').value,
+          km: parseInt(document.getElementById('recKm').value, 10) || 0,
+          nextKm: parseInt(document.getElementById('recNextKm').value, 10) || 0,
+          price: parseFloat(document.getElementById('recPrice').value) || 0,
+          categories: cats.length ? cats : ['Genel Servis'],
+          workDone: document.getElementById('recWorkDone').value.trim(),
+          paid: document.getElementById('recPaid').checked
+        };
+
+        const list = getRecords();
+        list.unshift(newRec);
+        saveRecords(list);
+        renderDashboard();
+        window.applyDetectedPlate(plate);
+        document.getElementById('recWorkDone').value = '';
+        showToast(`${plate} servis kaydı deftere eklendi.`);
+      });
+
+      function renderDashboard() {
+        const all = getRecords();
+        const query = (document.getElementById('adminSearchInput')?.value || '').toLowerCase().trim();
+
+        const plateCounts = {};
+        all.forEach(r => {
+          const p = normalizePlate(r.plate);
+          plateCounts[p] = (plateCounts[p] || 0) + 1;
+        });
+
+        const uniqueCount = Object.keys(plateCounts).length;
+        const returningCount = Object.values(plateCounts).filter(c => c > 1).length;
+
+        document.getElementById('statUniqueVehicles').textContent = uniqueCount;
+        document.getElementById('statTotalRecords').textContent = all.length;
+        document.getElementById('statReturningCount').textContent = returningCount;
+
+        const filtered = all.filter(r =>
+          !query ||
+          r.plate.toLowerCase().includes(query) ||
+          r.vehicle.toLowerCase().includes(query) ||
+          (r.customer || '').toLowerCase().includes(query) ||
+          r.workDone.toLowerCase().includes(query)
+        );
+
+        const listEl = document.getElementById('adminRecordsList');
+        listEl.innerHTML = filtered.map(r => {
+          const visits = plateCounts[normalizePlate(r.plate)] || 1;
+          const cleanPhone = (r.phone || '').replace(/\D/g, '').replace(/^0/, '90');
+          const waText = encodeURIComponent(`Sayın ${r.customer || 'Müşterimiz'}, Aykut Oto Tamir Bakım Çekici servis bilginiz:\n• Plaka: ${r.plate}\n• Araç: ${r.vehicle}\n• Tarih / KM: ${r.date} / ${Number(r.km).toLocaleString('tr-TR')} km\n• Yapılan İşlem: ${r.workDone}` + (r.nextKm ? `\n• Sonraki Bakım KM: ${Number(r.nextKm).toLocaleString('tr-TR')} km` : ''));
+
+          return `
+            <div class="rounded-2xl bg-slate-950/80 border border-white/10 p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div class="space-y-1.5">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-2.5 py-0.5 rounded-lg bg-amber-400 text-slate-950 font-display font-bold text-xs">${r.plate}</span>
+                  <span class="font-bold text-sm text-white">${r.vehicle}</span>
+                  <span class="px-2 py-0.5 rounded-full bg-white/10 text-slate-300 text-[11px] font-semibold">${visits}. Gelişi</span>
+                  <span class="text-xs text-slate-400">• ${r.date} • <strong>${Number(r.km).toLocaleString('tr-TR')} km</strong></span>
+                </div>
+                <div class="text-xs text-slate-300">${r.workDone}</div>
+                <div class="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
+                  ${r.customer ? `<span>Müşteri: <strong class="text-slate-200">${r.customer}</strong></span>` : ''}
+                  ${r.nextKm ? `<span class="text-emerald-400">Sonraki Bakım: <strong>${Number(r.nextKm).toLocaleString('tr-TR')} km</strong></span>` : ''}
+                  ${r.price ? `<span class="text-amber-300">Tutar: <strong>${Number(r.price).toLocaleString('tr-TR')} ₺</strong></span>` : ''}
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <button type="button" onclick="window.applyDetectedPlate('${r.plate}')" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-amber-300 text-xs font-bold">
+                  Geçmişi Aç
+                </button>
+                ${cleanPhone ? `<a href="https://wa.me/${cleanPhone}?text=${waText}" target="_blank" class="px-3 py-2 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold">WhatsApp Karne</a>` : ''}
+              </div>
+            </div>
+          `;
+        }).join('') || '<div class="text-xs text-slate-400">Aramanıza uygun kayıt bulunamadı.</div>';
+      }
+
+      on(document.getElementById('adminSearchInput'), 'input', renderDashboard);
+
+      // Initial fare calculation
+      calculateFare();
+    });
+  </script>
+</body>
+</html>
