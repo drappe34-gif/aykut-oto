@@ -8,12 +8,18 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box}body{font-family:Inter,Arial,sans-serif;background:#070b14;color:#f8fafc}
+*{box-sizing:border-box}
+body{font-family:Inter,Arial,sans-serif;background:#070b14;color:#f8fafc}
 .glass{background:rgba(13,20,36,.94);border:1px solid rgba(148,163,184,.16);backdrop-filter:blur(12px)}
 .field{width:100%;background:#080e1b;border:1px solid #334155;border-radius:12px;padding:11px 13px;color:white;font-size:13px;outline:none}
-.field:focus{border-color:#06b6d4}label{display:block;font-size:12px;color:#cbd5e1;margin-bottom:6px;font-weight:600}
+.field:focus{border-color:#06b6d4}
+label{display:block;font-size:12px;color:#cbd5e1;margin-bottom:6px;font-weight:600}
 .btn{border-radius:11px;padding:10px 14px;font-size:12px;font-weight:800}
-.btn-cyan{background:#06b6d4;color:#07111c}.btn-green{background:#10b981;color:#06150f}.btn-amber{background:#f59e0b;color:#171006}.btn-red{background:#e11d48;color:white}.btn-dark{background:#1e293b;color:#e2e8f0;border:1px solid #334155}
+.btn-cyan{background:#06b6d4;color:#07111c}
+.btn-green{background:#10b981;color:#06150f}
+.btn-amber{background:#f59e0b;color:#171006}
+.btn-red{background:#e11d48;color:white}
+.btn-dark{background:#1e293b;color:#e2e8f0;border:1px solid #334155}
 .card{background:#080e1b;border:1px solid #263449;border-radius:16px;padding:15px}
 .hidden{display:none!important}
 button:disabled{opacity:.5;cursor:not-allowed}
@@ -39,7 +45,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 <main class="max-w-6xl mx-auto p-4 space-y-5">
 
-<!-- ŞOFÖR GİRİŞ -->
 <section id="driverSection" class="space-y-5">
  <div id="driverAuth" class="glass rounded-3xl p-5 max-w-2xl mx-auto space-y-5">
   <div><p class="text-xs text-cyan-400 font-bold">ŞOFÖR PORTALI</p><h2 class="text-xl font-extrabold mt-1">Şoför Girişi / Üyelik</h2></div>
@@ -61,20 +66,17 @@ button:disabled{opacity:.5;cursor:not-allowed}
   </form>
  </div>
 
- <!-- ŞOFÖR ÇALIŞMA ALANI -->
  <div id="driverWorkspace" class="hidden space-y-5">
   <div class="glass rounded-2xl p-4 flex flex-wrap justify-between items-center gap-3">
    <div><p class="text-xs text-emerald-400 font-bold">ŞOFÖR OTURUMU AÇIK</p><h2 id="driverWelcome" class="font-extrabold text-lg"></h2></div>
    <button id="driverLogout" class="btn btn-red">Çıkış Yap</button>
   </div>
 
-  <!-- YÖNETİCİDEN GELEN İŞLER -->
   <div class="glass rounded-3xl p-5 space-y-4">
    <div><p class="text-xs text-amber-400 font-bold">İŞ GÖREVLENDİRMELERİ</p><h3 class="text-lg font-extrabold">Bana Gönderilen İşler</h3></div>
    <div id="driverJobs" class="space-y-3"></div>
   </div>
 
-  <!-- SEFER GÖNDER -->
   <div class="glass rounded-3xl p-5 space-y-4">
    <div><p class="text-xs text-cyan-400 font-bold">SEFER BİLDİRİMİ</p><h3 class="text-lg font-extrabold">Yeni Sefer Bilgisi Gönder</h3></div>
    <form id="tripForm" class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -102,7 +104,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
  </div>
 </section>
 
-<!-- YÖNETİCİ -->
 <section id="adminSection" class="hidden space-y-5">
  <div id="adminLoginBox" class="glass rounded-3xl p-6 max-w-md mx-auto space-y-4">
   <p class="text-xs text-amber-400 font-bold">YÖNETİCİ GİRİŞİ</p>
@@ -123,7 +124,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
    </div>
   </div>
 
-  <!-- YÖNETİCİ ŞİFRE DEĞİŞTİRME -->
   <div class="glass rounded-3xl p-5 space-y-4">
    <div><p class="text-xs text-amber-400 font-bold">HESAP GÜVENLİĞİ</p><h3 class="text-lg font-extrabold">Yönetici Şifresini Değiştir</h3></div>
    <form id="changeAdminPasswordForm" class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -135,7 +135,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
    <p class="text-[11px] text-slate-400">Şifre değişikliği Firebase'e kaydedilir. Yönetici hesapları listesinde şifre bilgisi gösterilmez.</p>
   </div>
 
-  <!-- ŞOFÖRE İŞ GÖNDER -->
   <div class="glass rounded-3xl p-5 space-y-4">
    <div><p class="text-xs text-emerald-400 font-bold">YENİ GÖREVLENDİRME</p><h3 class="text-lg font-extrabold">Şoföre İş Gönder</h3></div>
    <form id="assignJobForm" class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -150,19 +149,16 @@ button:disabled{opacity:.5;cursor:not-allowed}
    <div><h4 class="font-bold text-sm mb-3">Gönderilen İşler</h4><div id="adminJobs" class="space-y-3"></div></div>
   </div>
 
-  <!-- ÜYELİKLER -->
   <div class="glass rounded-3xl p-5 space-y-3">
    <h3 class="text-lg font-extrabold">Şoför Üyelikleri ve Onaylar</h3>
    <div id="adminDrivers" class="space-y-3"></div>
   </div>
 
-  <!-- SEFERLER -->
   <div class="glass rounded-3xl p-5 space-y-3">
    <h3 class="text-lg font-extrabold">Şoförlerden Gelen Seferler</h3>
    <div id="adminTrips" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
   </div>
 
-  <!-- PERSONEL -->
   <div class="glass rounded-3xl p-5 space-y-4">
    <h3 class="text-lg font-extrabold">Personel / Çekici Listesi</h3>
    <form id="staffForm" class="grid grid-cols-1 md:grid-cols-5 gap-3">
@@ -176,7 +172,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
    <div id="staffList" class="space-y-3"></div>
   </div>
 
-  <!-- FİNANS -->
   <div class="glass rounded-3xl p-5 space-y-4">
    <h3 class="text-lg font-extrabold">Gelir / Gider Takibi</h3>
    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -194,7 +189,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
    <div id="financeList" class="space-y-2"></div>
   </div>
 
-  <!-- YÖNETİCİ HESAPLARI -->
   <div class="glass rounded-3xl p-5 space-y-4">
    <h3 class="text-lg font-extrabold">Yönetici Hesapları</h3>
    <form id="addAdminForm" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -211,9 +205,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <script>
 "use strict";
 
-/* -------------------------------------------------------
-   AYKUT OTO ÇEKİCİ - UYGULAMA AYARLARI
-------------------------------------------------------- */
 const DB = "https://aykut-oto-servis-default-rtdb.firebaseio.com";
 const K = {
  drivers:"aykut_cekici_driver_accounts_v3",
@@ -229,6 +220,7 @@ const DEFAULT_DRIVERS = [{
  id:"drv_demo_1",name:"Mehmet Kaya",gmail:"mehmet.kaya@gmail.com",
  password:"1234",plate:"34 AYK 01",status:"approved"
 }];
+
 const CARS = {
  "Fiat":["Egea","Egea Cross","Linea","Doblo","Fiorino","Tipo"],
  "Renault":["Clio","Megane","Taliant","Captur","Kangoo"],
@@ -251,16 +243,17 @@ const CARS = {
  "Diğer":["Binek Araç","SUV","Ticari Araç","Motosiklet"]
 };
 
-let data = {
- drivers:[],trips:[],staff:[],entries:[],admins:[],jobs:[]
-};
+let data = {drivers:[],trips:[],staff:[],entries:[],admins:[],jobs:[]};
 let activeDriver = null;
 let adminUnlocked = false;
 let selectedPhotos = [];
+let loadInProgress = false;
 
 function $(id){return document.getElementById(id)}
 function money(n){return (Number(n)||0).toLocaleString("tr-TR")+" ₺"}
-function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function safe(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))
+}
 function notify(msg){
  $("toast").textContent=msg;
  $("toast").classList.remove("hidden");
@@ -268,7 +261,7 @@ function notify(msg){
  window.toastTimer=setTimeout(()=>$("toast").classList.add("hidden"),4500);
 }
 function badge(ok,text){
- $("cloudStatus").textContent=text|| (ok?"Bulut Bağlantısı Aktif":"Firebase Hatası");
+ $("cloudStatus").textContent=text||(ok?"Bulut Bağlantısı Aktif":"Firebase Hatası");
  $("cloudStatus").className="text-[10px] px-3 py-2 rounded-full "+(ok?"bg-emerald-500/15 text-emerald-300":"bg-rose-500/15 text-rose-300");
 }
 function localRead(key,fallback){
@@ -289,40 +282,63 @@ function normalize(value){
 function keyFor(node){
  return ({drivers:K.drivers,trips:K.trips,staff:K.staff,entries:K.entries,admins:K.admins,jobs:K.jobs})[node];
 }
+
 async function cloudGet(node){
- const res=await fetch(`${DB}/${node}.json`,{cache:"no-store"});
- if(!res.ok)throw new Error("Firebase okuma hatası: HTTP "+res.status);
+ const res=await fetch(`${DB}/${keyFor(node)}.json`,{cache:"no-store"});
+ if(!res.ok)throw new Error(node+" okunamadı. HTTP "+res.status);
  const result=normalize(await res.json());
  data[node]=result;
  localWrite(keyFor(node),result);
- badge(true,"Bulut Bağlantısı Aktif");
  return result;
 }
 async function cloudSave(node,list){
  const obj={};
  list.forEach((item,i)=>{obj[item.id||`${node}_${i}`]=item});
- const res=await fetch(`${DB}/${node}.json`,{
-  method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(obj)
+ const res=await fetch(`${DB}/${keyFor(node)}.json`,{
+  method:"PUT",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify(obj)
  });
- if(!res.ok)throw new Error("Firebase kayıt hatası: HTTP "+res.status+" "+await res.text());
+ if(!res.ok)throw new Error(node+" kaydedilemedi. HTTP "+res.status+" "+await res.text());
  data[node]=list;
  localWrite(keyFor(node),list);
- badge(true,"Bulut Bağlantısı Aktif");
  return true;
 }
+
+/* DÜZELTİLDİ: Artık tanımlanmamış renderAll() çağrılmıyor. */
 async function loadAll(){
+ if(loadInProgress)return false;
+ loadInProgress=true;
+ badge(true,"Bulut verileri yükleniyor...");
  try{
-  await Promise.all(["drivers","trips","staff","entries","admins","jobs"].map(cloudGet));
+  const nodes=["drivers","trips","staff","entries","admins","jobs"];
+  const results=await Promise.allSettled(nodes.map(cloudGet));
+  const failed=results.map((r,i)=>r.status==="rejected"?nodes[i]+": "+r.reason.message:null).filter(Boolean);
+
+  if(failed.length){
+   throw new Error("Veri yükleme sorunu: "+failed.join(" | "));
+  }
+
   if(!data.admins.length){
    data.admins=DEFAULT_ADMINS;
    await cloudSave("admins",data.admins);
   }
-  renderAll();
+
+  renderDriver();
+  if(adminUnlocked)renderAdmin();
+
+  badge(true,"Bulut Bağlantısı Aktif");
+  return true;
  }catch(e){
-  console.error(e);badge(false,"Firebase Bağlantı Hatası");
+  console.error("Firebase / Uygulama Hatası:",e);
+  badge(false,"Bağlantı Hatası");
   notify(e.message);
+  return false;
+ }finally{
+  loadInProgress=false;
  }
 }
+
 function initLocal(){
  for(const node of ["drivers","trips","staff","entries","admins","jobs"]){
   data[node]=localRead(keyFor(node),node==="admins"?DEFAULT_ADMINS:node==="drivers"?DEFAULT_DRIVERS:[]);
@@ -330,9 +346,7 @@ function initLocal(){
  if(!data.admins.length)data.admins=DEFAULT_ADMINS;
 }
 
-/* -------------------------------------------------------
-   EKRAN GEÇİŞLERİ
-------------------------------------------------------- */
+/* EKRAN GEÇİŞLERİ */
 function showMode(mode){
  $("driverSection").classList.toggle("hidden",mode!=="driver");
  $("adminSection").classList.toggle("hidden",mode!=="admin");
@@ -341,6 +355,7 @@ function showMode(mode){
 }
 $("driverModeBtn").onclick=()=>showMode("driver");
 $("adminModeBtn").onclick=()=>showMode("admin");
+
 $("loginTab").onclick=()=>{
  $("driverLoginForm").classList.remove("hidden");
  $("driverRegisterForm").classList.add("hidden");
@@ -354,9 +369,7 @@ $("registerTab").onclick=()=>{
  $("registerTab").className="btn btn-green";
 };
 
-/* -------------------------------------------------------
-   ŞOFÖR ÜYELİK VE GİRİŞ
-------------------------------------------------------- */
+/* ŞOFÖR ÜYELİK VE GİRİŞ */
 $("driverRegisterForm").onsubmit=async e=>{
  e.preventDefault();
  const name=$("regName").value.trim();
@@ -401,16 +414,16 @@ $("driverLoginForm").onsubmit=async e=>{
   notify("Hoş geldiniz "+found.name);
  }catch(err){notify("Giriş yapılamadı: "+err.message)}
 };
+
 $("driverLogout").onclick=()=>{
- activeDriver=null;sessionStorage.removeItem("aykut_active_driver");
+ activeDriver=null;
+ sessionStorage.removeItem("aykut_active_driver");
  $("driverWorkspace").classList.add("hidden");
  $("driverAuth").classList.remove("hidden");
  notify("Çıkış yapıldı.");
 };
 
-/* -------------------------------------------------------
-   ARAÇ SEÇİMİ
-------------------------------------------------------- */
+/* ARAÇ SEÇİMİ */
 Object.keys(CARS).forEach(brand=>$("tripBrand").add(new Option(brand,brand)));
 $("tripBrand").onchange=()=>{
  $("tripModel").innerHTML='<option value="">Model seçin</option>';
@@ -418,17 +431,21 @@ $("tripBrand").onchange=()=>{
 };
 for(let y=2026;y>=1985;y--)$("tripYear").add(new Option(y,y));
 
-/* -------------------------------------------------------
-   ÇOKLU FOTOĞRAF SEÇİMİ
-------------------------------------------------------- */
+/* ÇOKLU FOTOĞRAF */
 $("tripPhotos").onchange=async e=>{
  selectedPhotos=[];
  $("photoPreviews").innerHTML="";
  const files=Array.from(e.target.files||[]);
- if(files.length>8){e.target.value="";return notify("Bir sefer için en fazla 8 fotoğraf seçebilirsiniz.")}
+ if(files.length>8){
+  e.target.value="";
+  return notify("Bir sefer için en fazla 8 fotoğraf seçebilirsiniz.");
+ }
  for(const file of files){
   if(!file.type.startsWith("image/"))continue;
-  if(file.size>12*1024*1024){notify(file.name+" dosyası 12 MB sınırını aşıyor.");continue}
+  if(file.size>12*1024*1024){
+   notify(file.name+" dosyası 12 MB sınırını aşıyor.");
+   continue;
+  }
   const compressed=await compressImage(file);
   if(compressed){
    selectedPhotos.push(compressed);
@@ -440,6 +457,7 @@ $("tripPhotos").onchange=async e=>{
  }
  notify(selectedPhotos.length+" fotoğraf hazır.");
 };
+
 function compressImage(file){
  return new Promise(resolve=>{
   const reader=new FileReader();
@@ -461,55 +479,68 @@ function compressImage(file){
  });
 }
 
-/* -------------------------------------------------------
-   ŞOFÖR SEFER GÖNDERİMİ
-------------------------------------------------------- */
+/* ŞOFÖR SEFER GÖNDERİMİ */
 $("tripForm").onsubmit=async e=>{
  e.preventDefault();
  if(!activeDriver)return notify("Şoför girişi yapmalısınız.");
  const trip={
-  id:"trip_"+Date.now(),driverId:activeDriver.id,driverName:activeDriver.name,
-  driverGmail:activeDriver.gmail,truckPlate:activeDriver.plate,
-  brand:$("tripBrand").value,model:$("tripModel").value,year:$("tripYear").value,
+  id:"trip_"+Date.now(),
+  driverId:activeDriver.id,
+  driverName:activeDriver.name,
+  driverGmail:activeDriver.gmail,
+  truckPlate:activeDriver.plate,
+  brand:$("tripBrand").value,
+  model:$("tripModel").value,
+  year:$("tripYear").value,
   vehiclePlate:$("tripPlate").value.trim().toUpperCase(),
   vehicleInfo:`${$("tripBrand").value} ${$("tripModel").value} ${$("tripYear").value}`,
-  pickup:$("tripPickup").value.trim(),dropoff:$("tripDropoff").value.trim(),
-  fee:Number($("tripFee").value)||0,photos:[...selectedPhotos],
-  photoData:selectedPhotos[0]||"",date:new Date().toISOString().slice(0,10),
+  pickup:$("tripPickup").value.trim(),
+  dropoff:$("tripDropoff").value.trim(),
+  fee:Number($("tripFee").value)||0,
+  photos:[...selectedPhotos],
+  photoData:selectedPhotos[0]||"",
+  date:new Date().toISOString().slice(0,10),
   createdAt:Date.now()
  };
  try{
   await cloudGet("trips");
   await cloudSave("trips",[trip,...data.trips]);
-  e.target.reset();selectedPhotos=[];$("photoPreviews").innerHTML="";
-  renderDriver();notify("Sefer ve fotoğraflar yöneticiye gönderildi.");
+  e.target.reset();
+  selectedPhotos=[];
+  $("photoPreviews").innerHTML="";
+  renderDriver();
+  notify("Sefer ve fotoğraflar yöneticiye gönderildi.");
  }catch(err){notify("Sefer gönderilemedi: "+err.message)}
 };
 
-/* -------------------------------------------------------
-   ŞOFÖRE GÖNDERİLEN İŞLER
-------------------------------------------------------- */
+/* ŞOFÖRE GÖNDERİLEN İŞLER */
 function driverJobStatus(job){
  if(job.status==="accepted")return "Kabul Edildi";
  if(job.status==="completed")return "Tamamlandı";
  if(job.status==="rejected")return "Reddedildi";
  return "Yeni İş";
 }
+
 async function updateJobStatus(id,status){
  try{
   await cloudGet("jobs");
   const updated=data.jobs.map(j=>j.id===id?{...j,status,updatedAt:Date.now()}:j);
   await cloudSave("jobs",updated);
-  renderDriver();notify("İş durumu güncellendi.");
+  renderDriver();
+  if(adminUnlocked)renderAdmin();
+  notify("İş durumu güncellendi.");
  }catch(err){notify("İşlem yapılamadı: "+err.message)}
 }
+
 function renderDriver(){
  if(!activeDriver)return;
  $("driverAuth").classList.add("hidden");
  $("driverWorkspace").classList.remove("hidden");
  $("driverWelcome").textContent=activeDriver.name+" • "+activeDriver.plate;
+
  const jobs=data.jobs.filter(j=>j.driverId===activeDriver.id||j.driverGmail===activeDriver.gmail)
  .sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+
  $("driverJobs").innerHTML=jobs.length?jobs.map(j=>`
   <div class="card space-y-2">
    <div class="flex flex-wrap justify-between gap-2"><b class="text-amber-300">${safe(j.vehicle||"Çekici Görevi")}</b><span class="text-xs rounded-full px-2 py-1 bg-slate-800">${safe(driverJobStatus(j))}</span></div>
@@ -531,22 +562,25 @@ function renderDriver(){
   </div>`).join(""):'<p class="text-sm text-slate-400">Henüz sefer göndermediniz.</p>';
 }
 
-/* -------------------------------------------------------
-   YÖNETİCİ GİRİŞ VE ŞİFRE DEĞİŞİKLİĞİ
-------------------------------------------------------- */
+/* YÖNETİCİ GİRİŞİ */
 $("adminLoginForm").onsubmit=async e=>{
  e.preventDefault();
  try{
   await cloudGet("admins");
   const password=$("adminLoginPassword").value;
-  if(!data.admins.some(a=>a.password===password)){notify("Yönetici şifresi hatalı.");return}
+  if(!data.admins.some(a=>a.password===password)){
+   notify("Yönetici şifresi hatalı.");
+   return;
+  }
   adminUnlocked=true;
   $("adminLoginPassword").value="";
   $("adminLoginBox").classList.add("hidden");
   $("adminDashboard").classList.remove("hidden");
-  renderAdmin();notify("Yönetici paneli açıldı.");
+  renderAdmin();
+  notify("Yönetici paneli açıldı.");
  }catch(err){notify("Yönetici bilgileri alınamadı: "+err.message)}
 };
+
 $("adminLogout").onclick=()=>{
  adminUnlocked=false;
  $("adminDashboard").classList.add("hidden");
@@ -554,6 +588,7 @@ $("adminLogout").onclick=()=>{
  notify("Yönetici paneli kilitlendi.");
 };
 
+/* YÖNETİCİ ŞİFRE DEĞİŞTİRME */
 $("changeAdminPasswordForm").onsubmit=async e=>{
  e.preventDefault();
  const oldPass=$("oldAdminPassword").value;
@@ -572,152 +607,192 @@ $("changeAdminPasswordForm").onsubmit=async e=>{
  }catch(err){notify("Şifre değiştirilemedi: "+err.message)}
 };
 
-/* -------------------------------------------------------
-   YÖNETİCİDEN ŞOFÖRE İŞ GÖNDERME
-------------------------------------------------------- */
+/* YÖNETİCİDEN ŞOFÖRE İŞ GÖNDERME */
 $("assignJobForm").onsubmit=async e=>{
  e.preventDefault();
  const driver=data.drivers.find(d=>d.id===$("assignDriver").value);
  if(!driver)return notify("Önce bir şoför seçin.");
  const job={
-  id:"job_"+Date.now(),driverId:driver.id,driverGmail:driver.gmail,
-  driverName:driver.name,vehicle:$("jobVehicle").value.trim(),
-  pickup:$("jobPickup").value.trim(),dropoff:$("jobDropoff").value.trim(),
-  date:$("jobDate").value,note:$("jobNote").value.trim(),
-  status:"pending",createdAt:Date.now()
+  id:"job_"+Date.now(),
+  driverId:driver.id,
+  driverGmail:driver.gmail,
+  driverName:driver.name,
+  vehicle:$("jobVehicle").value.trim(),
+  pickup:$("jobPickup").value.trim(),
+  dropoff:$("jobDropoff").value.trim(),
+  date:$("jobDate").value,
+  note:$("jobNote").value.trim(),
+  status:"pending",
+  createdAt:Date.now()
  };
  try{
   await cloudGet("jobs");
   await cloudSave("jobs",[job,...data.jobs]);
-  e.target.reset();renderAdmin();
+  e.target.reset();
+  renderAdmin();
   notify(driver.name+" isimli şoföre iş gönderildi.");
  }catch(err){notify("İş gönderilemedi: "+err.message)}
 };
+
 async function deleteJob(id){
  if(!confirm("Bu iş kaydını silmek istiyor musunuz?"))return;
  try{
   await cloudGet("jobs");
   await cloudSave("jobs",data.jobs.filter(j=>j.id!==id));
-  renderAdmin();notify("İş silindi.");
+  renderAdmin();
+  notify("İş silindi.");
  }catch(err){notify(err.message)}
 }
 
-/* -------------------------------------------------------
-   YÖNETİCİ: ÜYELİK ONAYI
-------------------------------------------------------- */
+/* ŞOFÖR ÜYELİK ONAYI */
 async function changeDriverStatus(id,status){
  try{
   await cloudGet("drivers");
   const list=data.drivers.map(d=>d.id===id?{...d,status,updatedAt:Date.now()}:d);
-  await cloudSave("drivers",list);renderAdmin();notify("Şoför durumu güncellendi.");
+  await cloudSave("drivers",list);
+  renderAdmin();
+  notify("Şoför durumu güncellendi.");
  }catch(err){notify(err.message)}
 }
+
 async function deleteDriver(id){
  if(!confirm("Şoför hesabını silmek istiyor musunuz?"))return;
  try{
   await cloudGet("drivers");
   await cloudSave("drivers",data.drivers.filter(d=>d.id!==id));
-  renderAdmin();notify("Şoför silindi.");
+  renderAdmin();
+  notify("Şoför silindi.");
  }catch(err){notify(err.message)}
 }
 
-/* -------------------------------------------------------
-   YÖNETİCİ: SEFER FOTOĞRAFLARI
-------------------------------------------------------- */
+/* SEFER FOTOĞRAFLARI */
 function renderPhotos(t){
  const photos=Array.isArray(t.photos)&&t.photos.length?t.photos:(t.photoData?[t.photoData]:[]);
  if(!photos.length)return "";
  return `<div class="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-3">${photos.map((p,i)=>`
  <img src="${p}" onclick="showLargePhoto('${t.id}',${i})" class="w-full h-24 object-cover rounded-xl border border-slate-700 cursor-pointer" alt="Sefer fotoğrafı ${i+1}">`).join("")}</div>`;
 }
+
 window.showLargePhoto=function(id,index){
  const t=data.trips.find(x=>x.id===id);
  if(!t)return;
  const photos=t.photos?.length?t.photos:(t.photoData?[t.photoData]:[]);
  if(!photos[index])return;
  const w=window.open("","_blank");
- if(w){w.document.write(`<html><head><title>Sefer Fotoğrafı</title></head><body style="margin:0;background:#070b14;display:flex;justify-content:center;align-items:center;min-height:100vh"><img src="${photos[index]}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`);w.document.close()}
+ if(w){
+  w.document.write(`<html><head><title>Sefer Fotoğrafı</title></head><body style="margin:0;background:#070b14;display:flex;justify-content:center;align-items:center;min-height:100vh"><img src="${photos[index]}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`);
+  w.document.close();
+ }
 };
+
 async function deleteTrip(id){
  if(!confirm("Sefer kaydı silinsin mi?"))return;
  try{
   await cloudGet("trips");
   await cloudSave("trips",data.trips.filter(t=>t.id!==id));
-  renderAdmin();notify("Sefer silindi.");
+  renderAdmin();
+  notify("Sefer silindi.");
  }catch(err){notify(err.message)}
 }
 
-/* -------------------------------------------------------
-   PERSONEL VE FİNANS
-------------------------------------------------------- */
+/* PERSONEL VE FİNANS */
 $("staffForm").onsubmit=async e=>{
  e.preventDefault();
  const person={
-  id:"staff_"+Date.now(),name:$("staffName").value.trim(),
-  plate:$("staffPlate").value.trim().toUpperCase(),startDate:$("staffDate").value,
-  salary:Number($("staffSalary").value)||0,insurance:Number($("staffInsurance").value)||0
+  id:"staff_"+Date.now(),
+  name:$("staffName").value.trim(),
+  plate:$("staffPlate").value.trim().toUpperCase(),
+  startDate:$("staffDate").value,
+  salary:Number($("staffSalary").value)||0,
+  insurance:Number($("staffInsurance").value)||0
  };
  try{
-  await cloudGet("staff");await cloudSave("staff",[person,...data.staff]);
-  e.target.reset();renderAdmin();notify("Personel eklendi.");
+  await cloudGet("staff");
+  await cloudSave("staff",[person,...data.staff]);
+  e.target.reset();
+  renderAdmin();
+  notify("Personel eklendi.");
  }catch(err){notify(err.message)}
 };
+
 async function deleteStaff(id){
  if(!confirm("Personel silinsin mi?"))return;
- try{await cloudGet("staff");await cloudSave("staff",data.staff.filter(s=>s.id!==id));renderAdmin();notify("Personel silindi.")}
- catch(err){notify(err.message)}
+ try{
+  await cloudGet("staff");
+  await cloudSave("staff",data.staff.filter(s=>s.id!==id));
+  renderAdmin();
+  notify("Personel silindi.");
+ }catch(err){notify(err.message)}
 }
+
 async function addFinance(type,title,amount,date){
  await cloudGet("entries");
  const item={id:"entry_"+Date.now(),type,title,amount:Number(amount),date};
  await cloudSave("entries",[item,...data.entries]);
 }
+
 $("financeForm").onsubmit=async e=>{
  e.preventDefault();
  try{
   await addFinance($("financeType").value,$("financeTitle").value.trim(),$("financeAmount").value,$("financeDate").value);
-  e.target.reset();$("financeDate").value=new Date().toISOString().slice(0,10);
-  renderAdmin();notify("Finans kaydı eklendi.");
+  e.target.reset();
+  $("financeDate").value=new Date().toISOString().slice(0,10);
+  renderAdmin();
+  notify("Finans kaydı eklendi.");
  }catch(err){notify(err.message)}
 };
+
 async function deleteFinance(id){
  if(!confirm("Finans kaydı silinsin mi?"))return;
- try{await cloudGet("entries");await cloudSave("entries",data.entries.filter(x=>x.id!==id));renderAdmin();notify("Kayıt silindi.")}
- catch(err){notify(err.message)}
+ try{
+  await cloudGet("entries");
+  await cloudSave("entries",data.entries.filter(x=>x.id!==id));
+  renderAdmin();
+  notify("Kayıt silindi.");
+ }catch(err){notify(err.message)}
 }
+
 async function salaryPayment(id,kind){
- const s=data.staff.find(x=>x.id===id);if(!s)return;
+ const s=data.staff.find(x=>x.id===id);
+ if(!s)return;
  const amount=kind==="salary"?s.salary:s.insurance;
  if(!(amount>0))return notify("Ödeme tutarı sıfırdan büyük olmalı.");
  try{
   await addFinance("expense",s.name+" - "+(kind==="salary"?"Maaş Ödemesi":"Sigorta Ödemesi"),amount,new Date().toISOString().slice(0,10));
-  renderAdmin();notify("Ödeme gideri finans listesine eklendi.");
+  renderAdmin();
+  notify("Ödeme gideri finans listesine eklendi.");
  }catch(err){notify(err.message)}
 }
 
-/* -------------------------------------------------------
-   YÖNETİCİ HESAPLARI
-------------------------------------------------------- */
+/* YÖNETİCİ HESAPLARI */
 $("addAdminForm").onsubmit=async e=>{
  e.preventDefault();
- const item={id:"adm_"+Date.now(),name:$("newAdminName").value.trim(),password:$("newAdminPass").value};
+ const item={
+  id:"adm_"+Date.now(),
+  name:$("newAdminName").value.trim(),
+  password:$("newAdminPass").value
+ };
  try{
-  await cloudGet("admins");await cloudSave("admins",[...data.admins,item]);
-  e.target.reset();renderAdmin();notify("Yönetici hesabı eklendi.");
+  await cloudGet("admins");
+  await cloudSave("admins",[...data.admins,item]);
+  e.target.reset();
+  renderAdmin();
+  notify("Yönetici hesabı eklendi.");
  }catch(err){notify(err.message)}
 };
+
 async function deleteAdmin(id){
  if(data.admins.length<=1)return notify("En az bir yönetici hesabı kalmalı.");
  if(!confirm("Yönetici hesabı silinsin mi?"))return;
  try{
-  await cloudGet("admins");await cloudSave("admins",data.admins.filter(a=>a.id!==id));
-  renderAdmin();notify("Yönetici hesabı silindi.");
+  await cloudGet("admins");
+  await cloudSave("admins",data.admins.filter(a=>a.id!==id));
+  renderAdmin();
+  notify("Yönetici hesabı silindi.");
  }catch(err){notify(err.message)}
 }
 
-/* -------------------------------------------------------
-   YÖNETİCİ EKRANI
-------------------------------------------------------- */
+/* YÖNETİCİ EKRANI */
 function renderAdmin(){
  if(!adminUnlocked)return;
  $("adminLoginBox").classList.add("hidden");
@@ -766,17 +841,20 @@ function renderAdmin(){
 
  let income=data.trips.reduce((a,t)=>a+(Number(t.fee)||0),0);
  let expense=0;
- data.entries.forEach(x=>{if(x.type==="income")income+=Number(x.amount)||0;else expense+=Number(x.amount)||0});
+ data.entries.forEach(x=>{
+  if(x.type==="income")income+=Number(x.amount)||0;
+  else expense+=Number(x.amount)||0;
+ });
  $("totalIncome").textContent=money(income);
  $("totalExpense").textContent=money(expense);
  $("totalNet").textContent=money(income-expense);
+
  $("financeList").innerHTML=data.entries.length?data.entries.map(x=>`
  <div class="card flex justify-between items-center gap-3">
   <div><b class="text-sm">${safe(x.title)}</b><p class="text-xs text-slate-400">${safe(x.date)}</p></div>
   <div class="flex items-center gap-3"><b class="${x.type==="income"?"text-emerald-400":"text-rose-400"}">${x.type==="income"?"+":"-"}${money(x.amount)}</b><button class="text-xs text-rose-400" onclick="deleteFinance('${x.id}')">Sil</button></div>
  </div>`).join(""):'<p class="text-sm text-slate-400">Finans kaydı yok.</p>';
 
- // Güvenlik: Şifreler burada kesinlikle gösterilmez.
  $("adminAccountsList").innerHTML=data.admins.map(a=>`
  <div class="card flex justify-between items-center gap-3">
   <div><b>${safe(a.name)}</b><p class="text-xs text-slate-400">Şifre: •••••••• (Gizli)</p></div>
@@ -784,12 +862,10 @@ function renderAdmin(){
  </div>`).join("");
 }
 
-/* -------------------------------------------------------
-   GENEL YENİLEME
-------------------------------------------------------- */
+/* GENEL YENİLEME */
 $("syncBtn").onclick=async()=>{
- try{await loadAll();notify("Veriler yenilendi.");}
- catch(err){notify(err.message)}
+ const ok=await loadAll();
+ if(ok)notify("Veriler başarıyla yenilendi.");
 };
 
 window.changeDriverStatus=changeDriverStatus;
@@ -806,14 +882,23 @@ $("financeDate").value=new Date().toISOString().slice(0,10);
 $("jobDate").value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
 
 initLocal();
+
 try{
  const saved=JSON.parse(sessionStorage.getItem("aykut_active_driver")||"null");
- if(saved){activeDriver=saved;$("driverAuth").classList.add("hidden");$("driverWorkspace").classList.remove("hidden")}
+ if(saved){
+  activeDriver=saved;
+  $("driverAuth").classList.add("hidden");
+  $("driverWorkspace").classList.remove("hidden");
+ }
 }catch(e){}
+
 showMode("driver");
 renderDriver();
 loadAll();
-setInterval(()=>{if(!document.hidden)loadAll()},30000);
+
+setInterval(()=>{
+ if(!document.hidden)loadAll();
+},30000);
 </script>
 </body>
 </html>
